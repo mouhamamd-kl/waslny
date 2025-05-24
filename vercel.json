@@ -58,10 +58,10 @@
 
         "MEMCACHED_HOST": "127.0.0.1",
 
-        "REDIS_CLIENT":"phpredis",
-        "REDIS_HOST":"tls://gusc1-direct-stinkbug-31708.upstash.io",
-        "REDIS_PORT":"31708",
-        "REDIS_PASSWORD":"********",
+        "REDIS_CLIENT": "phpredis",
+        "REDIS_HOST": "127.0.0.1",
+        "REDIS_PASSWORD": "null",
+        "REDIS_PORT": "6379",
 
         "MAIL_MAILER": "smtp",
         "MAIL_HOST": "smtp.gmail.com",
