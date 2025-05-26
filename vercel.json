@@ -50,7 +50,6 @@
         "DB_PASSWORD": "SswRGLfMbr9Cfc5",
 
         "BROADCAST_CONNECTION": "pusher",
-        "FILESYSTEM_DISK": "local",
         "QUEUE_CONNECTION": "database",
 
         "CACHE_STORE": "database",
@@ -58,10 +57,9 @@
 
         "MEMCACHED_HOST": "127.0.0.1",
 
-        "REDIS_CLIENT": "phpredis",
-        "REDIS_HOST": "127.0.0.1",
-        "REDIS_PASSWORD": "null",
-        "REDIS_PORT": "6379",
+        "REDIS_HOST": "tls://gusc1-direct-stinkbug-31708.upstash.io",
+        "REDIS_PORT": "31708",
+        "REDIS_PASSWORD": "0b009fecf109404aa1f47ab52d432614",
 
         "MAIL_MAILER": "smtp",
         "MAIL_HOST": "smtp.gmail.com",
@@ -75,14 +73,18 @@
         "TELEGRAM_API_TOKEN": "AAHhBwAANUrvsM50I_x0QO3rhu3mTRGo1bPjEBgev9hD4A",
         "TELEGRAM_BOT_TOKEN": "8021940964:AAFT9yoTuoXs-C4CS9C9BdBacQu9dJPSn00",
 
-        "AWS_ACCESS_KEY_ID": "",
-        "AWS_SECRET_ACCESS_KEY": "",
-        "AWS_DEFAULT_REGION": "us-east-1",
-        "AWS_BUCKET": "",
-        "AWS_USE_PATH_STYLE_ENDPOINT": "false",
+        "FILESYSTEM_DISK":"supabase",
+        "AWS_ACCESS_KEY_ID":"9cec04e49e90ee5501478e710b383dd6",
+        "AWS_SECRET_ACCESS_KEY":"f7827fd2cb7826a8b0af7290bb44df391b253e26446390edf3cc44b71d9fb6ba",
+        "AWS_DEFAULT_REGION":"us-east-2",
+        "AWS_BUCKET":"waslny",
+        "AWS_ENDPOINT":"https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/s3/waslny",
+        "AWS_USE_PATH_STYLE_ENDPOINT":"true",
+        
+        "SUPABASE_PROJECT_ID":"cqrlbirnwzidgerehsdq",
+        "SUPABASE_STORAGE_BUCKET":"waslny",
 
         "VITE_APP_NAME": "${APP_NAME}",
-
 
         "PUSHER_APP_ID": "1997648",
         "PUSHER_APP_KEY": "23f5014c5ebc75d0acfb",

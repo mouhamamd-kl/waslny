@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+
+    'supabase' => [
+        'project_id' => env('SUPABASE_PROJECT_ID'),
+        'bucket' => env('SUPABASE_STORAGE_BUCKET'),
+    ],
 ];
