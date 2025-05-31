@@ -3,67 +3,117 @@
 
 namespace App\Services;
 
+use Exception;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use RuntimeException;
 use Illuminate\Support\Str;
+use phpDocumentor\Reflection\Types\Boolean;
+use PhpParser\Node\Expr\Throw_;
 
 class AwsFileService
 {
     public function upload(
         UploadedFile $file,
-        string $pathPrefix = 'AlSinwar',
-        string $disk = 'supabase'
+        string $pathPrefix = '',
+        Bool $public = true,
     ): string {
-        // Store the file with public visibility
+        if ($public) {
+            /** @var storage $storage */
+            $storage = Storage::disk('supabase');
 
-        $path = $file->store($pathPrefix, [
-            'disk' => $disk,
-            'visibility' => 'public' // Ensure file is publicly accessible
-        ]);
-        // Use the helper function to get public URL
-        return $path;
-        return supabase_public_url($path);
-
-        // $path =  Storage::disk('s3')->put($pathPrefix, $file);
-        // return supabase_public_url($path);
+            $filepath = Storage::disk('supabase')->put('', $file);
+            $url = $storage->url($filepath);
+            return $url;
+        } else {
+            /** @var storage $storage */
+            $storage = Storage::disk('supabase_private');
+            $filepath = $storage->put('', $file);
+            $signedUrl = $storage
+                ->temporaryUrl(
+                    $filepath,
+                    now()->addMinutes(10)
+                );
+            return $signedUrl;
+        }
     }
-    private function generateSafeFileName(UploadedFile $file): string
+
+
+
+    public function delete(string $filePath, string $disk = 'supabase'): bool
     {
-        $originalName = pathinfo(
-            $file->getClientOriginalName(),
-            PATHINFO_FILENAME
-        );
+        try {
+            if (empty($filePath)) {
+                Log::warning('Attempted to delete file with empty filePath');
 
-        $sanitized = preg_replace('/[^a-zA-Z0-9\-_]/', '', $originalName);
-        $sanitized = $sanitized ?: 'file';
+                return false;
+            }
 
-        return Str::slug($sanitized)
-            . '-' . uniqid()
-            . '.' . $file->extension();
+            /** @var FilesystemAdapter $storage */
+            $storage = Storage::disk($disk);
+
+            if (! $storage->exists($filePath)) {
+                Log::warning("File not found for deletion: {$filePath} on disk: {$disk}");
+
+                return true; // Consider non-existent files as successfully deleted
+            }
+
+            return $storage->delete($filePath);
+        } catch (\Exception $e) {
+            Log::error("S3 Delete Error: {$e->getMessage()}", [
+                'filePath' => $filePath,
+                'disk' => $disk,
+                'exception' => $e,
+            ]);
+
+            return false;
+        }
     }
 
-    private function buildFullPath(string $prefix, string $fileName): string
-    {
-        $prefix = trim($prefix, '/');
-        return $prefix ? "$prefix/$fileName" : $fileName;
-    }
-    
-    public function delete(string $filePath, string $disk = 's3'): bool
-    {
-        return Storage::disk($disk)->delete($filePath);
-    }
-
-    public function exists(string $filePath, string $disk = 's3'): bool
+    public function exists(string $filePath, string $disk = 'supabase'): bool
     {
         return Storage::disk($disk)->exists($filePath);
     }
 
-    public function getUrl(string $filePath, string $disk = 's3'): string
+    public function getUrl(string $filePath, string $disk = 'supabase'): string
     {
-        $disk = Storage::disk($disk);
-        $url = $disk->url($filePath);
-        return $url;
+        if (empty(trim($filePath))) {
+            throw new \InvalidArgumentException('File path cannot be empty');
+        }
+
+        if (!array_key_exists($disk, config('filesystems.disks'))) {
+            throw new \RuntimeException("Disk [$disk] not configured");
+        }
+        /** @var storage $storage */
+
+        $storage = Storage::disk($disk);
+
+        try {
+            // 4. Check file existence (optional - adds overhead)
+            if (!$storage->exists($filePath)) {
+                throw new FileNotFoundException("File [$filePath] not found in disk [$disk]");
+            }
+
+            // 5. Generate URL
+            $url = $storage->url($filePath);
+
+            // 6. Validate URL format
+            if (!filter_var($url, FILTER_VALIDATE_URL)) {
+                throw new \RuntimeException("Generated URL is invalid: $url");
+            }
+
+            return $url;
+        } catch (\Exception $e) {
+            // Log detailed error for debugging
+            Log::error("Failed to generate URL for [$filePath]: " . $e->getMessage());
+            throw $e; // Re-throw or return default/error URL as needed
+        }
+
+
+        // $url = $disk->url($filePath);
+        // return $url;
     }
 }

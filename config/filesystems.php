@@ -1,5 +1,7 @@
 <?php
 
+use App\Constants\DiskNames;
+
 return [
 
     /*
@@ -61,18 +63,99 @@ return [
             'public' => true,  // Default to true
 
         ],
-        'supabase' => [
+        DiskNames::SUBAPASEPUBLIC->name => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
-            'public' => true,  // Default to true
+            'region' => 'auto',
+            'bucket' => env('AWS_BUCKET_PUBLIC'),
+            'url' => env('AWS_URL_PUBLIC'),
+            'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
+            'visibility' => 'public', // If you want files publicly accessible
+        ],
+        DiskNames::DRIVERS_PROFILE->name => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => 'auto',
+            'bucket' => env('AWS_BUCKET_PUBLIC'),
+            'url' => env('AWS_URL_PUBLIC'),
+            'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
+            'visibility' => 'public', // If you want files publicly accessible
+            'root' => DiskNames::DRIVERS_PROFILE->value,
+        ],
+        DiskNames::DRIVERS_PROFILE->name => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => 'auto',
+            'bucket' => env('AWS_BUCKET_PUBLIC'),
+            'url' => env('AWS_URL_PUBLIC'),
+            'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
+            'visibility' => 'public', // If you want files publicly accessible
+            'root' => DiskNames::DRIVERS_PROFILE->value,
+        ],
+        DiskNames::DRIVERS_LICENSE->name => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => 'auto',
+            'bucket' => env('AWS_BUCKET_PUBLIC'),
+            'url' => env('AWS_URL_PUBLIC'),
+            'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
+            'visibility' => 'public', // If you want files publicly accessible
+            'root' => DiskNames::DRIVERS_LICENSE->value,
+        ],
+        DiskNames::DRIVERS_CAR_PHOTOS->name => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => 'auto',
+            'bucket' => env('AWS_BUCKET_PUBLIC'),
+            'url' => env('AWS_URL_PUBLIC'),
+            'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
+            'visibility' => 'public', // If you want files publicly accessible
+            'root' => DiskNames::DRIVERS_CAR_PHOTOS->value,
+        ],
+        DiskNames::SYSTEM->name => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => 'auto',
+            'bucket' => env('AWS_BUCKET_PUBLIC'),
+            'url' => env('AWS_URL_PUBLIC'),
+            'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
+            'visibility' => 'public', // If you want files publicly accessible
+            'root' => DiskNames::SYSTEM->value, // Dedicated folder for agents
+
+        ],
+        // 'supabase_private' => [
+        //     'driver' => 's3',
+        //     'key' => env('AWS_ACCESS_KEY_ID'),
+        //     'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        //     'region' => env('AWS_DEFAULT_REGION'),
+        //     'bucket' => env('AWS_BUCKET_PRIVATE'),
+        //     'endpoint' => env('AWS_ENDPOINT_PRIVATE'),
+        //     'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+        //     'public' => false,  // Default to true
+        // ],
+        DiskNames::SUPABASEPRIVATE->name => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'), // Use your service role key here
+            'region' => 'auto',
+            'bucket' => env('AWS_BUCKET_PRIVATE'),
+            'endpoint' =>  env('AWS_ENDPOINT_PRIVATE'),
+            'use_path_style_endpoint' =>  env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+            'visibility' => 'private',
         ],
 
-        
     ],
 
     /*

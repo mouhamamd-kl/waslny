@@ -37,7 +37,11 @@ return [
 
 
     'supabase' => [
+        'service_role_key' => env('SUPABASE_SERVICE_ROLE_KEY'),
+        'public_disk' => env('AWS_DISK_PUBLIC'),
+        'private_disk' => env('AWS_DISK_PRIVATE'),
         'project_id' => env('SUPABASE_PROJECT_ID'),
-        'bucket' => env('SUPABASE_STORAGE_BUCKET'),
+        'public_bucket' => env('AWS_BUCKET_PUBLIC'),
+        'private_bucket' => env('AWS_BUCKET_PRIVATE'),
     ],
 ];

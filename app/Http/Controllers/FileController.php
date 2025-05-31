@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use App\Services\AwsFileService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class FileController extends Controller
@@ -33,6 +35,8 @@ class FileController extends Controller
         try {
             $url = $this->fileService->upload(
                 $request->file('file'),
+                '',
+                true
                 // $request->input('path_prefix')
             );
 
@@ -40,7 +44,6 @@ class FileController extends Controller
                 'url' => $url,
                 'message' => 'File uploaded successfully'
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'File upload failed: ' . $e->getMessage()
@@ -49,38 +52,40 @@ class FileController extends Controller
     }
 
     /**
-     * Delete file from storage
+     * Delete a file with proper error handling
      */
-    public function delete(Request $request): JsonResponse
+    public function deleteFile(string $path = 'waslny/Frame%2011.png', string $disk = 'supabase'): bool
     {
-        $validator = Validator::make($request->all(), [
-            'file_path' => 'required|string'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => $validator->errors()->first()
-            ], 422);
-        }
 
         try {
-            $deleted = $this->fileService->delete(
-                $request->input('file_path')
-            );
+            if (empty($path)) {
+                Log::warning('Attempted to delete file with empty path');
 
-            return $deleted
-                ? response()->json(['message' => 'File deleted successfully'])
-                : response()->json(['error' => 'File not found'], 404);
+                return false;
+            }
 
+            /** @var FilesystemAdapter $storage */
+            $storage = Storage::disk($disk);
+
+            if (! $storage->exists($path)) {
+                Log::warning("File not found for deletion: {$path} on disk: {$disk}");
+                dd($storage->exists($path));
+                return true; // Consider non-existent files as successfully deleted
+            }
+
+            return $storage->delete($path);
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'File deletion failed: ' . $e->getMessage()
-            ], 500);
+            Log::error("S3 Delete Error: {$e->getMessage()}", [
+                'path' => $path,
+                'disk' => $disk,
+                'exception' => $e,
+            ]);
+
+            return false;
         }
     }
 
-
-        /**
+    /**
      * Check if the file from storage exists
      */
     public function exists(Request $request): JsonResponse
@@ -98,12 +103,12 @@ class FileController extends Controller
         try {
             $exists = $this->fileService->exists(
                 $request->input('file_path')
+                // 'Untitled'
             );
 
             return $exists
                 ? response()->json(['message' => 'File exsits '])
                 : response()->json(['error' => 'File not found'], 404);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'File Exists Check Failed: ' . $e->getMessage()
