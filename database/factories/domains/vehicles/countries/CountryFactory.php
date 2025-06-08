@@ -16,8 +16,35 @@ class CountryFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            //
+        $carProducingCountries = [
+            'Japan',
+            'United States',
+            'South Korea',
+            'China',
+            'Italy',
+            'France',
+            'United Kingdom',
+            'Sweden',
+            'Czech Republic',
+            'Spain',
+            'Mexico',
+            'Canada',
+            'Brazil'
         ];
+
+        return [
+            'name' => $this->faker->unique()->randomElement($carProducingCountries),
+            'is_active' => $this->faker->boolean(90), // 90% chance active
+        ];
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn() => ['is_active' => true]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn() => ['is_active' => false]);
     }
 }
