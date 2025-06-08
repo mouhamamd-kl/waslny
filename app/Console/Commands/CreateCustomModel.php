@@ -28,13 +28,16 @@ class CreateCustomModel extends Command
         if ($options != []) {
             $domain = $this->choice('Select domain', [
                 'default',
+                'custom',
                 'coupons',
                 'payments',
                 'trips',
                 'users',
                 'vehicles'
             ]);
-
+            if ($domain == 'custom') {
+                $domain = $this->ask('Enter Domain');
+            }
             if ($domain == 'default') {
                 $this->call('make:model', [
                     'name' => $model,
@@ -90,8 +93,8 @@ class CreateCustomModel extends Command
         // $path = database_path("../migrations/domains/{$domain}/{$folderName}");
         // $this->createDirIfNeeded($path);
         $this->call('make:migration', [
-            'name' => "\create_.".$folderName."_table",
-            '--path' => "database\migrations\domains\\".$domain."\\". $folderName,
+            'name' => "create_" . $folderName . "_table",
+            '--path' => "database\migrations\domains\\" . $domain . "\\" . $folderName,
             // '--create' => $folderName,
             // '--fullpath' => ("../domains/{$domain}/{$folderName}/")
         ]);
