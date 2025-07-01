@@ -2,64 +2,137 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApiResponse;
+use App\Http\Requests\RiderSavedLocationRequest;
+use App\Http\Resources\RiderSavedLocationResource;
 use App\Models\RiderSavedLocation;
+use App\Services\RiderSavedLocationService;
+use Exception;
 use Illuminate\Http\Request;
 
 class RiderSavedLocationController extends Controller
 {
+    protected $rider_saved_location_service;
+
+    public function __construct(RiderSavedLocationService $rider_saved_location_service)
+    {
+        $this->rider_saved_location_service = $rider_saved_location_service;
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        try {
+            $rider_saved_locations = $this->rider_saved_location_service->searchRiderFolders(
+                $request->input('filters', []),
+                $request->input('perPage', 5)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $rider_saved_locations,
+                RiderSavedLocationResource::class,
+                trans_fallback('messages.rider_saved_location.list', 'Rider Location Folder retrieved successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function search(Request $request)
+    {
+        try {
+            $filters = $request->only([
+                'name',
+                'is_active',
+            ]);
+            $rider_saved_locations = $this->rider_saved_location_service->searchRiderFolders(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
+
+            return ApiResponse::sendResponsePaginated(
+                $rider_saved_locations,
+                RiderSavedLocationResource::class, // Add your resource class
+                trans_fallback('messages.rider_saved_location.list', 'Rider Location Folder retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function store(RiderSavedLocationRequest $request)
     {
-        //
+        try {
+            $data = $request->validate();
+            $rider_saved_location = $this->rider_saved_location_service->create($data);
+            return ApiResponse::sendResponseSuccess(
+                $rider_saved_location,
+                RiderSavedLocationResource::class,
+                trans_fallback('messages.rider_saved_location.created', 'Rider Location Folder retrieved successfully'),
+                201
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'rider_saved_location Creation Failed') . $e->getMessage());
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
      */
-    public function show(RiderSavedLocation $riderSavedLocation)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(RiderSavedLocation $riderSavedLocation)
-    {
-        //
+        try {
+            $rider_saved_location = $this->rider_saved_location_service->findById($id);
+            return ApiResponse::sendResponseSuccess(data: new RiderSavedLocationResource($rider_saved_location), message: trans_fallback('messages.rider_saved_location.retrieved', 'rider_saved_location Retrived Successfully'));
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider Saved Location not found'), 404);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, RiderSavedLocation $riderSavedLocation)
+    public function update(RiderSavedLocationRequest $request, string $id)
     {
-        //
+        try {
+            $rider_saved_location = $this->rider_saved_location_service->update((int) $id, $request->validated());
+            return ApiResponse::sendResponseSuccess(
+                new RiderSavedLocationResource($rider_saved_location),
+                trans_fallback('messages.rider_saved_location.updated', 'Rider Saved Location updated successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.update_failed', 'Update failed: ' . $e->getMessage())
+            );
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RiderSavedLocation $riderSavedLocation)
+    public function destroy($id)
     {
-        //
+        try {
+            $this->rider_saved_location_service->delete((int) $id);
+            return ApiResponse::sendResponseSuccess(
+                message: trans_fallback('messages.rider_saved_location.deleted', 'Rider Saved Location updated successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.delete_failed', 'Delete failed: ' . $e->getMessage())
+            );
+        }
     }
 }

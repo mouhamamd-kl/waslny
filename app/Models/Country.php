@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\General\ActiveScope;
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Country extends Model
 {
-    use HasFactory;
+    use HasFactory,FilterScope,ActiveScope;
 
     // =================
     // Configuration
@@ -34,11 +36,6 @@ class Country extends Model
     // =================
     // Scopes
     // =================
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->where('is_active', true);
-    }
-
     public function scopePopular(Builder $query): Builder
     {
         return $query->withCount('manufacturers')

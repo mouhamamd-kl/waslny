@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->foreignIdFor(Rider::class)->onDelete('cascade');
             $table->timestamps();
+            $table->unique(['rider_id', 'name']);
         });
     }
 

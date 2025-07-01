@@ -17,7 +17,8 @@
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "3.0",
         "opcodesio/log-viewer": "^3.17",
-        "pusher/pusher-php-server": "*"
+        "pusher/pusher-php-server": "*",
+        "spatie/laravel-translatable": "^6.11"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",
@@ -33,7 +34,8 @@
     "autoload": {
         "files": [
             "app/Helpers/StorageHelper.php",
-            "app/Helpers/GeneralHelper.php"
+            "app/Helpers/GeneralHelper.php",
+            "app/Helpers/TranslationHelpers.php"
         ],
         "psr-4": {
             "App\\": "app/",

@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('code', length: 20);
             $table->bigInteger('max_uses'); // Maximum allowed uses
-            $table->double('amount');
+            $table->bigInteger('used_count'); // Maximum allowed uses
+            $table->double('percent');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

@@ -2,12 +2,26 @@
 
 namespace App\Models;
 
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+enum TripStatus: string
+{
+    case Pending = 'pending';
+    case Completed = 'completed';
+    case OnGoing = 'on_going'; // Underscore instead of space
+    case Cancelled = 'cancelled';
+
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
+}
 class TripStatus extends Model
 {
+    use FilterScope;
     // =================
     // Configuration
     // =================
@@ -28,7 +42,7 @@ class TripStatus extends Model
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => ucfirst($value), // Example: Format status name
+            get: fn(string $value) => ucfirst($value), // Example: Format status name
         );
     }
 

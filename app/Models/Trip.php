@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,7 @@ use Illuminate\Support\Carbon;
 
 class Trip extends Model
 {
+    use FilterScope;
     /**
      * Configuration
      */
@@ -38,6 +40,10 @@ class Trip extends Model
     public function type(): BelongsTo
     {
         return $this->belongsTo(TripType::class, 'trip_type_id');
+    }
+    public function timeType(): BelongsTo
+    {
+        return $this->belongsTo(TripTimeType::class, 'trip_time_type_id');
     }
 
     public function riderCoupon(): BelongsTo
@@ -88,22 +94,6 @@ class Trip extends Model
     /**
      * Scopes
      */
-
-    public function scopeFilter($query, array $filters)
-    {
-        foreach ($filters as $field => $value) {
-            if ($value !== null && is_array($value)) {
-                $query->where($field, $value);
-            }
-            // Handle array values (new)
-            else {
-                $query->whereIn($field, $value);  // WHERE IN (...)
-            }
-        }
-
-        return $query;
-    }
-    
     public function scopeCompleted($query)
     {
         return $query->whereNotNull('end_time');

@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Http\Controllers\Driver\Auth;
+
+use App\Enums\SuspensionReason;
+use App\Helpers\ApiResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\DriverResource;
+use App\Http\Resources\RiderResource;
+use App\Models\Agent;
+use App\Models\Driver;
+use App\Models\Rider;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash; // Add this at the top
+use Illuminate\Support\Facades\Validator;
+
+class DriverTwoFactorController extends Controller
+{
+    public function verify(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required',
+            'otp' => 'required|digits:6',
+        ]);
+        /** @var Driver $driver */ // Add PHPDoc type hint
+
+        $driver = Driver::where('driver', $request->phone)->first();
+
+        if (
+            ! $driver ||
+            $driver->two_factor_code !== $request->otp ||
+            $driver->two_factor_expires_at->lt(now())
+        ) {
+            return ApiResponse::sendResponseError('Invalid or expired code.', 403);
+        }
+        // Clear OTP after successful verification
+
+        if ($driver->isSuspended()) {
+            // Get the specific suspension message
+            $suspensionReason = SuspensionReason::tryFrom($driver->suspension_reason)
+                ?? SuspensionReason::OTHER;
+
+            return ApiResponse::sendResponseError(
+                message: $suspensionReason->message(),
+                statusCode: 403, // Forbidden
+                data: [
+                    'suspension_reason' => $driver->suspension_reason,
+                    'suspended_at' => $driver->suspended_at?->toDateTimeString(),
+                ]
+            );
+        }
+        $driver->resetTwoFactorCode();
+        // Generate authentication token
+        $token = $driver->createToken('riderAuthToken')->plainTextToken;
+        // Determine response based on profile completion
+        return $driver->isProfileComplete()
+            ? ApiResponse::sendResponseSuccess(
+                data: [
+                    'token' => $token,
+                    'is_new_driver' => false,
+                    'driver' => new DriverResource($driver)
+                ],
+                message: 'Login successful'
+            )
+            : ApiResponse::sendResponseSuccess(
+                data: [
+                    'token' => $token,
+                    'is_new_driver' => true
+                ],
+                message: 'Profile setup required',
+            );
+    }
+
+    public function resend(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'phone' => ['required', 'string',],
+        ], [], [
+            'phone' => __('lang.phone'),
+        ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
+        }
+
+        $driver = Driver::where('phone', $request->phone)->first();
+        $driver->generateTwoFactorCode();
+        // $rider->notify(new \App\Notifications\Agent\AgentTwoFactorCode);
+        return ApiResponse::sendResponseSuccess(
+            ['message' => 'A new verification code has been sent to your email.'],
+            'OTP code resent successfully.'
+        );
+    }
+}

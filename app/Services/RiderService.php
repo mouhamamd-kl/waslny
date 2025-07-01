@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\SuspensionReason;
+use Illuminate\Support\Str;  // Add this line
+use App\Helpers\CacheHelper;
+use App\Models\Rider;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+class RiderService extends BaseService
+{
+    public function __construct(CacheHelper $cache)
+    {
+        parent::__construct(new Rider, $cache);
+    }
+    public function searchRiders(
+        array $filters = [],
+        int $perPage = 10
+    ): LengthAwarePaginator {
+        return $this->toggleCache(config('app.enable_caching'))
+            ->paginatedList(
+                $filters,
+                [], // relations if any
+                $perPage,
+                ['*'],
+                [] // <-- Here is your withCount
+            );
+    }
+
+    public function deleteAssets($riderId)
+    {
+        try {
+            /** @var Rider $rider */ // Add PHPDoc type hint
+            $rider = $this->findById($riderId);
+            $assetService = FileServiceFactory::makeForRiderProfile();
+            $assetService->delete($rider->profile_photo);
+        } catch (Exception $e) {
+            throw new Exception('error deleting assets for rider' . $e);
+        }
+    }
+
+    public function suspend($riderId, SuspensionReason $suspension_reason)
+    {
+        try {
+            /** @var Rider $rider */ // Add PHPDoc type hint
+            $rider = $this->findById($riderId);
+            $rider->suspend($suspension_reason);
+        } catch (Exception $e) {
+            throw new Exception('error suspending for rider' . $e);
+        }
+    }
+
+    public function activate($riderId)
+    {
+        try {
+            /** @var Rider $rider */ // Add PHPDoc type hint
+            $rider = $this->findById($riderId);
+            $rider->reinstate();
+        } catch (Exception $e) {
+            throw new Exception('error activating for rider' . $e);
+        }
+    }
+}

@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\General\FilterScope;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
 class TripLocation extends Model
 {
-
+    use FilterScope;
     /**
      * Configuration
      */
@@ -51,20 +53,6 @@ class TripLocation extends Model
     /**
      * Scopes
      */
-    public function scopeFilter($query, array $filters)
-    {
-        foreach ($filters as $field => $value) {
-            if ($value !== null && is_array($value)) {
-                $query->where($field, $value);
-            }
-            // Handle array values (new)
-            else {
-                $query->whereIn($field, $value);  // WHERE IN (...)
-            }
-        }
-
-        return $query;
-    }
     public function scopeCompleted($query)
     {
         return $query->where('is_completed', true);

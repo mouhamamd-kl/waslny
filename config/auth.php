@@ -40,6 +40,18 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'rider-api' => [
+            'driver' => 'sanctum',
+            'provider' => 'riders',
+        ],
+        'driver-api' => [
+            'driver' => 'sanctum',
+            'provider' => 'drivers',
+        ],
+        'admin-api' => [
+            'driver' => 'sanctum',
+            'provider' => 'admins',
+        ],
     ],
 
     /*
@@ -64,7 +76,18 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-
+        'rider-api' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\Rider::class),
+        ],
+        'driver-api' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\Driver::class),
+        ],
+         'admin-api' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\Admin::class),
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

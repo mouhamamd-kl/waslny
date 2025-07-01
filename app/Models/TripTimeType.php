@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class TripTimeType extends Model
 {
-    use HasFactory;
+    use HasFactory, FilterScope;
 
     /**
      * Configuration
@@ -41,21 +42,6 @@ class TripTimeType extends Model
     /**
      * Scopes
      */
-    public function scopeFilter($query, array $filters)
-    {
-        foreach ($filters as $field => $value) {
-            if ($value !== null && is_array($value)) {
-                $query->where($field, $value);
-            }
-            // Handle array values (new)
-            else {
-                $query->whereIn($field, $value);  // WHERE IN (...)
-            }
-        }
-
-        return $query;
-    }
-
     public function scopeInstant(Builder $query): Builder
     {
         return $query->where('name', self::Instant);
@@ -75,6 +61,20 @@ class TripTimeType extends Model
     /**
      * Business Logic
      */
+    public function activate(): void
+    {
+        $this->update(['is_active' => true]);
+    }
+
+    public function deactivate(): void
+    {
+        $this->update(['is_active' => false]);
+    }
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
+
     public function isScheduled(): bool
     {
         return $this->name === self::Scheduled;

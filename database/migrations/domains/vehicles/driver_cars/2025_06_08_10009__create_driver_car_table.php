@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Car;
+use App\Models\CarModel;
 use App\Models\Driver;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -15,15 +16,13 @@ return new class extends Migration
     {
         Schema::create('driver_car', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Car::class)->onDelete('cascade');
+            $table->foreignIdFor(CarModel::class);
             $table->foreignIdFor(Driver::class)->onDelete('cascade');
-
             $table->string('front_photo');
             $table->string('back_photo');
             $table->string('left_photo');
             $table->string('right_photo');
             $table->string('inside_photo');
-
             $table->timestamps();
         });
     }

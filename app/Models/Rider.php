@@ -3,6 +3,10 @@
 namespace App\Models;
 
 use App\Services\FileServiceFactory;
+use App\Traits\General\FilterScope;
+use App\Traits\General\ResetOTP;
+use App\Traits\General\Suspendable;
+use App\Traits\General\TwoFactorCodeGenerator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,11 +14,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\HasApiTokens;
 
 class Rider extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCodeGenerator, FilterScope, ResetOTP, Suspendable;
 
     // =================
     // Configuration
@@ -81,11 +87,14 @@ class Rider extends Model
     /**
      * Coupons owned by the rider (through pivot)
      */
-    public function coupons()
+    public function Ridercoupons()
     {
         return $this->hasMany(RiderCoupon::class)->withTimestamps();
     }
-
+    public function coupons()
+    {
+        return $this->belongsToMany(Notification::class, 'rider_coupons', 'rider_id', 'coupon_id')->withTimestamps();
+    }
     // =================
     // Accessors & Mutators
     // =================
@@ -126,20 +135,6 @@ class Rider extends Model
     /**
      * Filter riders by parameters
      */
-    public function scopeFilter($query, array $filters)
-    {
-        foreach ($filters as $field => $value) {
-            if ($value !== null && is_array($value)) {
-                $query->where($field, $value);
-            }
-            // Handle array values (new)
-            else {
-                $query->whereIn($field, $value);  // WHERE IN (...)
-            }
-        }
-
-        return $query;
-    }
 
     public function scopeActive(Builder $query): Builder
     {
@@ -154,6 +149,12 @@ class Rider extends Model
     // =================
     // Business Logic
     // =================
+    public function generateTwoFactorCode(): void
+    {
+        $this->two_factor_code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $this->two_factor_expires_at = now()->addMinutes(5);
+        $this->save();
+    }
 
     public function suspend(): void
     {
@@ -180,8 +181,19 @@ class Rider extends Model
     /**
      * Check if rider has payment method set
      */
+    public function isProfileComplete(): bool
+    {
+        return $this->first_name != null
+            && $this->last_name != null;
+    }
+
     public function hasPaymentMethod(): bool
     {
         return !is_null($this->defaul_payment_id);
+    }
+
+    public function isSuspended(): bool
+    {
+        return ($this->suspended);
     }
 }

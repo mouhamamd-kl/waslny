@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\General\ActiveScope;
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Pricing extends Model
 {
-    use HasFactory;
+    use HasFactory, FilterScope, ActiveScope;
 
     // =================
     // Configuration
@@ -39,11 +41,6 @@ class Pricing extends Model
     // =================
     // Scopes
     // =================
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->where('is_active', true);
-    }
-
     public function scopeCurrent(Builder $query): Builder
     {
         return $query->latest()->limit(1);
@@ -61,7 +58,10 @@ class Pricing extends Model
     {
         $this->update(['is_active' => false]);
     }
-
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
     public function calculateFare(float $distance): float
     {
         return $distance * $this->price_per_km;

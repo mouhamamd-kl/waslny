@@ -16,15 +16,11 @@ return new class extends Migration
             $table->id();
             $table->magellanPoint('location', 4326);
             $table->smallInteger('location_order');
-            $table->enum('location_type', ['pickup', 'dropoff','stop']);
-
-            $table->timestamp('estimated_arrival_time'); // When trip is accepted
+            $table->enum('location_type', ['pickup', 'dropoff', 'stop']);
+            $table->timestamp('estimated_arrival_time')->nullable(); // When trip is accepted
             $table->timestamp('actual_arrival_time')->nullable(); // When trip completes
-
-
-            $table->boolean('is_completed');
+            $table->boolean('is_completed')->default(false);
             $table->foreignIdFor(Trip::class);
-
             $table->timestamps();
         });
     }

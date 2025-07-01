@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->boolean('is_active')->default(true);
 
-            $table->decimal('price_per_km');
+            $table->integer('price_per_km');
 
             $table->timestamps();
         });

@@ -2,7 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\SuspensionReason;
 use App\Services\FileServiceFactory;
+use App\Traits\General\FilterScope;
+use App\Traits\General\ResetOTP;
+use App\Traits\General\Suspendable;
+use App\Traits\General\TwoFactorCodeGenerator;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\HasApiTokens;
 
 enum DriverPhotoType: string
 {
@@ -20,7 +26,11 @@ enum DriverPhotoType: string
 
 class Driver extends Model
 {
-    use HasFactory;
+    use HasFactory, TwoFactorCodeGenerator, FilterScope, HasApiTokens, ResetOTP;
+    use Suspendable {
+        suspend as protected traitSuspend;
+        reinstate as protected traitReinstate;
+    }
 
     // Status constants
     const STATUS_OFFLINE = 'offline';
@@ -111,19 +121,15 @@ class Driver extends Model
     // Scopes
     // =================
 
-    public function scopeFilter($query, array $filters)
-    {
-        foreach ($filters as $field => $value) {
-            if ($value !== null && is_array($value)) {
-                $query->where($field, $value);
-            }
-            // Handle array values (new)
-            else {
-                $query->whereIn($field, $value);  // WHERE IN (...)
-            }
-        }
 
-        return $query;
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('suspended', false);
+    }
+
+    public function scopeSuspended(Builder $query): Builder
+    {
+        return $query->where('suspended', true);
     }
 
     public function scopeAvailable(Builder $query): Builder
@@ -172,6 +178,16 @@ class Driver extends Model
         return $this->status->name === self::STATUS_OFFLINE;
     }
 
+    public function isSuspended(): bool
+    {
+        return $this->suspended === true;
+    }
+
+    public function isProfileComplete(): bool
+    {
+        return $this->first_name != null
+            && $this->last_name != null && $this->driver_license_photo != null && $this->driverCar() !== null;
+    }
     // =================
     // Business Logic
     // =================
@@ -222,15 +238,24 @@ class Driver extends Model
         return $success && $this->save();
     }
 
-    public function suspend(): void
+
+    /**
+     * Custom suspend method that extends the trait functionality
+     */
+    public function suspend(SuspensionReason $suspensionReason): void
     {
-        $this->update(['suspended' => true]);
+
+        // Call the trait's original method
+        $this->traitSuspend($suspensionReason);
+
+        // Custom logic after suspension
         $this->setStatus(self::STATUS_OFFLINE);
     }
 
     public function reinstate(): void
     {
-        $this->update(['suspended' => false]);
+        // Call the trait's original method
+        $this->traitReinstate();
         $this->setStatus(self::STATUS_OFFLINE);
     }
 

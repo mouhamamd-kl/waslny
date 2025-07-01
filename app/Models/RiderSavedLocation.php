@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Clickbar\Magellan\Data\Geometries\Point;
 
+
 class RiderSavedLocation extends Model
 {
-    use HasFactory;
+    use HasFactory, FilterScope;
 
     // =================
     // Configuration
     // =================
-
     /**
      * The table associated with the model.
      */

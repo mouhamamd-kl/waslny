@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\General\ActiveScope;
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CarModel extends Model
 {
-    use HasFactory;
+    use HasFactory, FilterScope, ActiveScope;
 
     // =================
     // Configuration
@@ -35,9 +37,9 @@ class CarModel extends Model
         return $this->belongsTo(CarServiceLevel::class);
     }
 
-    public function cars(): HasMany
+    public function driversCars(): HasMany
     {
-        return $this->hasMany(Car::class);
+        return $this->hasMany(DriverCar::class);
     }
 
     // =================
@@ -52,25 +54,6 @@ class CarModel extends Model
     // =================
     // Scopes
     // =================
-    public function scopeFilter($query, array $filters)
-    {
-        foreach ($filters as $field => $value) {
-            if ($value !== null && is_array($value)) {
-                $query->where($field, $value);
-            }
-            // Handle array values (new)
-            else {
-                $query->whereIn($field, $value);  // WHERE IN (...)
-            }
-        }
-
-        return $query;
-    }
-
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->where('is_active', true);
-    }
 
     public function scopeByManufacturer(Builder $query, $manufacturerId): Builder
     {
@@ -94,7 +77,11 @@ class CarModel extends Model
     {
         $this->update(['is_active' => false]);
     }
-
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
+    
     public function isRecentModel(): bool
     {
         return $this->model_year >= now()->subYears(2)->year;

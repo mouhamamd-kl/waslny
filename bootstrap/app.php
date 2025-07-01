@@ -1,9 +1,20 @@
 <?php
 
+use Illuminate\Http\Request;
+use App\Console\Commands\CreateAdminAccount;
+use App\Console\Commands\CreateAdminAccountCommand;
 use App\Console\Commands\CreateCustomModel;
+use App\Console\Commands\GenerateResources;
+use App\Helpers\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\Exceptions\MissingAbilityException;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,12 +25,42 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+         $middleware->alias([
+            'abilities' => CheckAbilities::class,
+            'ability' => CheckForAnyAbility::class,
+        ]);
     })
 
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            return ApiResponse::sendResponseError(statusCode: 401, message: 'Not Authenticated',);
+        });
+
+        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
+            // Traverse the exception chain to find MissingAbilityException
+            $previousException = $e->getPrevious();
+            while ($previousException) {
+                if ($previousException instanceof MissingAbilityException) {
+                    return ApiResponse::sendResponseError(statusCode: 403, message: 'You do not have the required authorization to perform this action.');
+                }
+                $previousException = $previousException->getPrevious();
+            }
+            // If MissingAbilityException is not found, proceed with default handling
+            return ApiResponse::sendResponseError(statusCode: 403, message: 'you are not authorized');
+        });
+
+        // $exceptions->render(function (ValidationException $e, Request $request) {
+        //     // Ensure this is an API/JSON request
+        //     // if ($request->expectsJson() || $request->is('api/*')) {
+        //         return ApiResponse::sendResponseError(
+        //             statusCode: 434, // Recommended for validation errors
+        //             message: $e->validator->errors()->first()
+        //         );
+        //     // }
+        // });
     })
     ->withCommands([
         CreateCustomModel::class,
+        GenerateResources::class,
+        CreateAdminAccountCommand::class
     ])->create();

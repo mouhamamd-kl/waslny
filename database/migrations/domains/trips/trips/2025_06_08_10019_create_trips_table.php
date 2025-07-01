@@ -22,10 +22,10 @@ return new class extends Migration
         Schema::create('trips', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Driver::class);
+            $table->foreignIdFor(Driver::class)->nullable();
             $table->foreignIdFor(Rider::class);
 
-            $table->foreignIdFor(TripStatus::class);
+            $table->foreignIdFor(TripStatus::class)->nullable();
             $table->foreignIdFor(TripType::class);
             $table->foreignIdFor(TripTimeType::class);
 
@@ -36,8 +36,8 @@ return new class extends Migration
             $table->timestamp('start_time')->nullable();
             $table->timestamp('end_time')->nullable();
 
-            $table->bigInteger('distance');
-            $table->bigInteger('fare');
+            $table->bigInteger('distance')->nullable();
+            $table->bigInteger('fare')->nullable();
 
             $table->timestamps();
         });

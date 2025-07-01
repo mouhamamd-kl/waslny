@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('trip_types', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('icon')->after('name')->default('car');
-            $table->text('description')->after('icon')->nullable();
+            $table->text('description');
             $table->boolean('is_active')->after('description')->default(true);
             $table->timestamps();
         });

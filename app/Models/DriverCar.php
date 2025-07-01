@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\FileServiceFactory;
+use App\Traits\General\FilterScope;
 use Exception;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,7 @@ enum CarPhotoType: string
 
 class DriverCar extends Model
 {
+    use FilterScope;
     // =================
     // Configuration
     // =================
@@ -101,7 +103,7 @@ class DriverCar extends Model
 
     public function car(): BelongsTo
     {
-        return $this->belongsTo(Car::class);
+        return $this->belongsTo(CarModel::class);
     }
 
     // =================

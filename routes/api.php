@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\FileController;
+use App\Http\Requests\RiderSavedLocationRequest;
+use App\Http\Requests\TripRequest;
 use Illuminate\Support\Facades\Storage;
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -17,14 +19,14 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::get('/test', function (Request $request) {
-    // Storing a value in Redis
-    Redis::set('القائد', 'يحيى السنوار');
+// Route::get('/test', function (Request $request) {
+//     // Storing a value in Redis
+//     Redis::set('القائد', 'يحيى السنوار');
 
-    // Retrieving a value from Redis
-    $value = Redis::get('القائد');
-    return response()->json(['القائد' => $value]);
-});
+//     // Retrieving a value from Redis
+//     $value = Redis::get('القائد');
+//     return response()->json(['القائد' => $value]);
+// });
 
 
 Route::get('/trigger-event', function () {
@@ -162,4 +164,28 @@ Route::delete('/testFile', function (Request $request) {
 
     // Generate temporary URL for private access
     return $status;
+});
+
+Route::post('/testdriversaved', function (RiderSavedLocationRequest $request) {
+
+    $point = $request->input('location');
+
+    return response()->json([
+        'success' => true,
+        'coordinates' => [
+            'longitude' => $point->getLongitude(), // or getLongitude() if using geodetic
+            'latitude' => $point->getLatitude(),    // or getLatitude() if using geodetic
+        ]
+    ]);
+});
+
+
+Route::post('/test', function (TripRequest $request) {
+
+    $data = $request->validate();
+
+    return response()->json([
+        'success' => true,
+        'data' => $data
+    ]);
 });

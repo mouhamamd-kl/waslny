@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\General\ActiveScope;
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +12,7 @@ use Carbon\Carbon;
 
 class Coupon extends Model
 {
-    use HasFactory;
+    use HasFactory, FilterScope;
 
     // =================
     // Configuration
@@ -22,7 +24,7 @@ class Coupon extends Model
     protected $guarded = ['id'];
 
     protected $casts = [];
-
+    // Add this line to explicitly set the factory class
     // =================
     // Relationships
     // =================
@@ -70,21 +72,6 @@ class Coupon extends Model
     // =================
     // Scopes
     // =================
-    
-    public function scopeFilter($query, array $filters)
-    {
-        foreach ($filters as $field => $value) {
-            if ($value !== null && is_array($value)) {
-                $query->where($field, $value);
-            }
-            // Handle array values (new)
-            else {
-                $query->whereIn($field, $value);  // WHERE IN (...)
-            }
-        }
-
-        return $query;
-    }
 
     public function scopeActive(Builder $query): Builder
     {
@@ -160,4 +147,9 @@ class Coupon extends Model
     //         'used_at' => Carbon::now()
     //     ]);
     // }
+
+    // =================
+    // Business Logic
+    // =================
+
 }

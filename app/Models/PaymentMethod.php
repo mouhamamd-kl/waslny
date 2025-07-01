@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use App\Services\FileServiceFactory;
+use App\Traits\General\ActiveScope;
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PaymentMethod extends Model
 {
+    use FilterScope, ActiveScope;
     // =================
     // Configuration
     // =================
@@ -63,17 +66,22 @@ class PaymentMethod extends Model
     // =================
     // Scopes
     // =================
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
+
 
     // =================
     // Business Logic
     // =================
-    public function toggleActive(): bool
+    public function activate(): void
     {
-        $this->is_active = !$this->is_active;
-        return $this->save();
+        $this->update(['is_active' => true]);
+    }
+
+    public function deactivate(): void
+    {
+        $this->update(['is_active' => false]);
+    }
+    public function isActive(): bool
+    {
+        return $this->is_active;
     }
 }

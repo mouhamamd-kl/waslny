@@ -2,64 +2,137 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApiResponse;
+use App\Http\Requests\RiderFolderRequest;
+use App\Http\Resources\RiderFolderResource;
 use App\Models\RiderFolder;
+use App\Services\RiderFolderService;
+use Exception;
 use Illuminate\Http\Request;
 
 class RiderFolderController extends Controller
 {
+    protected $riderFolderService;
+
+    public function __construct(RiderFolderService $riderFolderService)
+    {
+        $this->riderFolderService = $riderFolderService;
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        try {
+            $rider_folders = $this->riderFolderService->searchRiderFolders(
+                $request->input('filters', []),
+                $request->input('perPage', 5)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $rider_folders,
+                RiderFolderResource::class,
+                trans_fallback('messages.rider_location_folder.list', 'Rider Location Folder retrieved successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function search(Request $request)
+    {
+        try {
+            $filters = $request->only([
+                'name',
+                'is_active',
+            ]);
+            $rider_folders = $this->riderFolderService->searchRiderFolders(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
+
+            return ApiResponse::sendResponsePaginated(
+                $rider_folders,
+                RiderFolderResource::class, // Add your resource class
+                trans_fallback('messages.rider_location_folder.list', 'Rider Location Folder retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function store(RiderFolderRequest $request)
     {
-        //
+        try {
+            $data = $request->validate();
+            $rider_folder = $this->riderFolderService->create($data);
+            return ApiResponse::sendResponseSuccess(
+                $rider_folder,
+                RiderFolderResource::class,
+                trans_fallback('messages.rider_location_folder.created', 'Rider Location Folder retrieved successfully'),
+                201
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'rider_location_folder Creation Failed') . $e->getMessage());
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
      */
-    public function show(RiderFolder $riderFolder)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(RiderFolder $riderFolder)
-    {
-        //
+        try {
+            $rider_folder = $this->riderFolderService->findById($id);
+            return ApiResponse::sendResponseSuccess(data: new RiderFolderResource($rider_folder), message: trans_fallback('messages.rider_location_folder.retrieved', 'rider_location_folder Retrived Successfully'));
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'rider_location_folder not found'), 404);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, RiderFolder $riderFolder)
+    public function update(RiderFolderRequest $request, string $id)
     {
-        //
+        try {
+            $rider_folder = $this->riderFolderService->update((int) $id, $request->validated());
+            return ApiResponse::sendResponseSuccess(
+                new RiderFolderResource($rider_folder),
+                trans_fallback('messages.rider_location_folder.updated', 'rider_location_folder updated successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.update_failed', 'Update failed: ' . $e->getMessage())
+            );
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RiderFolder $riderFolder)
+    public function destroy($id)
     {
-        //
+        try {
+            $this->riderFolderService->delete((int) $id);
+            return ApiResponse::sendResponseSuccess(
+                message: trans_fallback('messages.rider_location_folder.deleted', 'rider_location_folder updated successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.delete_failed', 'Delete failed: ' . $e->getMessage())
+            );
+        }
     }
 }

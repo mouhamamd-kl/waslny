@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 class RiderCoupon extends Model
 {
+    use FilterScope;
     // =================
     // Configuration
     // =================
@@ -37,20 +39,6 @@ class RiderCoupon extends Model
     // Scopes
     // =================
 
-    public function scopeFilter($query, array $filters)
-    {
-        foreach ($filters as $field => $value) {
-            if ($value !== null && is_array($value)) {
-                $query->where($field, $value);
-            }
-            // Handle array values (new)
-            else {
-                $query->whereIn($field, $value);  // WHERE IN (...)
-            }
-        }
-
-        return $query;
-    }
     // =================
     // Business Logic
     // =================

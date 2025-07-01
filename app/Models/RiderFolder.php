@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,7 @@ use MStaack\LaravelPostgis\Eloquent\PostgisTrait;
 
 class RiderFolder extends Model
 {
+    use FilterScope;
     // =================
     // Configuration
     // =================

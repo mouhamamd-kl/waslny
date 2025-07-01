@@ -12,57 +12,38 @@ class CarManufacturerSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     */
-
-    private array $majorManufacturers = [
-        'Germany' => [
-            'BMW' => true,
-            'Mercedes-Benz' => true,
-            'Volkswagen' => true,
-            'Audi' => true,
-            'Porsche' => true,
-        ],
-        'Japan' => [
-            'Toyota' => true,
-            'Honda' => true,
-            'Nissan' => true,
-            'Mazda' => true,
-            'Subaru' => true,
-        ],
-        'United States' => [
-            'Ford' => true,
-            'Tesla' => true,
-            'Chevrolet' => true,
-        ],
-        'South Korea' => [
-            'Hyundai' => true,
-            'Kia' => true,
-        ],
+     */    
+    private $countryMapping = [
+        'Kia' => 'South Korea',
+        'Hyundai' => 'South Korea',
+        'Honda' => 'Japan',
+        'Mazda' => 'Japan',
+        'Mitsubishi' => 'Japan',
+        'Chevrolet' => 'United States',
+        'Pejout' => 'France', // Note: Correct spelling is Peugeot
+        'Toyota' => 'Japan',
+        'Skoda' => 'Germany',
+        'Saba' => 'Sweden', // Note: Likely Saab
+        'BYD' => 'China',
+        'Proton' => 'Malaysia',
+        'Dacia' => 'Romania',
+        'Renult' => 'France', // Renault
+        'Ford' => 'United States',
+        'Nissan' => 'Japan',
+        'Volgsvagen' => 'Germany', // Volkswagen
+        'Audi' => 'Germany',
     ];
 
-    public function run(): void
+    public function run()
     {
-        // Ensure countries exist first
-        $this->call([CountrySeeder::class]);
-
-        // Seed major manufacturers
-        foreach ($this->majorManufacturers as $countryName => $manufacturers) {
+        foreach ($this->countryMapping as $brand => $countryName) {
             $country = Country::where('name', $countryName)->first();
 
-            foreach ($manufacturers as $name => $isActive) {
-                CarManufacturer::updateOrCreate(
-                    ['name' => $name],
-                    [
-                        'country_id' => $country->id,
-                        'is_active' => $isActive,
-                    ]
-                );
-            }
+            CarManufacturer::create([
+                'name' => $brand,
+                'country_id' => $country->id,
+                'is_active' => true
+            ]);
         }
-
-        // Create additional random manufacturers
-        CarManufacturer::factory()
-            ->count(15)
-            ->create();
     }
 }
