@@ -2,35 +2,55 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
+use App\Enums\channels\BroadCastChannelEnum;
+use App\Http\Resources\AccountSuspensionResource;
+use App\Models\AccountSuspension;
+use App\Models\Driver;
+use App\Models\Rider;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AccountSuspended
+class AccountSuspended implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
-    public function __construct()
-    {
-        //
+    public Model $user;
+
+    public function __construct(
+        Model $user,
+        public AccountSuspension $suspension
+    ) {
+        $this->user = $user;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
-    public function broadcastOn(): array
+    public function broadcastOn(): PrivateChannel
+    {
+        $channel = $this->user instanceof Driver
+            ? BroadCastChannelEnum::DRIVER
+            : BroadCastChannelEnum::RIDER;
+
+        $key = $this->user instanceof Driver ? 'driverId' : 'riderId';
+
+        return new PrivateChannel(
+            $channel->bind([
+                $key => $this->user->id
+            ])
+        );
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'account.suspended';
+    }
+
+    public function broadcastWith(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            'suspension' => (new AccountSuspensionResource($this->suspension))->resolve(),
         ];
     }
 }

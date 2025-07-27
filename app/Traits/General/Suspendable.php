@@ -8,7 +8,7 @@ use App\Enums\SuspensionReason;
 use App\Enums\UserStatus;
 use App\Models\AccountSuspension;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Carbon;
 
 /**
  * Suspendable trait provides functionality for suspending and reinstating models.
@@ -33,7 +33,7 @@ trait Suspendable
         ]);
     }
 
-    public function suspendTemporarily($suspendId, Date $suspended_until): AccountSuspension
+    public function suspendTemporarily($suspendId, Carbon $suspended_until): AccountSuspension
     {
         return $this->suspensions()->create([
             'suspended_until' => $suspended_until,

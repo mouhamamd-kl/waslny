@@ -429,3 +429,32 @@ Route::post('/add_website_photo', function (Request $request) {
 require __DIR__ . '/api/auth/AdminAuth.php';
 require __DIR__ . '/api/auth/DriverAuth.php';
 require __DIR__ . '/api/auth/RiderAuth.php';
+require __DIR__ . '/api/coupon/CouponRoute.php';
+require __DIR__ . '/api/driver/DriverRoute.php';
+require __DIR__ . '/api/payment/PaymentMethodRoute.php';
+
+require __DIR__ . '/api/rider/RiderRoute.php';
+require __DIR__ . '/api/rider/RiderFolderRoute.php';
+require __DIR__ . '/api/rider/RiderSavedLocationRoute.php';
+
+require __DIR__ . '/api/trip/TripRoute.php';
+require __DIR__ . '/api/trip/TripStatusRoute.php';
+require __DIR__ . '/api/trip/TripTimeTypeRoute.php';
+require __DIR__ . '/api/trip/TripTypeRoute.php';
+
+require __DIR__ . '/api/veichles/CarManufactureRoute.php';
+require __DIR__ . '/api/veichles/CarModelRoute.php';
+require __DIR__ . '/api/veichles/CarServiceLevelRoute.php';
+require __DIR__ . '/api/veichles/CountryRoute.php';
+require __DIR__ . '/api/veichles/PricingRoute.php';
+
+
+
+
+
+
+
+
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin-api']], function () {
+    require __DIR__ . '/api/admin/suspensions.php';
+});

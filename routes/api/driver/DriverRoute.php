@@ -9,7 +9,7 @@ Route::controller(DriverController::class)
     ->name('drivers.')
     ->group(function () {
         Route::get('/{driver}', 'show')->name('show');
-        Route::put('/{driver}', 'update')->name('update');
+        // Route::put('/{driver}', 'update')->name('update');
     });
 
 // Admin management routes (require admin authentication)

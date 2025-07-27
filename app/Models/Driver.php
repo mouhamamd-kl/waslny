@@ -24,6 +24,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
 enum DriverPhotoType: string
 {
@@ -302,7 +303,7 @@ class Driver extends Authenticatable
         $this->setStatus(DriverStatusEnum::STATUS_OFFLINE);
     }
 
-    public function suspendTemporarily($suspendId, Date $suspended_until): void
+    public function suspendTemporarily($suspendId, Carbon $suspended_until): void
     {
         // Call the trait's original method
         $this->traitSuspendTemp(suspendId: $suspendId, suspended_until: $suspended_until);
