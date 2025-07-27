@@ -16,7 +16,7 @@ class TripTimeType extends Model
     /**
      * Configuration
      */
-    protected $table = 'trip_types';
+    protected $table = 'trip_time_types';
     protected $guarded = ['id']; // Guard against mass assignment
 
     // Default trip type constants

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CarManufacturer extends Model
 {
-    use HasFactory,FilterScope,ActiveScope;
+    use HasFactory, FilterScope, ActiveScope;
 
     // =================
     // Configuration

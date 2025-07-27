@@ -16,7 +16,7 @@ class FileExtensions
     public const PROFILE_PHOTOS = ['jpg', 'jpeg', 'png'];
     public const LICENSE_FILES = ['jpg', 'jpeg', 'png', 'pdf'];
     public const CAR_PHOTOS = ['jpg', 'jpeg', 'png'];
-    public const SYSTEM_FILES = ['jpg', 'jpeg', 'png', 'pdf', 'docx', 'xlsx'];
+    public const SYSTEM_FILES = ['jpg', 'jpeg', 'png', 'pdf', 'docx', 'xlsx','svg'];
 
     // Generic categories
     public const ALL = ['*']; // Use with caution!

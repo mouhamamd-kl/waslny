@@ -29,10 +29,6 @@ class RiderSavedLocationRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'rider_id' => [
-                $this->isRequired(),
-                'exists:riders,id',
-            ],
             'rider_folder_id' => [
                 $this->isRequired(),
                 'exists:rider_folders,id',

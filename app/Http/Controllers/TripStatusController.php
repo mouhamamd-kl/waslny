@@ -24,12 +24,12 @@ class TripStatusController extends Controller
     public function index(Request $request)
     {
         try {
-            $$trip_statuses = $this->tripStatusService->searchTripTimeType(
+            $trip_statuses = $this->tripStatusService->searchTripTimeType(
                 $request->input('filters', []),
                 $request->input('perPage', 5)
             );
             return ApiResponse::sendResponsePaginated(
-                $$trip_statuses,
+                $trip_statuses,
                 TripStatusResource::class,
                 trans_fallback('messages.trip_status.list', 'Trip Statuses retrieved successfully')
             );

@@ -19,9 +19,12 @@ class CouponFactory extends Factory
     protected $model = Coupon::class; // <-- Add this line
     public function definition(): array
     {
+        $max_uses = $this->faker->numberBetween(10, 1000);
+        $used_count = $this->faker->numberBetween(0, $max_uses - 1);
         return [
             'code' => Str::upper(Str::random(10)),
-            'max_uses' => $this->faker->numberBetween(10, 1000),
+            'max_uses' => $max_uses,
+            'used_count' => $used_count,
             'percent' => $this->faker->randomFloat(2, 0.5, 20), // Generates: e.g., 5.75, 12.30, 0.50
             'start_date' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
             'end_date' => $this->faker->dateTimeBetween('+1 month', '+1 year'),

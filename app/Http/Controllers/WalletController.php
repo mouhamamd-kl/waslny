@@ -34,32 +34,32 @@ class WalletController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Wallet $wallet)
-    {
-        //
-    }
+    // public function show(Wallet $wallet)
+    // {
+    //     //
+    // }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Wallet $wallet)
-    {
-        //
-    }
+    // /**
+    //  * Show the form for editing the specified resource.
+    //  */
+    // public function edit(Wallet $wallet)
+    // {
+    //     //
+    // }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Wallet $wallet)
-    {
-        //
-    }
+    // /**
+    //  * Update the specified resource in storage.
+    //  */
+    // public function update(Request $request, Wallet $wallet)
+    // {
+    //     //
+    // }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Wallet $wallet)
-    {
-        //
-    }
+    // /**
+    //  * Remove the specified resource from storage.
+    //  */
+    // public function destroy(Wallet $wallet)
+    // {
+    //     //
+    // }
 }

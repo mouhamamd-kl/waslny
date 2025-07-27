@@ -151,5 +151,13 @@ class Coupon extends Model
     // =================
     // Business Logic
     // =================
+    public function activate(): void
+    {
+        $this->update(['is_active' => true]);
+    }
 
+    public function deactivate(): void
+    {
+        $this->update(['is_active' => false]);
+    }
 }

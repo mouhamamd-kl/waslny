@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\SuspensionReason;
 use App\Helpers\ApiResponse;
 use App\Http\Requests\RiderUpdateRequest;
+use App\Http\Requests\SuspendAccountForeverRequest;
 use App\Http\Requests\SuspendAccountRequest;
+use App\Http\Requests\SuspendAccountTemporarilyRequest;
 use App\Http\Resources\RiderResource;
 use App\Models\Rider;
 use App\Services\RiderService;
@@ -72,7 +74,8 @@ class RiderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+
+    public function showAdmin($id)
     {
         try {
             $rider = $this->riderService->findById($id);
@@ -85,28 +88,13 @@ class RiderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RiderUpdateRequest $request, string $id)
-    {
-        try {
-            $rider = $this->riderService->update((int) $id, $request->validated());
-            return ApiResponse::sendResponseSuccess(
-                new RiderResource($rider),
-                trans_fallback('messages.rider.updated', 'Rider updated successfully')
-            );
-        } catch (Exception $e) {
-            return ApiResponse::sendResponseError(
-                trans_fallback('messages.error.update_failed', 'Update failed: ' . $e->getMessage())
-            );
-        }
-    }
 
-    public function suspend($id, SuspendAccountRequest $request)
+    public function suspendForever($id, SuspendAccountForeverRequest $request)
     {
         try {
             $validatedData = $request->validate();
-            $reason = SuspensionReason::from($validatedData['suspension_reason']);
             /** @var Rider $rider */ // Add PHPDoc type hint
-            $rider = $this->riderService->suspend(riderId: $id, suspension_reason: $reason);
+            $rider = $this->riderService->suspendForever(riderId: $id, suspension_id: $request->suspension_id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.rider.suspended', 'Rider Suspended successfully')
             );
@@ -116,6 +104,22 @@ class RiderController extends Controller
             );
         }
     }
+    public function suspendTemporarily($id, SuspendAccountTemporarilyRequest $request)
+    {
+        try {
+            $validatedData = $request->validate();
+            /** @var Rider $rider */ // Add PHPDoc type hint
+            $rider = $this->riderService->suspendTemporarily(riderId: $id, suspension_id: $request->suspension_id, suspended_until: $request->suspended_until);
+            return ApiResponse::sendResponseSuccess(
+                message: trans_fallback('messages.rider.suspended', 'Rider Suspended successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.rider.error.suspension_failed', 'Suspension failed: ' . $e->getMessage())
+            );
+        }
+    }
+
 
     public function reinstate($id)
     {

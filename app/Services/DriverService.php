@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Enums\SuspensionReason;
+use App\Enums\SuspensionReasonEnum;
 use Illuminate\Support\Str;  // Add this line
 use App\Helpers\CacheHelper;
+use App\Models\Driver;
 use App\Models\Rider;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -14,6 +16,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class DriverService extends BaseService
 {
     protected DriverCarService $driverCarService;
+    protected SuspenssionService $suspenssion_service;
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new Rider, $cache);
@@ -38,27 +41,44 @@ class DriverService extends BaseService
         try {
             /** @var Driver $driver */ // Add PHPDoc type hint
             $driver = $this->findById($driverId);
-            $driverProfileAssetService = FileServiceFactory::makeForDriverProfile();
-            $driverLicenseAssetService = FileServiceFactory::makeForDriverLicense();
-            $driverProfileAssetService->delete($driver->profile_photo);
-            $driverLicenseAssetService->delete($driver->driver_license_photo);
+            $driver->deletePhotos();
             $this->driverCarService->deleteAssets($driver->driverCar->id);
         } catch (Exception $e) {
             throw new Exception('error deleting assets for driver' . $e);
         }
     }
 
-    public function suspend($driverId, SuspensionReason $suspension_reason)
+    public function suspendForever($driverId, $suspension_id)
     {
         try {
             /** @var Driver $driver */ // Add PHPDoc type hint
             $driver = $this->findById($driverId);
-            $driver->suspend($suspension_reason);
+            $driver->suspendForever($suspension_id);
         } catch (Exception $e) {
             throw new Exception('error suspending for driver' . $e);
         }
     }
-
+    public function suspendNeedConfirmation($driverId)
+    {
+        try {
+            /** @var Driver $driver */ // Add PHPDoc type hint
+            $driver = $this->findById($driverId);
+            $suspention = $this->suspenssion_service->searchByReason(SuspensionReasonEnum::NEED_REVIEW->value);
+            $driver->suspendForever($suspention->id);
+        } catch (Exception $e) {
+            throw new Exception('error suspending for driver' . $e);
+        }
+    }
+    public function suspendTemporarily($driverId, $suspension_id, $suspended_until)
+    {
+        try {
+            /** @var Driver $driver */ // Add PHPDoc type hint
+            $driver = $this->findById($driverId);
+            $driver->suspendTemporarily($suspension_id, $suspended_until);
+        } catch (Exception $e) {
+            throw new Exception('error suspending for driver' . $e);
+        }
+    }
     public function activate($driverId)
     {
         try {

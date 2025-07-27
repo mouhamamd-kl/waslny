@@ -55,4 +55,14 @@ class TripStatusService extends BaseService
             throw new Exception('error activating TripType' . $e);
         }
     }
+
+    public function search_trip_status($name)
+    {
+        try {
+            /** @var TripType $tripType */ // Add PHPDoc type hint
+            return  $tripType = $this->search_first(['name' => $name]);
+        } catch (Exception $e) {
+            throw new Exception('error Searching Trip Status' . $e);
+        }
+    }
 }

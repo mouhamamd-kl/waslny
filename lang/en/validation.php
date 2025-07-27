@@ -176,8 +176,15 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'locations' => [
+            'trip_location_types' => [
+                'pickup' => 'Must contain exactly one pickup point',
+                'dropoff' => 'Must contain exactly one dropoff point',
+            ],
+            'trip_location_order' => [
+                'pickup_first' => 'Pickup must be the first location',
+                'dropoff_last' => 'Dropoff must be the last location',
+            ],
         ],
     ],
 

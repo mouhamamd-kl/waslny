@@ -27,12 +27,9 @@ class DriverCarService extends BaseService
     public function deleteAssets($driverCarId)
     {
         try {
-            /** @var Driver $driver */ // Add PHPDoc type hint
+            /** @var DriverCar $driverCar */ // Add PHPDoc type hint
             $driverCar = $this->findById($driverCarId);
-            $driverCarAssetService = FileServiceFactory::makeForDriverCarPhotos();
-            foreach (CarPhotoType::cases() as $photoType) {
-                $driverCarAssetService->delete($photoType->name);
-            }
+            $driverCar->deletePhotos();
         } catch (Exception $e) {
             throw new Exception('error deleting assets for rider' . $e);
         }

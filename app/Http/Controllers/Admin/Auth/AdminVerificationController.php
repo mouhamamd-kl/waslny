@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ApiAdminEmailVerificationRequest;
 use App\Models\Admin;
 use App\Models\Agent;
+use Exception;
 use Illuminate\Http\Request;
 
 class AdminVerificationController extends Controller
@@ -20,25 +21,33 @@ class AdminVerificationController extends Controller
 
     public function resend(Request $request)
     {
-        $request->validate([
-            'email' => ['required', 'email', 'exists:admins,email'],
-        ]);
+        try {
+            $request->validate([
+                'email' => ['required', 'email', 'exists:admins,email'],
+            ]);
 
-        $admin = Admin::where('email', $request->email)->first();
+            $admin = Admin::where('email', $request->email)->first();
 
-        if ($admin->hasVerifiedEmail()) {
+            if ($admin->hasVerifiedEmail()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('auth.verification.already_verified', 'This email is already verified.'),
+                    400
+                );
+            }
+
+            $admin->sendEmailVerificationNotification();
+
+            return ApiResponse::sendResponseSuccess(
+                null,
+                trans_fallback('auth.verification.resent', 'A new verification link has been sent to your email address.'),
+                200
+            );
+        } catch (Exception $e) {
             return ApiResponse::sendResponseError(
-                trans_fallback('auth.verification.already_verified', 'This email is already verified.'),
-                400
+                trans_fallback('messages.error.generic', 'An error occurred'),
+                500,
+                get_debug_data($e) // Using the helper function
             );
         }
-
-        $admin->sendEmailVerificationNotification();
-
-        return ApiResponse::sendResponseSuccess(
-            null,
-            trans_fallback('auth.verification.resent', 'A new verification link has been sent to your email address.'),
-            200
-        );
     }
 }

@@ -139,4 +139,36 @@ class CouponController extends Controller
             );
         }
     }
+
+    public function deActivate($id)
+    {
+        try {
+            /** @var Coupon $coupon */ // Add PHPDoc type hint
+            $coupon = $this->couponService->findById($id);
+            $coupon->deactivate();
+            return ApiResponse::sendResponseSuccess(
+                message: trans_fallback('messages.coupon.deactivated', 'Coupon DeActivated successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.coupon.error.deactivation_failed', 'DeActivation failed: ' . $e->getMessage())
+            );
+        }
+    }
+
+    public function activate($id)
+    {
+        try {
+            /** @var Coupon $coupon */ // Add PHPDoc type hint
+            $coupon = $this->couponService->findById($id);
+            $coupon->activate();
+            return ApiResponse::sendResponseSuccess(
+                message: trans_fallback('messages.coupon.activated', 'Coupon Activated successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.coupon.error.activation_failed', 'Activation failed: ' . $e->getMessage())
+            );
+        }
+    }
 }

@@ -15,7 +15,8 @@ class DriverResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $assetService = FileServiceFactory::makeForRiderProfile();
+        $assetService = FileServiceFactory::makeForDriverProfile();
+        $assetDriverLicense = FileServiceFactory::makeForDriverLicense();
         return [
             'id' => $this->id,
             'first_name' => $this->first_name,
@@ -24,8 +25,12 @@ class DriverResource extends JsonResource
             'national_number' => $this->national_number,
             'phone' => $this->phone,
             'email' => $this->email,
-            'profile_photo' => $assetService->getUrl($this->profile_photo),
-            'driver_license_photo' => $assetService->getUrl($this->profile_photo),
+            'profile_photo' => $this->when($this->profile_photo, function () use ($assetService) {
+                return $assetService->getUrl($this->profile_photo);
+            }, null),
+            'driver_license_photo' => $this->when($this->driver_license_photo, function () use ($assetDriverLicense) {
+                return $assetDriverLicense->getUrl($this->driver_license_photo);
+            }, null),
             'rating' => $this->rating,
             'driver_status' => new DriverStatusResource($this->whenLoaded('status')),
             'dates' => [

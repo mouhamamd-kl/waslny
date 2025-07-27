@@ -33,11 +33,21 @@ return new class extends Migration
 
             $table->foreignIdFor(PaymentMethod::class);
 
+            $table->timestamp('requested_time')->nullable();
+
+            $table->json('status_timeline')->nullable()->after('trip_status_id');
+
             $table->timestamp('start_time')->nullable();
             $table->timestamp('end_time')->nullable();
 
+            $table->magellanPoint('current_location', 4326)->nullable();
+
             $table->bigInteger('distance')->nullable();
             $table->bigInteger('fare')->nullable();
+
+            $table->unsignedInteger('driver_search_radius')->default(5000); // meters (5km)
+            $table->timestamp('search_started_at')->nullable();
+            $table->timestamp('search_expires_at')->nullable();
 
             $table->timestamps();
         });

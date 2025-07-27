@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Driver\Auth;
 
+use App\Enums\DriverStatusEnum;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
 use App\Notifications\Driver\DriverTwoFactorCode;
 use App\Services\DriverService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -14,54 +17,88 @@ use Illuminate\Support\Facades\Validator;
 class DriverAuthController extends Controller
 {
     protected DriverService $driverService;
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
 
-        $validator = Validator::make($request->all(), [
-            'phone' => ['required', 'string'],
-        ], [], [
-            'phone' => __('lang.phone'),
-        ]);
+        try {
+            DB::beginTransaction();
 
-        if ($validator->fails()) {
-            return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
+            $validator = Validator::make($request->all(), [
+                'phone' => ['required', 'string'],
+            ], [], [
+                'phone' => __('lang.phone'),
+            ]);
+
+            if ($validator->fails()) {
+                return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
+            }
+
+            // $rider = Rider::where('phone', $request->phone)->first();
+            $driver = Driver::firstOrCreate(
+                [
+                    'phone' => $request->phone,
+                ],
+            );
+            $driver->setStatus(DriverStatusEnum::STATUS_OFFLINE);
+            $driver->generateTwoFactorCode();
+            $driver->notify(new DriverTwoFactorCode);
+
+            DB::commit();
+            return ApiResponse::sendResponseSuccess(
+                [
+                    'requires_otp' => true,
+                ],
+                trans_fallback('messages.auth.verification.sent', 'Verification Code has been sent')
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred'),
+                500,
+                get_debug_data($e) // Using the helper function
+            );
         }
-
-        // $rider = Rider::where('phone', $request->phone)->first();
-        $driver = Driver::firstOrCreate(
-            [
-                'phone' => $request->phone,
-            ],
-        );
-        $driver->generateTwoFactorCode();
-        $driver->notify(new DriverTwoFactorCode);
-        return ApiResponse::sendResponseSuccess(
-            [
-                'requires_otp' => true,
-            ],
-            trans_fallback('messages.auth.verification.sent', 'Verification Code has been sent')
-        );
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return ApiResponse::sendResponseSuccess(
-            [],
-            trans_fallback('messages.auth.logout', 'logged out successfully'),
-            200
-        );
+        try {
+            DB::beginTransaction();
+            $request->user()->currentAccessToken()->delete();
+            DB::commit(); // Never reached
+            return ApiResponse::sendResponseSuccess(
+                [],
+                trans_fallback('messages.auth.logout', 'logged out successfully'),
+                200
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred'),
+                500,
+                get_debug_data($e) // Using the helper function
+            );
+        }
     }
 
     // In AuthController
-    public function refreshToken(Request $request)
+    public function refreshToken(Request $request): JsonResponse
     {
-        $request->user()->tokens()->delete();
-
-        return response()->json([
-            'token' => $request->user()->createToken('refresh-token')->plainTextToken,
-        ]);
+        try {
+            DB::beginTransaction();
+            $request->user()->tokens()->delete();
+            DB::commit(); // Never reached
+            return response()->json([
+                'token' => $request->user()->createToken('refresh-token')->plainTextToken,
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred'),
+                500,
+                get_debug_data($e) // Using the helper function
+            );
+        }
     }
 
     public function deleteAccount(Request $request)
@@ -70,8 +107,8 @@ class DriverAuthController extends Controller
         $driver = $request->user('driver-api'); // Authenticated agent
         // return ApiResponse::sendResponseSuccess($agent, 'Agent account deleted successfully');
 
-        DB::beginTransaction();
         try {
+            DB::beginTransaction();
             // Delete uploaded files from S3
             $this->driverService->deleteAssets($driver->id);
             // Revoke tokens
@@ -82,7 +119,11 @@ class DriverAuthController extends Controller
             return ApiResponse::sendResponseSuccess(null, 'Driver account deleted successfully');
         } catch (\Throwable $e) {
             DB::rollBack();
-            return ApiResponse::sendResponseError('Failed to delete account: ' . $e->getMessage(), 500);
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred'),
+                500,
+                get_debug_data($e) // Using the helper function
+            );
         }
     }
 }

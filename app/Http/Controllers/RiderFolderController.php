@@ -24,8 +24,9 @@ class RiderFolderController extends Controller
     public function index(Request $request)
     {
         try {
+            $filters['rider_id'] = auth('rider-api')->user()->id;
             $rider_folders = $this->riderFolderService->searchRiderFolders(
-                $request->input('filters', []),
+                $filters,
                 $request->input('perPage', 5)
             );
             return ApiResponse::sendResponsePaginated(
@@ -48,8 +49,8 @@ class RiderFolderController extends Controller
         try {
             $filters = $request->only([
                 'name',
-                'is_active',
             ]);
+            $filters['rider_id'] = auth('rider-api')->user()->id;
             $rider_folders = $this->riderFolderService->searchRiderFolders(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -74,8 +75,9 @@ class RiderFolderController extends Controller
     public function store(RiderFolderRequest $request)
     {
         try {
-            $data = $request->validate();
-            $rider_folder = $this->riderFolderService->create($data);
+            $validatedData = $request->validated();
+            $validatedData['rider_id'] = $request->user()->id;
+            $rider_folder = $this->riderFolderService->create($validatedData);
             return ApiResponse::sendResponseSuccess(
                 $rider_folder,
                 RiderFolderResource::class,

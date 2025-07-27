@@ -1,0 +1,44 @@
+<?php
+
+use App\Http\Controllers\TripController;
+use Illuminate\Support\Facades\Route;
+
+// Rider-specific routes
+Route::middleware(['auth:rider-api'])
+    ->controller(TripController::class)
+    ->prefix('trips')
+    ->name('trips.')
+    ->group(function () {
+        Route::post('/', 'store')->name('store');
+        Route::get('/rider', 'riderIndex')->name('rider.index');
+    });
+
+// Driver-specific routes
+Route::middleware(['auth:driver-api'])
+    ->controller(TripController::class)
+    ->prefix('trips')
+    ->name('trips.')
+    ->group(function () {
+        Route::get('/driver', 'driverIndex')->name('driver.index');
+    });
+
+// Shared routes (accessible by both riders and drivers)
+Route::middleware(['auth:rider-api,driver-api,admin-api'])
+    ->controller(TripController::class)
+    ->prefix('trips')
+    ->name('trips.')
+    ->group(function () {
+        Route::get('/{trip}', 'show')->name('show');
+    });
+
+// Admin-only routes
+Route::middleware(['auth:admin-api'])
+    ->controller(TripController::class)
+    ->prefix('trips')
+    ->name('admin.trips.')
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/search', 'search')->name('search');
+        Route::put('/{trip}', 'update')->name('update');
+        Route::delete('/{trip}', 'destroy')->name('destroy');
+    });

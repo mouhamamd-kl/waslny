@@ -9,6 +9,7 @@ use Database\Seeders\domains\trips\trip_statuses\TripStatusSeeder;
 use Database\Seeders\domains\trips\trip_time_types\TripTimeTypeSeeder;
 use Database\Seeders\domains\trips\trip_types\TripTypeSeeder;
 use Database\Seeders\domains\users\drivers\driver_statuses\DriverStatusSeeder;
+use Database\Seeders\domains\users\suspensions\SuspensionSeeder;
 use Database\Seeders\domains\vehicles\car_manufacturers\CarManufacturerSeeder;
 use Database\Seeders\domains\vehicles\car_models\CarModelSeeder;
 use Database\Seeders\domains\vehicles\car_service_levels\CarServiceLevelSeeder;
@@ -26,17 +27,19 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
         $this->call([
-            CountrySeeder::class,
-            CarManufacturerSeeder::class,
-            CarServiceLevelSeeder::class,
-            CarModelSeeder::class,
-            PricingSeeder::class,
+            // CountrySeeder::class,
+            // CarManufacturerSeeder::class,
+            // CarServiceLevelSeeder::class,
+            // CarModelSeeder::class,
+            // PricingSeeder::class,
 
-            CouponSeeder::class,
+            // CouponSeeder::class,
 
-            PaymentMethodSeeder::class,
+            // PaymentMethodSeeder::class,
 
-            DriverStatusSeeder::class,
+            // DriverStatusSeeder::class,
+
+            // SuspensionSeeder::class,
 
             TripStatusSeeder::class,
             TripTimeTypeSeeder::class,

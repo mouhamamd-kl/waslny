@@ -101,7 +101,7 @@ class DriverCar extends Model
         return $this->belongsTo(Driver::class);
     }
 
-    public function car(): BelongsTo
+    public function carModel(): BelongsTo
     {
         return $this->belongsTo(CarModel::class);
     }
@@ -134,7 +134,8 @@ class DriverCar extends Model
     {
         return $this->{$type->value . '_photo'}; // Uses the accessor automatically
     }
-    protected function updatePhoto(CarPhotoType $type, UploadedFile $file): bool
+
+    public function updatePhoto(CarPhotoType $type, UploadedFile $file): bool
     {
         $column = $type->value . '_photo';
 
@@ -158,6 +159,7 @@ class DriverCar extends Model
             return false;
         }
     }
+
     public function deletePhoto(CarPhotoType $type): bool
     {
         $column = $type->value . '_photo';

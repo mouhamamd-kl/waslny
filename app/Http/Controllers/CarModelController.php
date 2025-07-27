@@ -155,7 +155,7 @@ class CarModelController extends Controller
         }
     }
 
-    public function Activate($id)
+    public function activate($id)
     {
         try {
             /** @var CarModel $car_model */ // Add PHPDoc type hint

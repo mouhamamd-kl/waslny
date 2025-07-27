@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\DriverStatusEnum;
 use App\Enums\SuspensionReason;
+use App\Services\BaseFileService;
 use App\Services\FileServiceFactory;
 use App\Traits\General\FilterScope;
 use App\Traits\General\ResetOTP;
@@ -15,27 +17,39 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Notifications\Notifiable;
 
 enum DriverPhotoType: string
 {
     case PROFILE = 'profile';
     case DRIVERLICENSE = 'driver_license';
+    public function serviceMethod(): BaseFileService
+    {
+        return match ($this) {
+            self::PROFILE => FileServiceFactory::makeForDriverProfile(),
+            self::DRIVERLICENSE => FileServiceFactory::makeForDriverLicense(),
+        };
+    }
 }
 
-class Driver extends Model
+class Driver extends Authenticatable
 {
-    use HasFactory, TwoFactorCodeGenerator, FilterScope, HasApiTokens, ResetOTP;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCodeGenerator, FilterScope, ResetOTP, Suspendable;
     use Suspendable {
-        suspend as protected traitSuspend;
+        suspendTemporarily as protected traitSuspendTemp;
+        suspendForever as protected traitSuspendForever;
+
         reinstate as protected traitReinstate;
     }
 
     // Status constants
-    const STATUS_OFFLINE = 'offline';
-    const STATUS_AVAILABLE = 'available';
-    const STATUS_ON_TRIP = 'ontrip';
+
 
     // =================
     // Configuration
@@ -48,7 +62,7 @@ class Driver extends Model
 
     protected $casts = [
         'birth_date' => 'date',
-        'suspended' => 'boolean',
+        'two_factor_expires_at' => 'datetime',
         'avg_rating' => 'float',
     ];
 
@@ -70,6 +84,23 @@ class Driver extends Model
         return $this->hasMany(Trip::class, 'driver_id');
     }
 
+    public function tripNotifications(): HasMany
+    {
+        return $this->hasMany(TripDriverNotification::class);
+    }
+
+    public function notifiedTrips(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Trip::class,
+            TripDriverNotification::class,
+            'driver_id',
+            'id',
+            'id',
+            'trip_id'
+        );
+    }
+
     public function completedTrips(): HasMany
     {
         return $this->trips()
@@ -81,31 +112,13 @@ class Driver extends Model
         return $this->hasOne(Trip::class, 'driver_id')
             ->whereHas('status', fn($q) => $q->where('name', 'in_progress'));
     }
-
+    public function suspensions()
+    {
+        return $this->morphMany(AccountSuspension::class, 'suspendable');
+    }
     // =================
     // Accessors & Mutators
     // =================
-    public function getProfilePhotoAttribute(): ?string
-    {
-        if (!$this->profile_photo) {
-            return null;
-        }
-        return filter_var($this->profile_photo, FILTER_VALIDATE_URL)
-            ? $this->profile_photo
-            : FileServiceFactory::makeForDriverProfile()->getUrl($this->profile_photo);
-    }
-
-    public function getDriverLicensePhotoAttribute(): ?string
-    {
-        if (!$this->driving_licence) {
-            return null;
-        }
-
-        return filter_var($this->driving_licence, FILTER_VALIDATE_URL)
-            ? $this->driving_licence
-            : FileServiceFactory::makeForDriverLicense()->getUrl($this->driving_licence);
-    }
-
 
     public function getFullNameAttribute(): string
     {
@@ -137,7 +150,7 @@ class Driver extends Model
         return $query->whereHas(
             'status',
             fn($q) =>
-            $q->where('name', self::STATUS_AVAILABLE)
+            $q->where('name', DriverStatusEnum::STATUS_AVAILABLE)
         );
     }
 
@@ -146,7 +159,7 @@ class Driver extends Model
         return $query->whereHas(
             'status',
             fn($q) =>
-            $q->where('name', self::STATUS_ON_TRIP)
+            $q->where('name', DriverStatusEnum::STATUS_ON_TRIP)
         );
     }
 
@@ -155,7 +168,7 @@ class Driver extends Model
         return $query->whereHas(
             'status',
             fn($q) =>
-            $q->where('name', self::STATUS_OFFLINE)
+            $q->where('name', DriverStatusEnum::STATUS_OFFLINE)
         );
     }
 
@@ -165,17 +178,17 @@ class Driver extends Model
 
     public function isAvailable(): bool
     {
-        return $this->status->name === self::STATUS_AVAILABLE;
+        return $this->status->name === DriverStatusEnum::STATUS_AVAILABLE;
     }
 
     public function isOnTrip(): bool
     {
-        return $this->status->name === self::STATUS_ON_TRIP;
+        return $this->status->name === DriverStatusEnum::STATUS_ON_TRIP;
     }
 
     public function isOffline(): bool
     {
-        return $this->status->name === self::STATUS_OFFLINE;
+        return $this->status->name === DriverStatusEnum::STATUS_OFFLINE;
     }
 
     public function isSuspended(): bool
@@ -186,11 +199,48 @@ class Driver extends Model
     public function isProfileComplete(): bool
     {
         return $this->first_name != null
-            && $this->last_name != null && $this->driver_license_photo != null && $this->driverCar() !== null;
+            && $this->last_name != null && $this->driver_license_photo != null && $this->profile_photo != null;
+    }
+    public function isDriverCarComplete(): bool
+    {
+        return $this->driverCar()->exists() !== false;
     }
     // =================
     // Business Logic
     // =================
+
+    public function isNotifiedForTrip(Trip $trip): bool
+    {
+        return $this->tripNotifications()
+            ->where('trip_id', $trip->id)
+            ->exists();
+    }
+
+    public function updatePhoto(DriverPhotoType $type, UploadedFile $file): bool
+    {
+        $column = $type->value . '_photo';
+
+        try {
+            $service = $type->serviceMethod();
+
+            // Delete old file if exists
+            if ($this->getRawOriginal($column)) {
+                $service->delete($this->getRawOriginal($column));
+            }
+
+            // Upload new file
+            $path = "{$this->id}/";
+            $url = $service->uploadPublic($file, $path);
+
+            // Update model with file path
+            $this->{$column} = $service->getFilePath($url);
+            return $this->save();
+        } catch (\Exception $e) {
+            report($e);
+            return false;
+        }
+    }
+
     public function deletePhoto(DriverPhotoType $type): bool
     {
         $column = $type->value . '_photo';
@@ -199,7 +249,7 @@ class Driver extends Model
         if (!$path) return true;
 
         try {
-            $service = FileServiceFactory::makeForDriverCarPhotos();
+            $service = $type->serviceMethod();
             $service->delete($path);
             $this->attributes[$column] = null;
             return $this->save();
@@ -212,9 +262,9 @@ class Driver extends Model
     public function deletePhotos(): bool
     {
         $success = true;
-        $service = FileServiceFactory::makeForDriverCarPhotos();
 
         foreach (DriverPhotoType::cases() as $type) {
+            $service = $type->serviceMethod();
             $column = $type->value . '_photo';
             $path = $this->getRawOriginal($column);
 
@@ -242,26 +292,35 @@ class Driver extends Model
     /**
      * Custom suspend method that extends the trait functionality
      */
-    public function suspend(SuspensionReason $suspensionReason): void
-    {
 
+    public function suspendForever($suspendId): void
+    {
         // Call the trait's original method
-        $this->traitSuspend($suspensionReason);
+        $this->traitSuspendForever(suspendId: $suspendId);
 
         // Custom logic after suspension
-        $this->setStatus(self::STATUS_OFFLINE);
+        $this->setStatus(DriverStatusEnum::STATUS_OFFLINE);
+    }
+
+    public function suspendTemporarily($suspendId, Date $suspended_until): void
+    {
+        // Call the trait's original method
+        $this->traitSuspendTemp(suspendId: $suspendId, suspended_until: $suspended_until);
+
+        // Custom logic after suspension
+        $this->setStatus(DriverStatusEnum::STATUS_OFFLINE);
     }
 
     public function reinstate(): void
     {
         // Call the trait's original method
         $this->traitReinstate();
-        $this->setStatus(self::STATUS_OFFLINE);
+        $this->setStatus(DriverStatusEnum::STATUS_OFFLINE);
     }
 
-    public function setStatus(string $status): void
+    public function setStatus(DriverStatusEnum $status): void
     {
-        $statusId = DriverStatus::firstWhere('status', $status)?->id;
+        $statusId = DriverStatus::firstWhere('name', $status)?->id;
         if ($statusId) {
             $this->update(['status_id' => $statusId]);
         }

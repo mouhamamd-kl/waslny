@@ -9,6 +9,10 @@ use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Http\Requests\TransformsGeojsonGeometry;
 use Clickbar\Magellan\Rules\GeometryGeojsonRule;
 use App\Rules\JsonValidatorRule;
+use App\Rules\TripLocationOrderRule;
+use App\Rules\TripLocationTypesRule;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class TripRequest extends BaseRequest
 {
@@ -30,17 +34,6 @@ class TripRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            // Required ID's fields with existence checks
-            'rider_id' => [
-                $this->isRequired(),
-                'exists:riders,id'
-            ],
-
-            'driver_id' => [
-                $this->isRequired(),
-                'exists:drivers,id'
-            ],
-
             'trip_type_id' => [
                 $this->isRequired(),
                 'exists:trip_types,id'
@@ -52,7 +45,7 @@ class TripRequest extends BaseRequest
             ],
 
             'coupon_id' => [
-                $this->isRequired(),
+                'sometimes',
                 'exists:coupons,id',
                 new ActiveCoupon,
             ],
@@ -63,7 +56,7 @@ class TripRequest extends BaseRequest
             ],
 
             // Date/time validation
-            'start_time' => [
+            'requested_time' => [
                 'required',
                 function ($attribute, $value, $fail) {
                     $datetime = Carbon::createFromFormat('Y-m-d H:i', $value);
@@ -81,11 +74,13 @@ class TripRequest extends BaseRequest
             //Trip Locations Validation
             'locations' => ['array', 'min:2', 'required', 'filled'],
             'locations.*' => [
-                new JsonValidatorRule(['location', 'location_order', 'location_type'])
+                new JsonValidatorRule(['location', 'location_order', 'location_type']),
+                new TripLocationTypesRule,
+                new TripLocationOrderRule,
             ],
             'locations.*.location' => [new GeometryGeojsonRule([Point::class]),],
-            'locations.*.location_order' => 'integer|min:1',
-            'locations.*.location_type' => [LocationTypeEnum::rule()],
+            'locations.*.location_order' => ['integer', 'min:1', 'distinct'],
+            'locations.*.location_type' => [Rule::enum(LocationTypeEnum::class)],
 
             // 'locations.*.estimated_arrival_time' => [
             //     'required',

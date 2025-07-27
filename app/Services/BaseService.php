@@ -83,7 +83,29 @@ abstract class BaseService
             ? $this->cache->manage($cacheKey, $callback, $this->defaultCacheTtl)
             : $callback();
     }
+    /**
+     * Get paginated results with caching
+     */
+    public function search_first(
+        array $filters = [],
+        array $relations = [],
+        int $perPage = 5,
+        array $columns = ['*'],
+        array $withCount = []
+    ): Model {
+        $cacheKey = $this->cache->generateKey(
+            $this->model::class,
+            compact('filters',  'withCount')
+        );
+        $callback = function () use ($filters, $relations, $perPage, $columns, $withCount) {
+            return $this->collection($filters, $relations, $columns, $withCount)
+                ->first();
+        };
 
+        return $this->cacheEnabled
+            ? $this->cache->manage($cacheKey, $callback, $this->defaultCacheTtl)
+            : $callback();
+    }
     /**
      * Find record with caching
      */

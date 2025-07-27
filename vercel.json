@@ -2,9 +2,19 @@
     "version": 2,
     "framework": null,
     "functions": {
+        "api/index2.php": {
+            "runtime": "vercel-php@0.7.3",
+            "memory": 1024,
+            "maxDuration": 300
+        },
         "api/index.php": { "runtime": "vercel-php@0.7.3" }
     },
     "routes": [
+        {
+            "src": "/api/driver-search",
+            "dest": "/api/index2.php",
+            "methods": ["POST"]
+        },
         { "src": "/(.*\\.\\w+)$", "dest": "/public/$1" },
         { "src": "/(.*)", "dest": "/api/index.php" }
     ],
@@ -73,25 +83,26 @@
         "TELEGRAM_API_TOKEN": "AAHhBwAANUrvsM50I_x0QO3rhu3mTRGo1bPjEBgev9hD4A",
         "TELEGRAM_BOT_TOKEN": "8021940964:AAFT9yoTuoXs-C4CS9C9BdBacQu9dJPSn00",
 
-        "FILESYSTEM_DISK":"supabase",
-        "AWS_ACCESS_KEY_ID":"9cec04e49e90ee5501478e710b383dd6",
-        "AWS_SECRET_ACCESS_KEY":"f7827fd2cb7826a8b0af7290bb44df391b253e26446390edf3cc44b71d9fb6ba",
-        "AWS_DEFAULT_REGION":"us-east-2",
-        "AWS_BUCKET":"waslny",
-        "AWS_ENDPOINT":"https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/s3/waslny",
-        "AWS_USE_PATH_STYLE_ENDPOINT":"true",
-        
-        "SUPABASE_PROJECT_ID":"cqrlbirnwzidgerehsdq",
-        "SUPABASE_STORAGE_BUCKET":"waslny",
+        "FILESYSTEM_DISK": "supabase",
+        "AWS_ACCESS_KEY_ID": "9cec04e49e90ee5501478e710b383dd6",
+        "AWS_SECRET_ACCESS_KEY": "f7827fd2cb7826a8b0af7290bb44df391b253e26446390edf3cc44b71d9fb6ba",
+        "AWS_DEFAULT_REGION": "us-east-2",
+        "AWS_BUCKET": "waslny",
+        "AWS_ENDPOINT": "https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/s3/waslny",
+        "AWS_USE_PATH_STYLE_ENDPOINT": "true",
+
+        "SUPABASE_PROJECT_ID": "cqrlbirnwzidgerehsdq",
+        "SUPABASE_STORAGE_BUCKET": "waslny",
 
         "VITE_APP_NAME": "${APP_NAME}",
 
-        "PUSHER_APP_ID": "1997648",
-        "PUSHER_APP_KEY": "23f5014c5ebc75d0acfb",
-        "PUSHER_APP_SECRET": "b709a0d4b5608e1cb0af",
-        "PUSHER_PORT": "443",
+        "PUSHER_APP_ID": "1975841",
+        "PUSHER_APP_KEY": "f521d53f124667c40c3c",
+        "PUSHER_APP_SECRET": "f7275fd65088d4b7a8a8",
         "PUSHER_APP_CLUSTER": "us2",
-        "PUSHER_SCHEME": "https",
-        "useTLS": "true"
+        "useTLS": "true",
+
+        "DRIVER_SEARCH_URL": "https://waslny-self.vercel.app/api/api/test-htpp",
+        "DRIVER_SEARCH_SECRET": "base64:A+m6qeo+ZUuB0umZYlbysicjn1iswH0w+/qyZU+KC6o="
     }
 }

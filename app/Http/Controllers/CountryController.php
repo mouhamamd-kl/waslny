@@ -153,7 +153,7 @@ class CountryController extends Controller
         }
     }
 
-    public function Activate($id)
+    public function activate($id)
     {
         try {
             /** @var Coupon $coupon */ // Add PHPDoc type hint

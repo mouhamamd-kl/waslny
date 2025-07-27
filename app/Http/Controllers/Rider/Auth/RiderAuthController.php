@@ -12,6 +12,7 @@ use App\Notifications\Rider\RiderTwoFactorCode;
 use App\Services\AssetsService;
 use App\Services\FileServiceFactory;
 use App\Services\RiderService;
+use Exception;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -24,51 +25,80 @@ class RiderAuthController extends Controller
     protected RiderService $riderSerivce;
     public function login(Request $request)
     {
+        try {
+            DB::beginTransaction();
+            $validator = Validator::make($request->all(), [
+                'phone' => ['required', 'string'],
+            ], [], [
+                'phone' => __('lang.phone'),
+            ]);
 
-        $validator = Validator::make($request->all(), [
-            'phone' => ['required', 'string'],
-        ], [], [
-            'phone' => __('lang.phone'),
-        ]);
+            if ($validator->fails()) {
+                return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
+            }
 
-        if ($validator->fails()) {
-            return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
+            // $rider = Rider::where('phone', $request->phone)->first();
+            $rider = Rider::firstOrCreate(
+                ['phone' => $request->phone],
+            );
+            // $token = $rider->createToken('authToken')->plainTextToken;
+            $rider->generateTwoFactorCode();
+            $rider->notify(new RiderTwoFactorCode);
+            DB::commit(); // Never reached
+            return ApiResponse::sendResponseSuccess(
+                [
+                    'requires_otp' => true,
+                ],
+                trans_fallback('messages.auth.verification.sent', 'Verification Code has been sent')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred'),
+                500,
+                get_debug_data($e) // Using the helper function
+            );
         }
-
-        // $rider = Rider::where('phone', $request->phone)->first();
-        $rider = Rider::firstOrCreate(
-            ['phone' => $request->phone],
-        );
-        $token = $rider->createToken('authToken')->plainTextToken;
-        $rider->generateTwoFactorCode();
-        $rider->notify(new RiderTwoFactorCode);
-        return ApiResponse::sendResponseSuccess(
-            [
-                'requires_otp' => true,
-            ],
-            trans_fallback('messages.auth.verification.sent', 'Verification Code has been sent')
-        );
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return ApiResponse::sendResponseSuccess(
-            [],
-            trans_fallback('messages.auth.logout', 'logged out successfully'),
-            200
-        );
+        try {
+            DB::beginTransaction();
+            $request->user()->currentAccessToken()->delete();
+            DB::commit(); // Never reached
+            return ApiResponse::sendResponseSuccess(
+                [],
+                trans_fallback('messages.auth.logout', 'logged out successfully'),
+                200
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred'),
+                500,
+                get_debug_data($e) // Using the helper function
+            );
+        }
     }
 
     // In AuthController
     public function refreshToken(Request $request)
     {
-        $request->user()->tokens()->delete();
-
-        return response()->json([
-            'token' => $request->user()->createToken('refresh-token')->plainTextToken,
-        ]);
+        try {
+            DB::beginTransaction();
+            $request->user()->tokens()->delete();
+            DB::commit(); // Never reached
+            return response()->json([
+                'token' => $request->user()->createToken('refresh-token')->plainTextToken,
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred'),
+                500,
+                get_debug_data($e) // Using the helper function
+            );
+        }
     }
 
     public function deleteAccount(Request $request)
@@ -91,8 +121,11 @@ class RiderAuthController extends Controller
             return ApiResponse::sendResponseSuccess(null, 'Rider account deleted successfully');
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            return ApiResponse::sendResponseError('Failed to delete account: ' . $e->getMessage(), 500);
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred'),
+                500,
+                get_debug_data($e) // Using the helper function
+            );
         }
     }
 }

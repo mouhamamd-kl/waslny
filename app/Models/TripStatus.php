@@ -2,23 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\TripStatusEnum;
 use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-enum TripStatus: string
-{
-    case Pending = 'pending';
-    case Completed = 'completed';
-    case OnGoing = 'on_going'; // Underscore instead of space
-    case Cancelled = 'cancelled';
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
-}
 class TripStatus extends Model
 {
     use FilterScope;
@@ -45,7 +34,10 @@ class TripStatus extends Model
             get: fn(string $value) => ucfirst($value), // Example: Format status name
         );
     }
-
+    public function toEnum(): TripStatusEnum
+    {
+        return TripStatusEnum::from($this->name);
+    }
     // =================
     // Scopes
     // =================
@@ -57,13 +49,16 @@ class TripStatus extends Model
     // =================
     // Business Logic
     // =================
-    public function isCompletedStatus(): bool
+    public function isCompleted(): bool
     {
-        return $this->name === 'completed';
+        return $this->toEnum() === TripStatusEnum::Completed;
     }
-
+    public function isCancelled(): bool
+    {
+        return str_ends_with($this->name, '_cancelled');
+    }
     public function isCancellable(): bool
     {
-        return in_array($this->name, ['pending', 'in_progress']);
+        return $this->toEnum()->isCancellable();
     }
 }

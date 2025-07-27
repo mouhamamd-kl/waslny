@@ -43,12 +43,22 @@ class RiderService extends BaseService
         }
     }
 
-    public function suspend($riderId, SuspensionReason $suspension_reason)
+    public function suspendForever($riderId, $suspension_id)
     {
         try {
             /** @var Rider $rider */ // Add PHPDoc type hint
             $rider = $this->findById($riderId);
-            $rider->suspend($suspension_reason);
+            $rider->suspend($suspension_id);
+        } catch (Exception $e) {
+            throw new Exception('error suspending for rider' . $e);
+        }
+    }
+    public function suspendTemporarily($riderId, $suspension_id, $suspended_until)
+    {
+        try {
+            /** @var Rider $rider */ // Add PHPDoc type hint
+            $rider = $this->findById($riderId);
+            $rider->suspendTemporarily($suspension_id, $suspended_until);
         } catch (Exception $e) {
             throw new Exception('error suspending for rider' . $e);
         }

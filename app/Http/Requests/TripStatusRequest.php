@@ -15,7 +15,7 @@ class TripStatusRequest extends BaseRequest
      */
     public function authorize(): bool
     {
-        return auth('rider-api')->check();
+        return auth('admin-api')->check();
     }
 
     /**

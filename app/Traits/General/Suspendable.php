@@ -6,7 +6,9 @@ namespace App\Traits\General;
 
 use App\Enums\SuspensionReason;
 use App\Enums\UserStatus;
+use App\Models\AccountSuspension;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Date;
 
 /**
  * Suspendable trait provides functionality for suspending and reinstating models.
@@ -22,13 +24,20 @@ trait Suspendable
      * @return void
      * @throws \RuntimeException If the model doesn't use the required status functionality
      */
-    public function suspend(SuspensionReason $suspensionReason): void
+    // In Rider/Driver models
+    public function suspendForever($suspendId): AccountSuspension
     {
-        $this->validateSuspendable();
+        return $this->suspensions()->create([
+            'suspension_id' => $suspendId,
+            'is_permanent' => true,
+        ]);
+    }
 
-        $this->update([
-            'suspended' => true,
-            'suspension_reason_id' => $suspensionReason->id,
+    public function suspendTemporarily($suspendId, Date $suspended_until): AccountSuspension
+    {
+        return $this->suspensions()->create([
+            'suspended_until' => $suspended_until,
+            'suspension_id' => $suspendId,
         ]);
     }
 
@@ -38,16 +47,25 @@ trait Suspendable
      * @return void
      * @throws \RuntimeException If the model doesn't use the required status functionality
      */
-    public function reinstate(): void
+    public function reinstate(): bool
     {
-        $this->validateSuspendable();
-
-        $this->update([
-            'suspended' => false,
-            'suspension_reason_id' => null,
-        ]);
+        /** @var AccountSuspension $accountSuspension */ // Add PHPDoc type hint
+        if ($accountSuspension = $this->activeSuspension) {
+            return $accountSuspension->lift();
+        }
+        return false;
     }
 
+    public function activeSuspension(): ?AccountSuspension
+    {
+        return $this->suspensions()
+            ->where(function ($query) {
+                $query->where('is_permanent', true)
+                    ->orWhere('suspended_until', '>', now());
+            })
+            ->whereNull('lifted_at')
+            ->first();
+    }
     /**
      * Check if the model is currently suspended.
      *
@@ -55,7 +73,7 @@ trait Suspendable
      */
     public function isSuspended(): bool
     {
-        return (bool) $this->suspended;
+        return $this->suspensions()->active()->exists();
     }
 
     /**
@@ -65,9 +83,31 @@ trait Suspendable
      */
     public function suspensionReason()
     {
-        return $this->belongsTo(SuspensionReason::class);
+        return $this->activeSuspension()->suspenssion()->reason();
     }
 
+    public function userSuspensionMessage()
+    {
+        return $this->activeSuspension()->suspenssion()->userSuspenssionMessage();
+    }
+
+    public function suspensionStatus(): ?string
+    {
+        if (!$suspension = $this->activeSuspension()) {
+            return null;
+        }
+
+        return $suspension->is_permanent
+            ? 'Permanently suspended'
+            : 'Suspended until ' . $suspension->suspended_until->format('M d, Y');
+    }
+
+    public function getStatusAttribute(): string
+    {
+        return $this->isSuspended()
+            ? ($this->activeSuspension->is_permanent ? 'banned' : 'suspended')
+            : 'active';
+    }
     /**
      * Validate that the model has required properties and methods.
      *

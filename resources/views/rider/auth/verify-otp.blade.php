@@ -28,7 +28,7 @@
         }
 
         .header {
-            background-color: #04473a;
+            background-color: #2949FA;
             padding: 30px;
             text-align: center;
         }
@@ -58,8 +58,8 @@
             display: inline-block;
             font-size: 28px;
             font-weight: bold;
-            color: #04473a;
-            background-color: #e8f5f2;
+            color: #0417B9;
+            background-color: #5A6BFB;
             padding: 14px 24px;
             border-radius: 50px;
             margin: 30px 0;
@@ -75,7 +75,7 @@
         }
 
         .footer a {
-            color: #20b486;
+            color: #2964FA;
             text-decoration: none;
         }
 
@@ -104,8 +104,7 @@
                 <table class="email-wrapper" role="presentation">
                     <tr>
                         <td class="header">
-                            <img src="https://laravel-test-bucket-8642.s3.ap-southeast-2.amazonaws.com/profile-pictures/white_logo.png"
-                                alt="Astra Logo" aria-label="Astra Logo">
+                            <img src="https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/object/public/waslny/storage/v1/s3/waslny/waslny/system/Gm63IEBgl6QFmnPUhgBGb6dT0R6TuBU9i9PM32VK.png" alt="Waslny Logo" aria-label="Waslny Logo">
                         </td>
                     </tr>
                     <tr>
@@ -119,9 +118,9 @@
                     </tr>
                     <tr>
                         <td class="footer">
-                            <p>Thanks,<br>The Astra Team</p>
+                            <p>Thanks,<br>Waslny Team</p>
                             <p><a href="#">Privacy Policy</a> • <a href="#">Terms of Service</a></p>
-                            <p>&copy; 2025 Astra Real Estate. All rights reserved.</p>
+                            <p>&copy; 2025 Waslny company. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
@@ -130,4 +129,4 @@
     </table>
 </body>
 
-</html> 
+</html>

@@ -153,7 +153,7 @@ class CarServiceLevelController extends Controller
         }
     }
 
-    public function Activate($id)
+    public function activate($id)
     {
         try {
             /** @var CarServiceLevel $car_model */ // Add PHPDoc type hint

@@ -24,8 +24,10 @@ class RiderSavedLocationController extends Controller
     public function index(Request $request)
     {
         try {
+            $filters = $request->input('filters');
+            $filters['rider_id'] = auth('rider-api')->user()->id;
             $rider_saved_locations = $this->rider_saved_location_service->searchRiderFolders(
-                $request->input('filters', []),
+                $filters,
                 $request->input('perPage', 5)
             );
             return ApiResponse::sendResponsePaginated(
@@ -43,30 +45,30 @@ class RiderSavedLocationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
-    {
-        try {
-            $filters = $request->only([
-                'name',
-                'is_active',
-            ]);
-            $rider_saved_locations = $this->rider_saved_location_service->searchRiderFolders(
-                filters: $filters,
-                perPage: $request->input('per_page', 10),
-            );
+    // public function search(Request $request)
+    // {
+    //     try {
+    //         $filters = $request->only([
+    //             'name',
+    //             'is_active',
+    //         ]);
+    //         $rider_saved_locations = $this->rider_saved_location_service->searchRiderFolders(
+    //             filters: $filters,
+    //             perPage: $request->input('per_page', 10),
+    //         );
 
-            return ApiResponse::sendResponsePaginated(
-                $rider_saved_locations,
-                RiderSavedLocationResource::class, // Add your resource class
-                trans_fallback('messages.rider_saved_location.list', 'Rider Location Folder retrieved successfully'),
-            );
-        } catch (Exception $e) {
-            return ApiResponse::sendResponseError(
-                'Search failed: ' . $e->getMessage(),
-                500
-            );
-        }
-    }
+    //         return ApiResponse::sendResponsePaginated(
+    //             $rider_saved_locations,
+    //             RiderSavedLocationResource::class, // Add your resource class
+    //             trans_fallback('messages.rider_saved_location.list', 'Rider Location Folder retrieved successfully'),
+    //         );
+    //     } catch (Exception $e) {
+    //         return ApiResponse::sendResponseError(
+    //             'Search failed: ' . $e->getMessage(),
+    //             500
+    //         );
+    //     }
+    // }
 
     /**
      * Show the form for creating a new resource.
@@ -74,8 +76,9 @@ class RiderSavedLocationController extends Controller
     public function store(RiderSavedLocationRequest $request)
     {
         try {
-            $data = $request->validate();
-            $rider_saved_location = $this->rider_saved_location_service->create($data);
+            $validatedData = $request->validated();
+            $validatedData['rider_id'] = $request->user()->id;
+            $rider_saved_location = $this->rider_saved_location_service->create($validatedData);
             return ApiResponse::sendResponseSuccess(
                 $rider_saved_location,
                 RiderSavedLocationResource::class,

@@ -15,7 +15,8 @@ return [
         'deleted' => 'تم حذف حساب الراكب بنجاح',
         'retrieved' => 'تم استرجاع حساب الراكب بنجاح',
         'list' => 'تم استرجاع حسابات الركاب بنجاح',
-        'completion' => 'تم إكمال بيانات الراكب بنجاح'
+        'completion' => 'تم إكمال بيانات الراكب بنجاح',
+        'error' => ['profile_already_completed' => 'تم إكمال الملف الشخصي مسبقاً',    'profile_incomplete' => 'يرجى إكمال ملفك الشخصي قبل الوصول إلى هذه الميزة',],
     ],
     'rider_location_folder' => [
         // Success Messages
@@ -77,6 +78,12 @@ return [
         'applied' => 'تم تطبيق الكوبون بنجاح',
         'expired' => 'انتهت صلاحية الكوبون',
         'invalid' => 'كوبون غير صالح',
+        'activated' => 'تم تفعيل الكوبون بنجاح',
+        'deactivated' => 'تم إيقاف الكوبون بنجاح',
+        'error' => [
+            'activation_failed' => 'فشل تفعيل الكوبون',
+            'deactivation_failed' => 'فشل إيقاف الكوبون',
+        ],
     ],
     'rider_coupon' => [
         // Success Messages
@@ -214,6 +221,85 @@ return [
             'deactivation_failed' => 'فشل تعطيل نوع وقت الرحلة',
         ]
     ],
+    'trip' => [
+        // Success Messages
+        'created' => 'تم إنشاء الرحلة بنجاح',
+        'updated' => 'تم تحديث الرحلة بنجاح',
+        'deleted' => 'تم حذف الرحلة بنجاح',
+        'retrieved' => 'تم استرجاع الرحلة بنجاح',
+        'list' => 'تم استرجاع قائمة الرحلات بنجاح',
+        'started' => 'تم بدء الرحلة بنجاح',
+        'completed' => 'تم إكمال الرحلة بنجاح',
+        'canceled' => 'تم إلغاء الرحلة بنجاح',
+        'driver_assigned' => 'تم تعيين سائق للرحلة بنجاح',
+        'driver_arrived' => 'وصل السائق إلى نقطة الالتقاط',
+        'rider_picked_up' => 'تم اصطحاب الراكب بنجاح',
+        'route_updated' => 'تم تحديث مسار الرحلة بنجاح',
+        'payment_processed' => 'تمت معالجة الدفع بنجاح',
+        'rated' => 'تم تقييم الرحلة بنجاح',
+        'scheduled' => 'تم جدولة الرحلة بنجاح',
+
+        // Error Messages
+        'error' => [
+            'creation_failed' => 'فشل إنشاء الرحلة',
+            'update_failed' => 'فشل تحديث الرحلة',
+            'delete_failed' => 'فشل حذف الرحلة',
+            'not_found' => 'الرحلة غير موجودة',
+            'start_failed' => 'فشل بدء الرحلة',
+            'completion_failed' => 'فشل إكمال الرحلة',
+            'cancellation_failed' => 'فشل إلغاء الرحلة',
+            'invalid_status' => 'حالة الرحلة غير صالحة',
+            'driver_unavailable' => 'لا يوجد سائق متاح',
+            'driver_assignment_failed' => 'فشل تعيين سائق',
+            'rider_not_ready' => 'الراكب غير جاهز للركوب',
+            'pickup_failed' => 'فشل عملية الالتقاط',
+            'route_calculation_failed' => 'فشل حساب المسار',
+            'payment_failed' => 'فشل معالجة الدفع',
+            'rating_failed' => 'فشل تقييم الرحلة',
+            'scheduling_failed' => 'فشل جدولة الرحلة',
+            'timeout' => 'انتهى وقت الانتظار',
+            'distance_exceeded' => 'المسافة المقطوعة تجاوزت المخطط',
+            'price_mismatch' => 'عدم تطابق السعر النهائي مع التقدير',
+            'vehicle_mismatch' => 'نوع المركبة غير مطابق',
+            'rider_cancellation_fee' => 'تم تطبيق رسوم إلغاء الرحلة',
+            'driver_cancellation_penalty' => 'تم تطبيق عقوبة إلغاء السائق',
+            'no_drivers_available' => 'لا يوجد سائقون متاحون ضمن نطاق البحث. يرجى المحاولة مرة أخرى.',
+        ]
+    ],
+    'trip_location' => [
+        // Success Messages
+        'created' => 'تم إنشاء موقع الرحلة بنجاح',
+        'updated' => 'تم تحديث موقع الرحلة بنجاح',
+        'deleted' => 'تم حذف موقع الرحلة بنجاح',
+        'retrieved' => 'تم استرجاع موقع الرحلة بنجاح',
+        'list' => 'تم استرجاع قائمة مواقع الرحلة بنجاح',
+        'completed' => 'تم تأكيد الوصول إلى الموقع بنجاح',
+        'sequence_updated' => 'تم تحديث تسلسل المواقع بنجاح',
+        'eta_updated' => 'تم تحديث وقت الوصول المتوقع بنجاح',
+        'arrival_confirmed' => 'تم تسجيل وقت الوصول الفعلي بنجاح',
+        'route_optimized' => 'تم تحسين مسار المواقع بنجاح',
+
+        // Error Messages
+        'error' => [
+            'creation_failed' => 'فشل إنشاء موقع الرحلة',
+            'update_failed' => 'فشل تحديث موقع الرحلة',
+            'delete_failed' => 'فشل حذف موقع الرحلة',
+            'not_found' => 'موقع الرحلة غير موجود',
+            'completion_failed' => 'فشل تأكيد الوصول إلى الموقع',
+            'invalid_sequence' => 'تسلسل المواقع غير صالح',
+            'eta_calculation_failed' => 'فشل حساب وقت الوصول المتوقع',
+            'arrival_confirmation_failed' => 'فشل تسجيل وقت الوصول الفعلي',
+            'route_optimization_failed' => 'فشل تحسين مسار المواقع',
+            'invalid_location_type' => 'نوع الموقع غير صالح',
+            'order_conflict' => 'تعارض في ترتيب المواقع',
+            'trip_completed' => 'لا يمكن التعديل على رحلة مكتملة',
+            'invalid_coordinates' => 'إحداثيات الموقع غير صالحة',
+            'distance_calculation_failed' => 'فشل حساب المسافة بين المواقع',
+            'sequence_out_of_bounds' => 'ترتيب الموقع خارج النطاق المسموح',
+            'already_completed' => 'الموقع مكتمل بالفعل',
+            'dependency_exists' => 'لا يمكن الحذف بسبب وجود مواقع تابعة',
+        ]
+    ],
     'trip_status' => [
         // Success Messages
         'created' => 'تم إنشاء حالة الرحلة بنجاح',
@@ -241,6 +327,8 @@ return [
         'error' => [
             'suspension_failed' => 'فشل تعليق الحساب',
             'reinstate_failed' => 'فشل إعادة تفعيل الحساب',
+            'profile_already_completed' => 'تم إكمال الملف الشخصي مسبقاً',
+            'car_already_added' => 'تمت إضافة المركبة مسبقاً', // New message added here
         ],
         'car' => [
             'created' => 'تم إنشاء المركبة بنجاح'
@@ -253,7 +341,14 @@ return [
             'sent' => 'تم إرسال رمز التحقق'
         ],
         'registered' => 'تم التسجيل بنجاح. يرجى التحقق من بريدك الإلكتروني.',
-        'logout' => 'تم تسجيل الخروج بنجاح'
+        'logout' => 'تم تسجيل الخروج بنجاح',
+        'profile' => [
+            'retrieved' => 'تم استرجاع بيانات الملف الشخصي بنجاح',
+            'updated' => 'تم تحديث الملف الشخصي بنجاح',
+        ],
+        'error' => [
+            'update_failed' => 'Failed to update profile',
+        ]
     ],
     'error' => [
         'generic' => 'حدث خطأ ما. الرجاء المحاولة لاحقًا',

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->longText('profile_photo')->nullable(); // Nullable, for profile picture or file path
             $table->timestamp('two_factor_expires_at')->nullable();
-            $table->char('two_factor_code', length: 6);
-            $table->boolean('two_factor_enabled')->default(true);;
+            $table->char('two_factor_code', length: 6)->nullable();
+            $table->boolean('two_factor_enabled')->default(true);
             $table->string('password'); // Encrypted password
             $table->rememberToken();
             $table->timestamps();

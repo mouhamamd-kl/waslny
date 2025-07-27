@@ -10,7 +10,7 @@ use App\Services\PricingService;
 use Exception;
 use Illuminate\Http\Request;
 
-class pricingController extends Controller
+class PricingController extends Controller
 {
     protected $pricingService;
 
@@ -152,7 +152,7 @@ class pricingController extends Controller
         }
     }
 
-    public function Activate($id)
+    public function activate($id)
     {
         try {
             /** @var Coupon $pricing */ // Add PHPDoc type hint

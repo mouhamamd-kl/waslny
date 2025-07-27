@@ -17,6 +17,7 @@ return new class extends Migration
             $table->magellanPoint('location', 4326);
             $table->smallInteger('location_order');
             $table->enum('location_type', ['pickup', 'dropoff', 'stop']);
+            $table->double('distance', 10, 2)->unsigned()->default(0); // e.g., 1.23 km
             $table->timestamp('estimated_arrival_time')->nullable(); // When trip is accepted
             $table->timestamp('actual_arrival_time')->nullable(); // When trip completes
             $table->boolean('is_completed')->default(false);

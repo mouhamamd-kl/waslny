@@ -6,6 +6,7 @@ use App\Console\Commands\CreateAdminAccountCommand;
 use App\Console\Commands\CreateCustomModel;
 use App\Console\Commands\GenerateResources;
 use App\Helpers\ApiResponse;
+use App\Http\Middleware\EnsureRiderProfileComplete;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -25,9 +26,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-         $middleware->alias([
+        $middleware->alias([
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
+        ]);
+        $middleware->alias([
+            'rider.profile.completed' => EnsureRiderProfileComplete::class
         ]);
     })
 
@@ -48,16 +52,6 @@ return Application::configure(basePath: dirname(__DIR__))
             // If MissingAbilityException is not found, proceed with default handling
             return ApiResponse::sendResponseError(statusCode: 403, message: 'you are not authorized');
         });
-
-        // $exceptions->render(function (ValidationException $e, Request $request) {
-        //     // Ensure this is an API/JSON request
-        //     // if ($request->expectsJson() || $request->is('api/*')) {
-        //         return ApiResponse::sendResponseError(
-        //             statusCode: 434, // Recommended for validation errors
-        //             message: $e->validator->errors()->first()
-        //         );
-        //     // }
-        // });
     })
     ->withCommands([
         CreateCustomModel::class,

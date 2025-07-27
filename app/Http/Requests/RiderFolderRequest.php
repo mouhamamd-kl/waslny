@@ -35,6 +35,7 @@ class RiderFolderRequest extends BaseRequest
                     ->where('rider_id', auth('rider-api')->id())
                     ->ignore($this->route('rider_folder'))
             ],
+            
         ];
     }
 }

@@ -76,15 +76,15 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-        'rider-api' => [
+        'riders' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\Rider::class),
         ],
-        'driver-api' => [
+        'drivers' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\Driver::class),
         ],
-         'admin-api' => [
+         'admins' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\Admin::class),
         ],

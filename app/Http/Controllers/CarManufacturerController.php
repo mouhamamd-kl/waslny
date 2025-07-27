@@ -153,7 +153,7 @@ class CarManufacturerController extends Controller
         }
     }
 
-    public function Activate($id)
+    public function activate($id)
     {
         try {
             /** @var CarManufacturer $car_manufacture */ // Add PHPDoc type hint

@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Enums\TripStatusEnum;
+use App\Exceptions\InvalidTransitionException;
 use App\Traits\General\FilterScope;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 
 class Trip extends Model
@@ -26,6 +30,25 @@ class Trip extends Model
     {
         return $this->belongsTo(Driver::class);
     }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(TripDriverNotification::class);
+    }
+
+    public function notifiedDrivers(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Driver::class,
+            TripDriverNotification::class,
+            'trip_id',
+            'id',
+            'id',
+            'driver_id'
+        );
+    }
+
+
 
     public function rider(): BelongsTo
     {
@@ -80,7 +103,16 @@ class Trip extends Model
             get: fn() => $this->distance / 1000, // Convert meters to km
         );
     }
+    public function durationInMinutes(): ?int
+    {
+        // Check if both times are set
+        if (!$this->start_time || !$this->end_time) {
+            return null;
+        }
 
+        // Calculate duration in minutes
+        return $this->end_time->diffInMinutes($this->start_time);
+    }
     protected function duration(): Attribute
     {
         return Attribute::make(
@@ -127,20 +159,115 @@ class Trip extends Model
     /**
      * Business Logic
      */
+
+    public function transitionTo(TripStatusEnum $newStatus): void
+    {
+        $currentStatus = TripStatusEnum::tryFrom($this->status->name);
+
+        if (!$currentStatus->canTransitionTo($newStatus)) {
+            throw new InvalidTransitionException(
+                "Cannot transition from {$currentStatus->value} to {$newStatus->value}"
+            );
+        }
+
+        // Get database status model
+        $newStatusModel = TripStatus::firstWhere('name', $newStatus->value);
+        if (!$newStatusModel) {
+            throw new \RuntimeException("Status {$newStatus->value} not found in database");
+        }
+        // Update status timeline
+        $timeline = $this->status_timeline ?? [];
+        $timeline[$newStatus->value] = now()->toDateTimeString();
+
+        // Update trip status and timeline
+        $this->trip_status_id = $newStatusModel->id;
+        $this->status_timeline = $timeline;
+        $this->save();
+
+        // Fire events
+        // event(new TripStatusChanged($this, $currentStatus, $newStatus));
+    }
+    // Accessor for any status time
+
+    public function isNotified(Driver $driver): bool
+    {
+        return $this->notifications()
+            ->where('driver_id', $driver->id)
+            ->exists();
+    }
+
+    public function assignDriver(Driver $driver): void
+    {
+        if ($this->driver_id) {
+            throw new Exception('Trip already has a driver assigned');
+        }
+
+        $this->driver()->associate($driver);
+        $this->transitionTo(TripStatusEnum::DriverAssigned);
+        $this->save();
+
+        // Update driver status
+        $driver->update([
+            'driver_status_id' => DriverStatus::where('name', 'in_trip')->first()->id
+        ]);
+    }
+
+    public function recordNotification(Driver $driver): void
+    {
+        $this->notifications()->firstOrCreate([
+            'driver_id' => $driver->id,
+            'sent_at' => now()
+        ]);
+    }
+
+    public function getStatusTime(TripStatusEnum $status): ?Carbon
+    {
+        return isset($this->status_timeline[$status->value])
+            ? Carbon::parse($this->status_timeline[$status->value])
+            : null;
+    }
+
+    // Aliases for common status times
+    public function getStartedAtAttribute(): ?Carbon
+    {
+        return $this->getStatusTime(TripStatusEnum::OnGoing);
+    }
+
+    public function getCancelledAtAttribute(): ?Carbon
+    {
+        return $this->getStatusTime(TripStatusEnum::RiderCancelled) ??
+            $this->getStatusTime(TripStatusEnum::DriverCancelled) ??
+            $this->getStatusTime(TripStatusEnum::SystemCancelled);
+    }
+
+    public function getCompletedAtAttribute(): ?Carbon
+    {
+        return $this->getStatusTime(TripStatusEnum::Completed);
+    }
+
     public function startTrip(): void
     {
-        $this->update([
-            'start_time' => now(),
-            'trip_status_id' => TripStatus::where('name', 'in_progress')->first()->id
-        ]);
+        $this->transitionTo(TripStatusEnum::OnGoing);
+        $this->start_time = now();  // Still track specific timing if needed
+        $this->save();
     }
 
     public function completeTrip(): void
     {
-        $this->update([
-            'end_time' => now(),
-            'trip_status_id' => TripStatus::where('name', 'completed')->first()->id
-        ]);
+        $this->transitionTo(TripStatusEnum::Completed);
+        $this->end_time = now();
+        $this->save();
+    }
+
+    public function cancelByRider(): void
+    {
+        $this->transitionTo(TripStatusEnum::RiderCancelled);
+        $this->save();
+    }
+    public function cancelByDriver(): void
+    {
+        $this->transitionTo(TripStatusEnum::DriverCancelled);
+        $this->save();
     }
 
     public function applyCoupon(RiderCoupon $riderCoupon): void
@@ -180,8 +307,8 @@ class Trip extends Model
         // ]);
     }
 
-    public function addLocation(array $locationData): TripLocation
+    public function addLocation(array $locations): TripLocation
     {
-        return $this->locations()->create($locationData);
+        return $this->locations()->create($locations);
     }
 }

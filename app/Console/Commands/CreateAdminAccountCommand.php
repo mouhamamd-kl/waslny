@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 class CreateAdminAccountCommand extends Command
 {
-    protected $signature = 'make:accounto';
+    protected $signature = 'make:admin-account';
     protected $description = 'Create an admin account for the system';
 
     public function handle(): int
@@ -31,6 +31,7 @@ class CreateAdminAccountCommand extends Command
         $defaultData = [
             'user_name' => 'Admin',
             'email' => 'mouhammadk44@gmail.com',
+            'phone'=>'+963937897938',
             'password' => 'password123',
         ];
 
@@ -40,8 +41,8 @@ class CreateAdminAccountCommand extends Command
         }
         try {
             Admin::create([
-                'user_name' => $defaultData['first_name'],
-                'phone' => '+1234567890',
+                'user_name' => $defaultData['user_name'],
+                'phone' => $defaultData['phone'],
                 'email' => $defaultData['email'],
                 'password' => Hash::make($defaultData['password']),
                 'created_at' => now(),

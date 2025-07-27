@@ -81,17 +81,21 @@ class TripLocation extends Model
     /**
      * Business Logic
      */
-    public function markAsCompleted(): void
+    public function isCompleted(): bool
     {
-        $this->update([
+        return $this->is_completed;
+    }
+    public function completeTripLocation(): bool
+    {
+        return $this->update([
             'actual_arrival_time' => now(),
             'is_completed' => true
         ]);
     }
 
-    public function updateEstimatedArrival($minutes): void
+    public function updateEstimatedArrival($minutes): bool
     {
-        $this->update([
+        return $this->update([
             'estimated_arrival_time' => now()->addMinutes($minutes)
         ]);
     }

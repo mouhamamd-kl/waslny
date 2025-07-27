@@ -9,6 +9,15 @@ use App\Services\BaseFileService;
 class FileServiceFactory
 {
     // Rider-related services
+    public static function makeForAdminProfile(): BaseFileService
+    {
+        return new BaseFileService(
+            FileExtensions::PROFILE_PHOTOS,
+            DiskNames::ADMINS_PROFILE->name
+        );
+    }
+
+    // Rider-related services
     public static function makeForRiderProfile(): BaseFileService
     {
         return new BaseFileService(

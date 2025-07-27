@@ -9,6 +9,7 @@ trait EnumFromName
         return constant("self::$name");
     }
 }
+
 use Exception;
 
 // class DiskNames
@@ -26,6 +27,7 @@ enum DiskNames: string
 {
     use EnumFromName;
     case RIDERS = 'riders/profile';
+    case ADMINS_PROFILE = 'admins/profile';
     case DRIVERS_PROFILE = 'drivers/profile';
     case DRIVERS_LICENSE = 'drivers/license';
     case DRIVERS_CAR_PHOTOS = 'drivers/car-photos';
