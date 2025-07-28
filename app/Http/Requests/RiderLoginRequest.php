@@ -2,27 +2,16 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\SuspensionReason;
-use App\Models\Country;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class SuspendAccountForeverRequest extends BaseRequest
+class RiderLoginRequest extends FormRequest
 {
-    // /**
-    //  * Determine if the user is authorized to make this request.
-    //  */
-    // public function authorize(): bool
-    // {
-    //     return auth('admin-api')->check();
-    // }
-
-    /**
+     /**
      * Determine if the user is authorized to make this request.
      */
     public function handleAuthorization(): bool
     {
-        return auth('admin-api')->check();
+        return true;
     }
 
     /**
@@ -33,7 +22,7 @@ class SuspendAccountForeverRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'suspension_id' => ['required', 'exists:suspensions,id'],
+            'phone' => ['required', 'string']
         ];
     }
 }

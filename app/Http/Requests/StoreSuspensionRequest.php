@@ -7,12 +7,20 @@ use Illuminate\Validation\Rule;
 
 class StoreSuspensionRequest extends FormRequest
 {
+    // /**
+    //  * Determine if the user is authorized to make this request.
+    //  */
+    // public function authorize(): bool
+    // {
+    //     return auth('admin-api')->check();;
+    // }
+
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function handleAuthorization(): bool
     {
-        return true;
+        return auth('admin-api')->check();;
     }
 
     /**

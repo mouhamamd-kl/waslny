@@ -11,6 +11,17 @@ if (!function_exists('is_debug_mode')) {
         return (bool) config('app.debug', false);
     }
 }
+if (!function_exists('is_console')) {
+    /**
+     * Determine if the application is running in the console.
+     *
+     * @return bool
+     */
+    function is_console(): bool
+    {
+        return app()->runningInConsole();
+    }
+}
 if (!function_exists('get_debug_data')) {
     /**
      * Get debug information when APP_DEBUG is true

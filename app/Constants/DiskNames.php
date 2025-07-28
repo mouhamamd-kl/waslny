@@ -32,7 +32,7 @@ enum DiskNames: string
     case DRIVERS_LICENSE = 'drivers/license';
     case DRIVERS_CAR_PHOTOS = 'drivers/car-photos';
     case SYSTEM = 'system';
-    case SUBAPASEPUBLIC = 'subabase';
+    case SUBAPASEPUBLIC = 'supabase';
     case SUPABASEPRIVATE = 'supabase_private';
     // Get all valid disk names (keys)
     public static function names(): array

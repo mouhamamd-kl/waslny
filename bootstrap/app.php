@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
+
         ]);
         $middleware->alias([
             'rider.profile.completed' => EnsureRiderProfileComplete::class

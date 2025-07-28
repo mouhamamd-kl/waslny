@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminResetLinkRequest;
+use App\Http\Requests\AdminResetPasswordRequest;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,10 +13,10 @@ use Illuminate\Support\Facades\Password;
 
 class AdminPasswordResetController extends Controller
 {
-    public function sendResetLink(Request $request)
+    public function sendResetLink(AdminResetLinkRequest $request)
     {
         try {
-            $request->validate(['email' => 'required|email']);
+            $data = $request->validated();
 
             $status = Password::broker('admins')->sendResetLink(
                 $request->only('email')
@@ -36,15 +38,11 @@ class AdminPasswordResetController extends Controller
             );
         }
     }
-    public function resetPassword(Request $request)
+    public function resetPassword(AdminResetPasswordRequest $request)
     {
         try {
             DB::beginTransaction();
-            $request->validate([
-                'token' => 'required',
-                'email' => 'required|email',
-                'password' => 'required|min:8|confirmed',
-            ]);
+            $data = $request->validated();
 
             $status = Password::broker('admins')->reset(
                 $request->only('email', 'password', 'password_confirmation', 'token'),

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Rider\Auth;
+namespace App\Http\Controllers\AuthTest;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;

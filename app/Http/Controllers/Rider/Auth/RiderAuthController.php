@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rider\Auth;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AgentRegisterRequest;
+use App\Http\Requests\RiderLoginRequest;
 use App\Models\Agent;
 use App\Models\Rider;
 use App\Notifications\Agent\AgentTwoFactorCode;
@@ -23,23 +24,16 @@ use Illuminate\Support\Facades\Validator;
 class RiderAuthController extends Controller
 {
     protected RiderService $riderSerivce;
-    public function login(Request $request)
+    public function login(RiderLoginRequest $request)
     {
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), [
-                'phone' => ['required', 'string'],
-            ], [], [
-                'phone' => __('lang.phone'),
-            ]);
+            $data = $request->validated();
 
-            if ($validator->fails()) {
-                return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
-            }
 
             // $rider = Rider::where('phone', $request->phone)->first();
             $rider = Rider::firstOrCreate(
-                ['phone' => $request->phone],
+                ['phone' => $data->phone],
             );
             // $token = $rider->createToken('authToken')->plainTextToken;
             $rider->generateTwoFactorCode();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rider\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DriverResendOtpRequest;
 use App\Http\Requests\TwoFactorCodeRequest;
 use App\Http\Resources\RiderResource;
 use App\Models\Agent;
@@ -68,21 +69,12 @@ class RiderTwoFactorController extends Controller
         }
     }
 
-    public function resend(Request $request)
+    public function resend(DriverResendOtpRequest $request)
     {
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), [
-                'phone' => ['required', 'string',],
-            ], [], [
-                'phone' => __('lang.phone'),
-            ]);
-
-            if ($validator->fails()) {
-                return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
-            }
-
-            $rider = Rider::where('phone', $request->phone)->first();
+            $data = $request->validated();
+            $rider = Rider::where('phone', $data->phone)->first();
             $rider->generateTwoFactorCode();
             // $rider->notify(new \App\Notifications\Agent\AgentTwoFactorCode);
             DB::commit(); // Never reached

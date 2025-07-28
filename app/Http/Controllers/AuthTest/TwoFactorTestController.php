@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Rider\Auth;
+namespace App\Http\Controllers\AuthTest;
+
 
 use App\Enums\SuspensionReason;
+use App\Enums\SuspensionReasonEnum;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RiderResource;
@@ -33,8 +35,8 @@ class TwoFactorTestController extends Controller
         }
         if ($rider->isSuspended()) {
             // Get the specific suspension message
-            $suspensionReason = SuspensionReason::tryFrom($rider->suspension_reason)
-                ?? SuspensionReason::OTHER;
+            $suspensionReason = SuspensionReasonEnum::tryFrom($rider->suspension_reason)
+                ?? SuspensionReasonEnum::OTHER;
 
             return ApiResponse::sendResponseError(
                 message: $suspensionReason->message(),

@@ -10,13 +10,22 @@ use Illuminate\Validation\Rule;
 
 class TripTypeRequest extends BaseRequest
 {
+    // /**
+    //  * Determine if the user is authorized to make this request.
+    //  */
+    // public function authorize(): bool
+    // {
+    //     return auth('rider-api')->check();
+    // }
+
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function handleAuthorization(): bool
     {
         return auth('rider-api')->check();
     }
+
 
     /**
      * Get the validation rules that apply to the request.

@@ -11,7 +11,23 @@ class ApiAdminEmailVerificationRequest extends BaseRequest
 {
     protected Admin $userInstance;
 
-    public function authorize()
+    // public function authorize()
+    // {
+    //     $this->userInstance = Admin::find(id: $this->route('id'));
+
+    //     if (! $this->userInstance) {
+    //         throw ValidationException::withMessages([
+    //             'user' => 'Invalid verification link',
+    //         ]);
+    //     }
+
+    //     return hash_equals(
+    //         sha1($this->userInstance->getEmailForVerification()),
+    //         (string) $this->route('hash')
+    //     );
+    // }
+
+    public function handleAuthorization(): bool
     {
         $this->userInstance = Admin::find(id: $this->route('id'));
 

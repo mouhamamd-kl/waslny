@@ -6,7 +6,7 @@ use App\Helpers\CacheHelper;
 use App\Models\Admin;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class CarManufactureService extends BaseService
+class AdminService extends BaseService
 {
     public function __construct(CacheHelper $cache)
     {

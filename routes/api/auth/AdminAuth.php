@@ -42,9 +42,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('auth:admin-api')
         ->name('verification.notice');
 
-    Route::get('email/verify/{id}/{hash}', [AdminVerificationController::class, 'verifyEmail'])
-        ->middleware(['signed'])
-        ->name('verification.verify');
+    // Route::get('email/verify/{id}/{hash}', [AdminVerificationController::class, 'verifyEmail'])
+    //     ->middleware(['signed'])
+    //     ->name('verification.verify');
 
     Route::post('email/resend', [AdminVerificationController::class, 'resendVerificationEmail'])
         ->middleware(['throttle:6,1'])

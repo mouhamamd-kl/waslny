@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminLoginRequest;
 use App\Models\Admin;
 use App\Notifications\Admin\AdminTwoFactorCode;
 use Exception;
@@ -24,22 +25,11 @@ class AdminAuthController extends Controller
             ],
         ];
     }
-    public function login(Request $request)
+    public function login(AdminLoginRequest $request)
     {
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), [
-                'email' => ['required', 'string', 'email'],
-                'password' => ['required', 'string'],
-            ], [], [
-                'email' => __('lang.email'),
-                'password' => __('lang.password'),
-            ]);
-
-            if ($validator->fails()) {
-                return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
-            }
-
+            $data = $request->validated();
             $admin = Admin::where('email', $request->email)->first();
             if (! $admin || ! Hash::check($request->password, $admin->password)) {
                 return ApiResponse::sendResponseError('Invalids credentials', 401);

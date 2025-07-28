@@ -11,14 +11,40 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class BaseRequest extends FormRequest
 {
+    // /**
+    //  * Determine if the user is authorized to make this request.
+    //  *
+    //  * @return bool
+    //  */
+    // public function authorize()
+    // {
+    //     return true;
+    // }
+
     /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
+     * Global authorization rules with console bypass
      */
-    public function authorize()
+    final public function authorize(): bool
+    {
+        return $this->isConsoleExecution()
+            ? true
+            : $this->handleAuthorization();
+    }
+
+    /**
+     * Handle non-console authorization
+     */
+    protected function handleAuthorization(): bool
     {
         return true;
+    }
+
+    /**
+     * Determine if execution is in console context
+     */
+    final function isConsoleExecution(): bool
+    {
+        return is_console();
     }
 
     /**

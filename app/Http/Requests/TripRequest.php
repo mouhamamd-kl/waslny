@@ -17,13 +17,20 @@ use Illuminate\Validation\Validator;
 class TripRequest extends BaseRequest
 {
     use TransformsGeojsonGeometry;
+    // /**
+    //  * Determine if the user is authorized to make this request.
+    //  */
+    // public function authorize(): bool
+    // {
+    //     return auth('rider-api')->check();
+    // }
+
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function handleAuthorization(): bool
     {
-        return true;
-        // return auth('rider-api')->check();
+        return auth('rider-api')->check();
     }
 
     /**
@@ -33,71 +40,98 @@ class TripRequest extends BaseRequest
      */
     public function rules(): array
     {
-        return [
-            'trip_type_id' => [
-                $this->isRequired(),
-                'exists:trip_types,id'
-            ],
-
-            'trip_time_type_id' => [
-                $this->isRequired(),
-                'exists:trip_time_types,id'
-            ],
-
-            'coupon_id' => [
-                'sometimes',
-                'exists:coupons,id',
-                new ActiveCoupon,
-            ],
-
-            'payment_method_id' => [
-                $this->isRequired(),
-                'exists:payment_methods,id'
-            ],
-
-            // Date/time validation
-            'requested_time' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    $datetime = Carbon::createFromFormat('Y-m-d H:i', $value);
-
-                    if (!$datetime) {
-                        $fail('Invalid datetime format. Use YYYY-MM-DD HH:MM.');
-                    }
-
-                    if ($datetime->isPast()) {
-                        $fail('The start time must be in the future.');
-                    }
-                },
-            ],
-
-            //Trip Locations Validation
-            'locations' => ['array', 'min:2', 'required', 'filled'],
-            'locations.*' => [
-                new JsonValidatorRule(['location', 'location_order', 'location_type']),
-                new TripLocationTypesRule,
-                new TripLocationOrderRule,
-            ],
-            'locations.*.location' => [new GeometryGeojsonRule([Point::class]),],
-            'locations.*.location_order' => ['integer', 'min:1', 'distinct'],
-            'locations.*.location_type' => [Rule::enum(LocationTypeEnum::class)],
-
-            // 'locations.*.estimated_arrival_time' => [
-            //     'required',
-            //     function ($attribute, $value, $fail) {
-            //         $datetime = Carbon::createFromFormat('Y-m-d H:i', $value);
-
-            //         if (!$datetime) {
-            //             $fail('Invalid datetime format. Use YYYY-MM-DD HH:MM.');
-            //         }
-
-            //         if ($datetime->isPast()) {
-            //             $fail('The arrival time must be in the future.');
-            //         }
-            //     },
-            // ],
-        ];
+        return
+            [
+                'trip_type_id' => [
+                    $this->isRequired(),
+                    'exists:trip_types,id'
+                ],
+                'trip_time_type_id' => [
+                    $this->isRequired(),
+                    'exists:trip_time_types,id'
+                ],
+                'coupon_id' => [
+                    'sometimes',
+                    'exists:coupons,id',
+                    new ActiveCoupon,
+                ],
+                'payment_method_id' => [
+                    $this->isRequired(),
+                    'exists:payment_methods,id'
+                ],
+                'requested_time' => [
+                    'required',
+                   function(){},
+                ],
+            ];
     }
+    // public function rules(): array
+    // {
+    //     return [
+    //         'trip_type_id' => [
+    //             $this->isRequired(),
+    //             'exists:trip_types,id'
+    //         ],
+
+    // 'trip_time_type_id' => [
+    //     $this->isRequired(),
+    //     'exists:trip_time_types,id'
+    // ],
+
+    // 'coupon_id' => [
+    //     'sometimes',
+    //     'exists:coupons,id',
+    //     new ActiveCoupon,
+    // ],
+
+    // 'payment_method_id' => [
+    //     $this->isRequired(),
+    //     'exists:payment_methods,id'
+    // ],
+
+    // // Date/time validation
+    // 'requested_time' => [
+    //     'required',
+        // function ($attribute, $value, $fail) {
+        //     $datetime = Carbon::createFromFormat('Y-m-d H:i', $value);
+
+        //     if (!$datetime) {
+        //         $fail('Invalid datetime format. Use YYYY-MM-DD HH:MM.');
+        //     }
+
+        //     if ($datetime->isPast()) {
+        //         $fail('The start time must be in the future.');
+        //     }
+        // },
+    // ],
+
+    // //Trip Locations Validation
+    // 'locations' => ['array', 'min:2', 'required', 'filled'],
+    // 'locations.*' => [
+    //     new JsonValidatorRule(['location', 'location_order', 'location_type']),
+    //     new TripLocationTypesRule,
+    //     new TripLocationOrderRule,
+    // ],
+    // 'locations.*.location' => [new GeometryGeojsonRule([Point::class]),],
+    // 'locations.*.location_order' => ['integer', 'min:1', 'distinct'],
+    // 'locations.*.location_type' => [Rule::enum(LocationTypeEnum::class)],
+
+    // 'locations.*.estimated_arrival_time' => [
+    //     'required',
+    //     function ($attribute, $value, $fail) {
+    //         $datetime = Carbon::createFromFormat('Y-m-d H:i', $value);
+
+    //         if (!$datetime) {
+    //             $fail('Invalid datetime format. Use YYYY-MM-DD HH:MM.');
+    //         }
+
+    //         if ($datetime->isPast()) {
+    //             $fail('The arrival time must be in the future.');
+    //         }
+    //     },
+    // ],
+    // ];
+    // }
     public function geometries(): array
     {
         return ['locations.*.location'];

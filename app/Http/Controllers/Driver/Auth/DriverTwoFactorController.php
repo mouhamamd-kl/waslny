@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Driver\Auth;
 use App\Enums\SuspensionReason;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DriverResendOtpRequest;
+use App\Http\Requests\RiderResendOtpRequest;
 use App\Http\Requests\TwoFactorCodeRequest;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\RiderResource;
@@ -22,72 +24,71 @@ class DriverTwoFactorController extends Controller
     public function verify(TwoFactorCodeRequest $request)
     {
         try {
-        DB::beginTransaction();
-        $request->validated();
-        /** @var Driver $driver */ // Add PHPDoc type hint
+            DB::beginTransaction();
+            $request->validated();
+            /** @var Driver $driver */ // Add PHPDoc type hint
 
-        $driver = Driver::where('phone', $request->phone)->first();
+            $driver = Driver::where('phone', $request->phone)->first();
 
-        if (
-            ! $driver ||
-            $driver->two_factor_code !== $request->otp ||
-            $driver->two_factor_expires_at->lt(now())
-        ) {
-            return ApiResponse::sendResponseError('Invalid or expired code.', 403);
-        }
-        // Clear OTP after successful verification
+            if (
+                ! $driver ||
+                $driver->two_factor_code !== $request->otp ||
+                $driver->two_factor_expires_at->lt(now())
+            ) {
+                return ApiResponse::sendResponseError('Invalid or expired code.', 403);
+            }
+            // Clear OTP after successful verification
 
-        if ($driver->isSuspended()) {
-            // Get the specific suspension message
-            return ApiResponse::sendResponseError(
-                message: $driver->userSuspensionMessage(),
-                statusCode: 403,
-                data: [
-                    'suspension_details' => [
-                        'is_permanent' => $driver->activeSuspension()->is_permanent,
-                        'suspended_until' => $driver->activeSuspension()->suspended_until,
-                        'suspended_at' => $driver->activeSuspension()->created_at,
+            if ($driver->isSuspended()) {
+                // Get the specific suspension message
+                return ApiResponse::sendResponseError(
+                    message: $driver->userSuspensionMessage(),
+                    statusCode: 403,
+                    data: [
+                        'suspension_details' => [
+                            'is_permanent' => $driver->activeSuspension()->is_permanent,
+                            'suspended_until' => $driver->activeSuspension()->suspended_until,
+                            'suspended_at' => $driver->activeSuspension()->created_at,
+                        ]
                     ]
-                ]
-            );
-        }
-        $driver->resetTwoFactorCode();
-        // Generate authentication token
-        $token = $driver->createToken('driverAuthToken')->plainTextToken;
-        // Determine response based on profile completion
-        DB::commit(); // Never reached
+                );
+            }
+            $driver->resetTwoFactorCode();
+            // Generate authentication token
+            $token = $driver->createToken('driverAuthToken')->plainTextToken;
+            // Determine response based on profile completion
+            DB::commit(); // Never reached
 
-        if ($driver->isProfileComplete() && $driver->isDriverCarComplete()) {
-            
-            return ApiResponse::sendResponseSuccess(
-                data: [
-                    'token' => $token,
-                    'is_new_driver' => false,
-                    'next_step' => 'home',  // Added navigation target
-                    'driver' => new DriverResource($driver)
-                ],
-                message: 'Login successful'
-            );
-        } elseif (!$driver->isProfileComplete()) {
-            return ApiResponse::sendResponseSuccess(
-                data: [
-                    'token' => $token,
-                    'is_new_driver' => true,
-                    'next_step' => 'profile_completion'  // Explicit screen target
-                ],
-                message: 'Driver profile setup required',
-            );
-        } elseif (!$driver->isDriverCarComplete()) {
-            return ApiResponse::sendResponseSuccess(
-                data: [
-                    'token' => $token,
-                    'is_new_driver' => true,
-                    'next_step' => 'car_completion'  // Explicit screen target
-                ],
-                message: 'Driver Car setup required',
-            );
-        }
+            if ($driver->isProfileComplete() && $driver->isDriverCarComplete()) {
 
+                return ApiResponse::sendResponseSuccess(
+                    data: [
+                        'token' => $token,
+                        'is_new_driver' => false,
+                        'next_step' => 'home',  // Added navigation target
+                        'driver' => new DriverResource($driver)
+                    ],
+                    message: 'Login successful'
+                );
+            } elseif (!$driver->isProfileComplete()) {
+                return ApiResponse::sendResponseSuccess(
+                    data: [
+                        'token' => $token,
+                        'is_new_driver' => true,
+                        'next_step' => 'profile_completion'  // Explicit screen target
+                    ],
+                    message: 'Driver profile setup required',
+                );
+            } elseif (!$driver->isDriverCarComplete()) {
+                return ApiResponse::sendResponseSuccess(
+                    data: [
+                        'token' => $token,
+                        'is_new_driver' => true,
+                        'next_step' => 'car_completion'  // Explicit screen target
+                    ],
+                    message: 'Driver Car setup required',
+                );
+            }
         } catch (Exception $e) {
             DB::rollBack();
             return ApiResponse::sendResponseError(
@@ -98,21 +99,13 @@ class DriverTwoFactorController extends Controller
         }
     }
 
-    public function resend(Request $request)
+    public function resend(DriverResendOtpRequest $request)
     {
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), [
-                'phone' => ['required', 'string',],
-            ], [], [
-                'phone' => __('lang.phone'),
-            ]);
+            $data = $request->validated();
 
-            if ($validator->fails()) {
-                return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
-            }
-
-            $driver = Driver::where('phone', $request->phone)->first();
+            $driver = Driver::where('phone', $data->phone)->first();
             $driver->generateTwoFactorCode();
             DB::commit(); // Never reached
             // $rider->notify(new \App\Notifications\Agent\AgentTwoFactorCode);

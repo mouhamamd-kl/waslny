@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Driver\Auth;
 use App\Enums\DriverStatusEnum;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DriverLoginRequest;
 use App\Models\Driver;
 use App\Notifications\Driver\DriverTwoFactorCode;
 use App\Services\DriverService;
@@ -17,26 +18,16 @@ use Illuminate\Support\Facades\Validator;
 class DriverAuthController extends Controller
 {
     protected DriverService $driverService;
-    public function login(Request $request): JsonResponse
+    public function login(DriverLoginRequest $request): JsonResponse
     {
 
         try {
             DB::beginTransaction();
-
-            $validator = Validator::make($request->all(), [
-                'phone' => ['required', 'string'],
-            ], [], [
-                'phone' => __('lang.phone'),
-            ]);
-
-            if ($validator->fails()) {
-                return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
-            }
-
+            $data = $request->validated();
             // $rider = Rider::where('phone', $request->phone)->first();
             $driver = Driver::firstOrCreate(
                 [
-                    'phone' => $request->phone,
+                    'phone' => $data->phone,
                 ],
             );
             $driver->setStatus(DriverStatusEnum::STATUS_OFFLINE);

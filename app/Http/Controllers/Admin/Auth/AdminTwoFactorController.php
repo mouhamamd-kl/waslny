@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\TwoFactorCodeRequest;
+use App\Http\Requests\AdminOtpRequest;
+use App\Http\Requests\AdminResendOtpRequest;
 use App\Models\Admin;
 use App\Models\Agent;
 use Exception;
@@ -15,11 +16,16 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminTwoFactorController extends Controller
 {
-    public function verify(TwoFactorCodeRequest $request)
+    public function verify(AdminOtpRequest $request)
     {
         try {
             DB::beginTransaction();
-            $request->validated();
+            $data=$request->validated();
+            // $request->validate([
+            //     // 'phone' => 'required',
+            //     'email' => 'required|email',
+            //     'otp' => 'required|digits:6',
+            // ]);
 
             $admin = Admin::where('email', $request->email)->first();
 
@@ -45,21 +51,22 @@ class AdminTwoFactorController extends Controller
         }
     }
 
-    public function resend(Request $request)
+    public function resend(AdminResendOtpRequest $request)
     {
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), [
-                'email' => ['required', 'string', 'email'],
-                'password' => ['required', 'string'],
-            ], [], [
-                'email' => __('lang.email'),
-                'password' => __('lang.password'),
-            ]);
+            $data = $request->validated();
+            // $validator = Validator::make($request->all(), [
+            //     'email' => ['required', 'string', 'email'],
+            //     'password' => ['required', 'string'],
+            // ], [], [
+            //     'email' => __('lang.email'),
+            //     'password' => __('lang.password'),
+            // ]);
 
-            if ($validator->fails()) {
-                return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
-            }
+            // if ($validator->fails()) {
+            //     return ApiResponse::sendResponseError('Validation failed', 422, $validator->errors());
+            // }
 
             $admin = Admin::where('email', $request->email)->first();
             if (! $admin || ! Hash::check($request->password, $admin->password)) {

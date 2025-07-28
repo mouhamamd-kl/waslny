@@ -12,7 +12,12 @@ class CouponRequest extends BaseRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    // public function authorize(): bool
+    // {
+    //     return auth('admin-api')->check();
+    // }
+
+    public function handleAuthorization(): bool
     {
         return auth('admin-api')->check();
     }
