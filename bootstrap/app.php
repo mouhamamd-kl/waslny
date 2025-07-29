@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use App\Console\Commands\CreateAdminAccount;
 use App\Console\Commands\CreateAdminAccountCommand;
 use App\Console\Commands\CreateCustomModel;
+use App\Console\Commands\ExportPostmanMyVersion;
+use App\Console\Commands\ExportPostmanTesto;
 use App\Console\Commands\GenerateResources;
 use App\Helpers\ApiResponse;
 use App\Http\Middleware\EnsureRiderProfileComplete;
@@ -57,5 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
         CreateCustomModel::class,
         GenerateResources::class,
-        CreateAdminAccountCommand::class
+        CreateAdminAccountCommand::class,
+        ExportPostmanTesto::class,
+        ExportPostmanMyVersion::class,
     ])->create();

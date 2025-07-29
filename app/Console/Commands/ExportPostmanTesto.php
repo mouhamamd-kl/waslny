@@ -19,10 +19,10 @@ use PhpParser\Node\Stmt\Return_;
 use PhpParser\NodeFinder;
 use PhpParser\ParserFactory;
 
-class ExportPostmanMyVersion extends Command
+class ExportPostmanTesto extends Command
 {
     /** @var string */
-    protected $signature = 'export:postman-test2 {--bearer= : The bearer token to use on your endpoints}';
+    protected $signature = 'export:postman-testo {--bearer= : The bearer token to use on your endpoints}';
 
     /** @var string */
     protected $description = 'Automatically generate a Postman collection for your API routes';
@@ -237,28 +237,63 @@ class ExportPostmanMyVersion extends Command
                                         $rules = $this->extractRulesFromClass2($className);
 
                                         if (!empty($rules)) {
-                                            $formdata = [];
+                                            $isJsonRequest = false;
                                             foreach ($rules as $key => $rule) {
-                                                $isFileInput = false;
-                                                $ruleString = $this->ruleToString($rule);
-
-                                                if (stripos($ruleString, 'file') !== false || stripos($ruleString, 'image') !== false) {
-                                                    $isFileInput = true;
+                                                if (str_contains($key, '.*')) {
+                                                    $isJsonRequest = true;
+                                                    break;
                                                 }
-
-                                                $formdata[] = [
-                                                    'key' => $key,
-                                                    'value' => '',
-                                                    'type' => $isFileInput ? 'file' : 'text',
-                                                    'description' => $ruleString,
-                                                ];
-                                                print_r($formdata);
                                             }
 
-                                            $requestData['request']['body'] = [
-                                                'mode' => 'formdata',
-                                                'formdata' => $formdata,
-                                            ];
+                                            if ($isJsonRequest) {
+                                                $rawJson = [];
+                                                foreach ($rules as $key => $rule) {
+                                                    $this->buildNestedArray($rawJson, $key, $this->getSampleValueForRule($rule));
+                                                }
+
+                                                // The above creates a structure with numeric keys for arrays,
+                                                // let's clean it up to be a single object in the array.
+                                                foreach ($rawJson as $key => $value) {
+                                                    if (is_array($value) && isset($value[0])) {
+                                                        $rawJson[$key] = [$value[0]];
+                                                    }
+                                                }
+
+
+                                                $requestData['request']['body'] = [
+                                                    'mode' => 'raw',
+                                                    'raw' => json_encode($rawJson, JSON_PRETTY_PRINT),
+                                                    'options' => [
+                                                        'raw' => [
+                                                            'language' => 'json'
+                                                        ]
+                                                    ]
+                                                ];
+
+                                                print_r($requestData);
+                                            } else {
+                                                $formdata = [];
+                                                foreach ($rules as $key => $rule) {
+                                                    $isFileInput = false;
+                                                    $ruleString = $this->ruleToString($rule);
+
+                                                    if (stripos($ruleString, 'file') !== false || stripos($ruleString, 'image') !== false) {
+                                                        $isFileInput = true;
+                                                    }
+
+                                                    $formdata[] = [
+                                                        'key' => $key,
+                                                        'value' => '',
+                                                        'type' => $isFileInput ? 'file' : 'text',
+                                                        'description' => $ruleString,
+                                                    ];
+                                                }
+
+                                                $requestData['request']['body'] = [
+                                                    'mode' => 'formdata',
+                                                    'formdata' => $formdata,
+                                                ];
+                                            }
                                         }
                                     } catch (Exception $e) {
                                         throw $e;
@@ -469,5 +504,53 @@ class ExportPostmanMyVersion extends Command
         }
 
         return (string) $rule;
+    }
+
+    protected function getSampleValueForRule($rule)
+    {
+        $ruleString = $this->ruleToString($rule);
+
+        if (str_contains($ruleString, 'string')) {
+            return 'string';
+        }
+        if (str_contains($ruleString, 'integer')) {
+            return 1;
+        }
+        if (str_contains($ruleString, 'numeric')) {
+            return 123.45;
+        }
+        if (str_contains($ruleString, 'boolean')) {
+            return true;
+        }
+        if (str_contains($ruleString, 'date')) {
+            return '2024-01-01';
+        }
+        if (str_contains($ruleString, 'datetime')) {
+            return '2024-01-01 12:00:00';
+        }
+        if (str_contains($ruleString, 'Point')) {
+            return [
+                'type' => 'Point',
+                'coordinates' => [0, 0]
+            ];
+        }
+
+        return '';
+    }
+
+    function buildNestedArray(&$arr, $key, $value)
+    {
+        $keys = explode('.', str_replace('.*.', '.*.', $key));
+        $current = &$arr;
+        foreach ($keys as $i => $k) {
+            if ($k === '*') {
+                $k = 0;
+            }
+            if (!isset($current[$k]) || !is_array($current[$k])) {
+                $current[$k] = [];
+            }
+            $current = &$current[$k];
+        }
+        $current = $value;
     }
 }
