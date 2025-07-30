@@ -11,24 +11,28 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
+use App\Http\Resources\DriverResource;
+use App\Http\Resources\TripResource;
+use App\Models\Driver;
+use App\Models\Trip;
+
 class DriverAssigned implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $tripData;
-    public $driverData;
-    public $riderId;
+    public $trip;
+    public $driver;
+
     /**
      * Create a new event instance.
      *
-     * @param array $tripData
-     * @param int $driverId
+     * @param \App\Models\Trip $trip
+     * @param \App\Models\Driver $driver
      */
-    public function __construct(array $tripData, array $driverData, int $riderId)
+    public function __construct(Trip $trip, Driver $driver)
     {
-        $this->tripData = $tripData;
-        $this->driverData = $driverData;
-        $this->riderId = $riderId;
+        $this->trip = $trip;
+        $this->driver = $driver;
     }
 
     /**
@@ -38,7 +42,7 @@ class DriverAssigned implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('rider.' . $this->riderId);
+        return new PrivateChannel('rider.' . $this->trip->rider_id);
     }
 
     /**
@@ -59,8 +63,8 @@ class DriverAssigned implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'trip' => $this->tripData,
-            'driver' => $this->driverData,
+            'trip' => new TripResource($this->trip),
+            'driver' => new DriverResource($this->driver),
             'sent_at' => now()->toISOString()
         ];
     }

@@ -206,6 +206,7 @@ class Trip extends Model
         $this->transitionTo(TripStatusEnum::DriverAssigned);
         $this->save();
 
+
         // Update driver status
         $driver->update([
             'driver_status_id' => DriverStatus::where('name', 'in_trip')->first()->id

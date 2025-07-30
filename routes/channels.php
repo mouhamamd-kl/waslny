@@ -19,8 +19,8 @@ Broadcast::channel(BroadCastChannelEnum::DRIVER->pattern(), function (Driver $dr
     return  (int) $driver->id === (int) $driverId && $driver->isSuspended() === false;
 }, ['guards' => ['api-driver']]);
 
-Broadcast::channel(BroadCastChannelEnum::DRIVERS_ONLINE->pattern(), function ($driver) {
-    return $driver();
+Broadcast::channel(BroadCastChannelEnum::DRIVERS_ONLINE->pattern(), function (Driver $driver) {
+    return $driver->id;
 }, ['guards' => ['api-driver']]);
 
 Broadcast::channel(BroadCastChannelEnum::TRIP->pattern(), function ($user, $tripId) {

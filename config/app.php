@@ -117,6 +117,7 @@ return [
     | Supported drivers: "file", "cache"
     |
     */
+    'enable_caching' => env('APP_CACHE_ENABLED', false),
 
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),

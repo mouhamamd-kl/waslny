@@ -28,12 +28,6 @@ class TripStatus extends Model
     // =================
     // Accessors & Mutators
     // =================
-    protected function name(): Attribute
-    {
-        return Attribute::make(
-            get: fn(string $value) => ucfirst($value), // Example: Format status name
-        );
-    }
     public function toEnum(): TripStatusEnum
     {
         return TripStatusEnum::from($this->name);

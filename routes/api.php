@@ -1,5 +1,6 @@
 <?php
 
+use App\Constants\DiskNames;
 use App\Enums\TripStatusEnum;
 use App\Events\TestEvent;
 use App\Events\TestNotification;
@@ -270,6 +271,7 @@ Route::post('/trip/find-driver', function (Request $request) {
     // Check if search should continue
     if ($trip->search_expires_at->isPast()) {
         $trip->update(['trip_status_id' => TripStatusEnum::SystemCancelled->value]);
+        event(new \App\Events\SearchTimeout($trip));
         return response()->json([
             'status' => 'completed',
             'result' => 'search_expired'
@@ -289,18 +291,29 @@ Route::post('/trip/find-driver', function (Request $request) {
 // Helper methods
 function findNearbyDrivers(Trip $trip)
 {
+    $pickupLocation = $trip->locations()->pickupPoints()->first();
+
+    if (!$pickupLocation) {
+        return collect();
+    }
+
+    $rider = $trip->rider;
+
     return Driver::where('driver_status_id', 'available') // Available status
-        ->whereDoesntHave('notifications', function ($query) use ($trip) {
-            $query->where('trip_id', $trip->id);
+        ->when($rider && $rider->rating !== null, function ($query) use ($rider) {
+            $minRating = max(0, $rider->rating - 1);
+            $maxRating = min(5, $rider->rating + 1);
+            return $query->whereBetween('rating', [$minRating, $maxRating]);
         })
+        ->notNotifiedForTrip($trip)
         ->whereRaw(
             "ST_DWithin(location, ?, ?)",
             [
-                $trip->current_location,
+                $pickupLocation->location->toWkt(),
                 $trip->driver_search_radius
             ]
         )
-        ->orderByRaw("rating DESC, ST_Distance(location, ?)", [$trip->current_location])
+        ->orderByRaw("rating DESC, ST_Distance(location, ?)", [$pickupLocation->location->toWkt()])
         ->limit(5)
         ->get();
 }
@@ -317,7 +330,7 @@ function notifyDriver(Trip $trip, Driver $driver)
     $tripData = $tripWithRelations->toArray();
 
     // Send push notification to driver
-    $driver->notify(new TripAvailableForDriver($tripData, $driver->id));
+    $driver->notify(new TripAvailableForDriver($trip, $driver->id));
 
     // Record notification
     TripDriverNotification::create([
@@ -458,3 +471,7 @@ require __DIR__ . '/api/veichles/PricingRoute.php';
 Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin-api']], function () {
     require __DIR__ . '/api/admin/suspensions.php';
 });
+
+require __DIR__ . '/api/trip/TripDriverActionsRoute.php';
+
+Route::post('/trip/check-scheduled', [\App\Http\Controllers\ScheduledTripController::class, 'checkScheduledTrips']);

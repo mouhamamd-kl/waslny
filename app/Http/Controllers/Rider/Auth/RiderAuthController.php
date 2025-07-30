@@ -33,7 +33,7 @@ class RiderAuthController extends Controller
 
             // $rider = Rider::where('phone', $request->phone)->first();
             $rider = Rider::firstOrCreate(
-                ['phone' => $data->phone],
+                ['phone' => $data['phone'],],
             );
             // $token = $rider->createToken('authToken')->plainTextToken;
             $rider->generateTwoFactorCode();

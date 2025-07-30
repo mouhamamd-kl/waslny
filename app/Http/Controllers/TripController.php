@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TripStatusEnum;
+use App\Events\TripCancelledByDriver;
+use App\Events\TripCancelledByRider;
+use App\Events\TripCompleted;
 use App\Helpers\ApiResponse;
 use App\Http\Requests\TripRequest;
 use App\Http\Resources\TripResource;
@@ -118,10 +121,17 @@ class TripController extends Controller
     }
 
 
-    // Driver completes trip
-    public function completeTrip($id)
+    public function completeTrip(Trip $trip)
     {
-        // Update trip status to "completed"
+        try {
+            $trip->completeTrip();
+
+            event(new TripCompleted($trip));
+
+            return ApiResponse::sendResponseSuccess([], 'Trip completed successfully.', 200);
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError($e->getMessage());
+        }
     }
 
     // Rider submits review (rating + notes + tip)
@@ -138,10 +148,34 @@ class TripController extends Controller
         // Process driver review
     }
 
-    public function cancelTripByRider(Request $request) {}
+    public function cancelTripByRider(Request $request)
+    {
+        try {
+            $trip = Trip::findOrFail($request->trip_id);
+            $trip->cancelByRider();
+
+            event(new TripCancelledByRider($trip));
+
+            return ApiResponse::sendResponseSuccess([], 'Trip cancelled by rider successfully.', 200);
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError($e->getMessage());
+        }
+    }
 
 
-    public function cancelTripByDriver(Request $request) {}
+    public function cancelTripByDriver(Request $request)
+    {
+        try {
+            $trip = Trip::findOrFail($request->trip_id);
+            $trip->cancelByDriver();
+
+            event(new TripCancelledByDriver($trip));
+
+            return ApiResponse::sendResponseSuccess([], 'Trip cancelled by driver successfully.', 200);
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError($e->getMessage());
+        }
+    }
     /**
      * Show the form for creating a new resource.
      */

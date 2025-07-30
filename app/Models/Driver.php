@@ -173,6 +173,13 @@ class Driver extends Authenticatable
         );
     }
 
+    public function scopeNotNotifiedForTrip(Builder $query, Trip $trip): Builder
+    {
+        return $query->whereDoesntHave('tripNotifications', function ($q) use ($trip) {
+            $q->where('trip_id', $trip->id);
+        });
+    }
+
     // =================
     // Status Helpers
     // =================

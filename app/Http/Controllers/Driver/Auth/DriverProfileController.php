@@ -74,13 +74,13 @@ class DriverProfileController extends Controller
                     unset($data[$type->value . '_photo']);
                     if ($request[$type->value . '_photo']) {
                         $file = $request[$type->value . '_photo'];
+                        
                         if ($file instanceof UploadedFile) {
                             // $driverCar->updatePhoto($type, $file);
                             $driver->updatePhoto($type, $file);
                         }
                     }
                 }
-
                 $driver->update(attributes: $data);
                 DB::commit(); // Never reached
                 return ApiResponse::sendResponseSuccess(

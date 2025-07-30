@@ -11,6 +11,7 @@ Route::middleware(['auth:rider-api'])
     ->group(function () {
         Route::post('/', 'store')->name('store');
         Route::get('/rider', 'riderIndex')->name('rider.index');
+        Route::post('/cancel-by-rider', 'cancelTripByRider')->name('cancel.rider');
     });
 
 // Driver-specific routes
@@ -20,6 +21,8 @@ Route::middleware(['auth:driver-api'])
     ->name('trips.')
     ->group(function () {
         Route::get('/driver', 'driverIndex')->name('driver.index');
+        Route::post('/{trip}/complete', 'completeTrip')->name('complete');
+        Route::post('/cancel-by-driver', 'cancelTripByDriver')->name('cancel.driver');
     });
 
 // Shared routes (accessible by both riders and drivers)

@@ -27,7 +27,7 @@ class DriverAuthController extends Controller
             // $rider = Rider::where('phone', $request->phone)->first();
             $driver = Driver::firstOrCreate(
                 [
-                    'phone' => $data->phone,
+                    'phone' => $data['phone'],
                 ],
             );
             $driver->setStatus(DriverStatusEnum::STATUS_OFFLINE);
