@@ -15,21 +15,22 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class RiderSavedLocationService extends BaseService
 {
+    protected array $relations = ['rider', 'folder'];
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new RiderSavedLocation, $cache);
     }
-    public function searchRiderFolders(
+    public function searchRiderSavedLocations(
         array $filters = [],
         int $perPage = 10
     ): LengthAwarePaginator {
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
-                $filters,
-                [], // relations if any
-                $perPage,
-                ['*'],
-                [] // <-- Here is your withCount
+                filters: $filters,
+                relations: $this->relations,
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
             );
     }
 }

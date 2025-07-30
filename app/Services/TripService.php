@@ -17,6 +17,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class TripService extends BaseService
 {
+    protected array $relations = ['driver', 'rider', 'status', 'type', 'timeType', 'locations', 'paymentMethod', 'notifications', 'notifiedDrivers', 'riderCoupon'];
+
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new Trip, $cache);
@@ -28,17 +30,16 @@ class TripService extends BaseService
     ): LengthAwarePaginator {
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
-                $filters,
-                ['driver', 'rider', 'status', 'type', 'timeType', 'locations', 'paymentMethod'], // relations if any
-                $perPage,
-                ['*'],
-                [] // <-- Here is your withCount
+                filters: $filters,
+                relations: $this->relations,
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
             );
     }
 
     public function findTripById($id): ?Trip
     {
-        $relations = ['driver', 'rider', 'status', 'type', 'timeType', 'locations', 'paymentMethod'];
-        return $this->findById(id: $id, relations: $relations);
+        return $this->findById(id: $id, relations: $this->relations);
     }
 }

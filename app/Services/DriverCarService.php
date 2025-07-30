@@ -14,6 +14,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class DriverCarService extends BaseService
 {
+    protected array $relations = ['driver', 'carModel'];
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new DriverCar, $cache);

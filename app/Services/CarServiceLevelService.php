@@ -4,15 +4,16 @@ namespace App\Services;
 
 use Illuminate\Support\Str;  // Add this line
 use App\Helpers\CacheHelper;
-use App\Models\CarManufacturer;
-use App\Models\CarModel;
+use App\Models\CarServiceLevel;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class CarServiceLevelService extends BaseService
 {
+    protected array $relations = ['carModels', 'pricings'];
+
     public function __construct(CacheHelper $cache)
     {
-        parent::__construct(new CarModel, $cache);
+        parent::__construct(new CarServiceLevel, $cache);
     }
 
     public function searchCarServiceLevel(
@@ -21,11 +22,11 @@ class CarServiceLevelService extends BaseService
     ): LengthAwarePaginator {
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
-                $filters,
-                [], // relations if any
-                $perPage,
-                ['*'],
-                [] // <-- Here is your withCount
+                filters: $filters,
+                relations: $this->relations,
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
             );
     }
 }

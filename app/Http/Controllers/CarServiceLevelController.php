@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\CarServiceLevelRequest;
+use App\Http\Requests\CarServiceLevelSearchRequest;
 use App\Http\Resources\CarServiceLevelResource;
 use App\Models\CarServiceLevel;
 use App\Services\CarServiceLevelService;
@@ -43,13 +44,10 @@ class CarServiceLevelController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(CarServiceLevelSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-                'is_active',
-            ]);
+            $filters = $request->validated();
             $car_service_levels = $this->carServiceLevelService->searchCarServiceLevel(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

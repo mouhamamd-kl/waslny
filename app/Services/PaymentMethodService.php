@@ -15,6 +15,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class PaymentMethodService extends BaseService
 {
+    protected array $relations = ['riders', 'trips'];
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new PaymentMethod, $cache);
@@ -26,11 +27,11 @@ class PaymentMethodService extends BaseService
     ): LengthAwarePaginator {
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
-                $filters,
-                [], // relations if any
-                $perPage,
-                ['*'],
-                [] // <-- Here is your withCount
+                filters: $filters,
+                relations: $this->relations,
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
             );
     }
 }

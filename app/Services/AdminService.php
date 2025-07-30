@@ -19,11 +19,11 @@ class AdminService extends BaseService
     ): LengthAwarePaginator {
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
-                $filters,
-                [], // relations if any
-                $perPage,
-                ['*'],
-                [] // <-- Here is your withCount
+                filters: $filters,
+                relations: [],
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: [] // <-- Here is your withCount
             );
     }
 }

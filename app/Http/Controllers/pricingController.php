@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\PricingRequest;
+use App\Http\Requests\PricingSearchRequest;
 use App\Http\Resources\PricingResource;
 use App\Models\pricing;
 use App\Services\PricingService;
@@ -43,13 +44,10 @@ class PricingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(PricingSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-                'is_active',
-            ]);
+            $filters = $request->validated();
             $pricings = $this->pricingService->searchPricings(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

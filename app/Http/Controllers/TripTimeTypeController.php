@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\TripTimeTypeRequest;
+use App\Http\Requests\TripTimeTypeSearchRequest;
 use App\Http\Resources\TripTimeTypeResource;
 use App\Models\TripTimeType;
 use App\Services\TripTimeTypeService;
@@ -44,13 +45,10 @@ class TripTimeTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(TripTimeTypeSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-                'is_active',
-            ]);
+            $filters = $request->validated();
             $trip_time_types = $this->tripTimeTypeService->searchTripTimeType(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

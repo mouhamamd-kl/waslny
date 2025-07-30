@@ -13,6 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class RiderService extends BaseService
 {
+    protected array $relations = ['defaultPaymentMethod', 'savedLocations', 'folders', 'trips', 'completedTrips', 'currentTrip', 'Ridercoupons', 'coupons', 'suspensions'];
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new Rider, $cache);
@@ -23,11 +24,11 @@ class RiderService extends BaseService
     ): LengthAwarePaginator {
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
-                $filters,
-                [], // relations if any
-                $perPage,
-                ['*'],
-                [] // <-- Here is your withCount
+                filters: $filters,
+                relations: $this->relations,
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
             );
     }
 

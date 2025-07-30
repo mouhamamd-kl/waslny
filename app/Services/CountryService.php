@@ -13,6 +13,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class CountryService extends BaseService
 {
+    protected array $relations = ['manufacturers'];
+
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new Country, $cache);
@@ -24,11 +26,11 @@ class CountryService extends BaseService
     ): LengthAwarePaginator {
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
-                $filters,
-                [], // relations if any
-                $perPage,
-                ['*'],
-                [] // <-- Here is your withCount
+                filters: $filters,
+                relations: $this->relations,
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
             );
     }
 }

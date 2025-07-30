@@ -7,6 +7,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Requests\DriverUpdateRequest;
 use App\Http\Requests\SuspendAccountForeverRequest;
 use App\Http\Requests\SuspendAccountRequest;
+use App\Http\Requests\DriverSearchRequest;
 use App\Http\Requests\SuspendAccountTemporarilyRequest;
 use App\Http\Requests\UpdateDriverProfileRequest;
 use Illuminate\Http\UploadedFile;
@@ -49,12 +50,10 @@ class DriverController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(DriverSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-            ]);
+            $filters = $request->validated();
             $drivers = $this->driverService->searchDrivers(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

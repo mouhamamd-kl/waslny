@@ -17,6 +17,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class TripLocationService extends BaseService
 {
+    protected array $relations = ['trip'];
     protected $tripService;
     public function __construct(CacheHelper $cache, TripService $tripService)
     {
@@ -30,16 +31,16 @@ class TripLocationService extends BaseService
     ): LengthAwarePaginator {
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
-                $filters,
-                [], // relations if any
-                $perPage,
-                ['*'],
-                [] // <-- Here is your withCount
+                filters: $filters,
+                relations: $this->relations,
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
             );
     }
     public function getNextPendingTripLocation(int $tripId): ?Model
     {
-        return $this->getNextPendingTripLocation($tripId)->first();
+        return $this->getNextPendingTripLocations($tripId)->first();
     }
     public function getNextPendingTripLocations(int $tripId): ?Collection
     {

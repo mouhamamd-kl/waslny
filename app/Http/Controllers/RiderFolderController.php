@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\RiderFolderRequest;
+use App\Http\Requests\RiderFolderSearchRequest;
 use App\Http\Resources\RiderFolderResource;
 use App\Models\RiderFolder;
 use App\Services\RiderFolderService;
@@ -44,12 +45,10 @@ class RiderFolderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(RiderFolderSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-            ]);
+            $filters = $request->validated();
             $filters['rider_id'] = auth('rider-api')->user()->id;
             $rider_folders = $this->riderFolderService->searchRiderFolders(
                 filters: $filters,

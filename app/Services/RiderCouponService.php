@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class RiderCouponService extends BaseService
 {
+    protected array $relations = ['rider', 'coupon'];
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new RiderCoupon, $cache);
@@ -27,11 +28,11 @@ class RiderCouponService extends BaseService
     ): LengthAwarePaginator {
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
-                $filters,
-                [], // relations if any
-                $perPage,
-                ['*'],
-                [] // <-- Here is your withCount
+                filters: $filters,
+                relations: $this->relations,
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
             );
     }
     public function deleteRiderCoupon($rider, $riderCouponId)

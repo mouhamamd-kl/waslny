@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Traits\General;
-
+use Illuminate\Support\Str;
 
 
 trait FilterScope
@@ -13,14 +13,20 @@ trait FilterScope
     {
         foreach ($filters as $field => $value) {
             if ($value !== null && is_array($value)) {
-                $query->where($field, $value);
+                $query->whereIn($field, $value);
+            }
+            if (Str::startsWith($field, 'min_')) {
+                $query->where(substr($field, 4), '>=', $value);
+                continue;
+            } elseif (Str::startsWith($field, 'max_')) {
+                $query->where(substr($field, 4), '<=', $value);
+                continue;
             }
             // Handle array values (new)
             else {
-                $query->whereIn($field, $value);  // WHERE IN (...)
+                $query->where($field, $value);  // WHERE IN (...)
             }
         }
-
         return $query;
     }
 }

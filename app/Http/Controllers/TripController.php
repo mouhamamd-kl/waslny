@@ -8,6 +8,7 @@ use App\Events\TripCancelledByRider;
 use App\Events\TripCompleted;
 use App\Helpers\ApiResponse;
 use App\Http\Requests\TripRequest;
+use App\Http\Requests\TripSearchRequest;
 use App\Http\Resources\TripResource;
 use App\Models\Trip;
 use App\Models\TripLocation;
@@ -95,13 +96,11 @@ class TripController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(TripSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-                'is_active',
-            ]);
+
+            $filters = $request->validated();
             $trips = $this->trip_service->searchTrips(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

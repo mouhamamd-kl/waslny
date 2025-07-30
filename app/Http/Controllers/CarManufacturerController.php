@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\CarManufactureRequest;
+use App\Http\Requests\CarManufacturerSearchRequest;
 use App\Http\Resources\CarManufacturerResource;
 use App\Models\CarManufacturer;
 use App\Services\CarManufactureService;
@@ -18,15 +19,16 @@ class CarManufacturerController extends Controller
     {
         $this->carManufactureService = $carManufactureService;
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function adminIndex(Request $request)
     {
         try {
             $car_manufactures = $this->carManufactureService->searchCarManufacture(
-                $request->input('filters', []),
-                $request->input('perPage', 5)
+                filters: $request->input('filters', []),
+                perPage: $request->input('perPage', 10000)
             );
             return ApiResponse::sendResponsePaginated(
                 $car_manufactures,
@@ -43,14 +45,58 @@ class CarManufacturerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function index(Request $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-                'country_id',
-                'is_active',
-            ]);
+            $car_manufactures = $this->carManufactureService->searchCarManufacture(
+                filters: $request->input('filters', ['is_active' => true]),
+                perPage: $request->input('perPage', 10000)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $car_manufactures,
+                CarManufacturerResource::class,
+                trans_fallback('messages.car_manufacture.list', 'Car Manufacture retrieved successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function adminSearch(CarManufacturerSearchRequest $request)
+    {
+        try {
+            $filters = $request->validated();
+            $car_manufactures = $this->carManufactureService->searchCarManufacture(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
+
+            return ApiResponse::sendResponsePaginated(
+                $car_manufactures,
+                CarManufacturerResource::class, // Add your resource class
+                trans_fallback('messages.car_manufacture.list', 'Car Manufacture retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function search(CarManufacturerSearchRequest $request)
+    {
+        try {
+            $filters = $request->validated();
+            $filters['is_active'] = true;
             $car_manufactures = $this->carManufactureService->searchCarManufacture(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

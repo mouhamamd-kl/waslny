@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\CountryRequest;
+use App\Http\Requests\CountrySearchRequest;
 use App\Http\Resources\CountryResource;
 use App\Models\Country;
 use App\Models\Coupon;
@@ -44,13 +45,10 @@ class CountryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(CountrySearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-                'is_active',
-            ]);
+            $filters = $request->validated();
             $countries = $this->countryService->searchCountries(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\SuspensionReason;
 use App\Helpers\ApiResponse;
+use App\Http\Requests\RiderSearchRequest;
 use App\Http\Requests\RiderUpdateRequest;
 use App\Http\Requests\SuspendAccountForeverRequest;
 use App\Http\Requests\SuspendAccountRequest;
@@ -47,12 +48,10 @@ class RiderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(RiderSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-            ]);
+            $filters = $request->validated();
             $riders = $this->riderService->searchRiders(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

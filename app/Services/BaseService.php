@@ -32,9 +32,10 @@ abstract class BaseService
     public function collection(
         array $filters = [],
         array $relations = [],
+        int $perPage = 5,
         array $columns = ['*'],
         array $withCount = []
-    ): Collection {
+    ) {
         $cacheKey = $this->cache->generateKey(
             $this->model::class,
             compact('filters', 'perPage', 'withCount')
@@ -53,7 +54,7 @@ abstract class BaseService
             }
 
             return $query
-                ->filter($filters);
+                ->filter($filters)->get($columns);
         };
 
         return $this->cacheEnabled
@@ -75,7 +76,14 @@ abstract class BaseService
             compact('filters',  'withCount')
         );
         $callback = function () use ($filters, $relations, $perPage, $columns, $withCount) {
-            return $this->collection($filters, $relations, $columns, $withCount)
+            $query = $this->model->with($relations);
+
+            if (! empty($withCount)) {
+                $query->withCount($withCount);
+            }
+
+            return $query
+                ->filter($filters)
                 ->paginate($perPage, $columns);
         };
 
@@ -98,7 +106,7 @@ abstract class BaseService
             compact('filters',  'withCount')
         );
         $callback = function () use ($filters, $relations, $perPage, $columns, $withCount) {
-            return $this->collection($filters, $relations, $columns, $withCount)
+            return $this->collection(filters: $filters, relations: $relations, columns: $columns, withCount: $withCount, perPage: $perPage)
                 ->first();
         };
 

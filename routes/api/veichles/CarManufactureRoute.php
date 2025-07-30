@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\CarManufacturerController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,7 @@ Route::middleware(['auth:admin-api'])->controller(CarManufacturerController::cla
     ->prefix('car-manufacturers')
     ->name('car-manufacturers.')
     ->group(function () {
+        Route::get('/', 'adminIndex')->name('index');
         Route::post('/', 'store')->name('store');
         Route::prefix('{car_manufacturer}')->group(function () {
             Route::put('/', 'update')->name('update');
@@ -25,4 +27,5 @@ Route::middleware(['auth:admin-api'])->controller(CarManufacturerController::cla
             Route::post('/activate', 'activate')->name('activate');
             Route::post('/deactivate', 'deActivate')->name('deactivate');
         });
+        Route::get('/search', 'adminSearch')->name('search');
     });

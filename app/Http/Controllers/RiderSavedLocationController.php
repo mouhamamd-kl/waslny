@@ -26,7 +26,7 @@ class RiderSavedLocationController extends Controller
         try {
             $filters = $request->input('filters');
             $filters['rider_id'] = auth('rider-api')->user()->id;
-            $rider_saved_locations = $this->rider_saved_location_service->searchRiderFolders(
+            $rider_saved_locations = $this->rider_saved_location_service->searchRiderSavedLocations(
                 $filters,
                 $request->input('perPage', 5)
             );

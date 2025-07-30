@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\TripStatusRequest;
+use App\Http\Requests\TripStatusSearchRequest;
 use App\Http\Resources\TripStatusResource;
 use App\Models\TripStatus;
 use App\Services\TripStatusService;
@@ -24,7 +25,7 @@ class TripStatusController extends Controller
     public function index(Request $request)
     {
         try {
-            $trip_statuses = $this->tripStatusService->searchTripTimeType(
+            $trip_statuses = $this->tripStatusService->searchTripStatus(
                 $request->input('filters', []),
                 $request->input('perPage', 5)
             );
@@ -43,20 +44,17 @@ class TripStatusController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(TripStatusSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-                'is_active',
-            ]);
-            $$trip_statuses = $this->tripStatusService->searchTripTimeType(
+            $filters = $request->validated();
+            $trip_statuses = $this->tripStatusService->searchTripStatus(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
             );
 
             return ApiResponse::sendResponsePaginated(
-                $$trip_statuses,
+                $trip_statuses,
                 TripStatusResource::class, // Add your resource class
                 trans_fallback('messages.trip_status.list', 'Trip Statuses retrieved successfully'),
             );

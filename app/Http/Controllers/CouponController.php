@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\CouponRequest;
+use App\Http\Requests\CouponSearchRequest;
 use App\Http\Resources\CouponResource;
 use App\Models\Coupon;
 use App\Services\CouponService;
@@ -43,17 +44,10 @@ class CouponController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(CouponSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'code',
-                'start_date',
-                'end_date',
-                'max_uses',
-                'percent',
-                'is_active',
-            ]);
+            $filters = $request->validated();
             $coupons = $this->couponService->searchCoupons(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

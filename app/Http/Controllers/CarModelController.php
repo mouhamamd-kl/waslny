@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\CarModelRequest;
+use App\Http\Requests\CarModelSearchRequest;
 use App\Http\Resources\CarModelResource;
 use App\Models\CarModel;
 use App\Services\CarModelService;
@@ -21,7 +22,7 @@ class CarModelController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function adminIndex(Request $request)
     {
         try {
             $car_models = $this->carModelService->searchCarModel(
@@ -34,6 +35,27 @@ class CarModelController extends Controller
                 trans_fallback('messages.car_model.list', 'Car Model retrieved successfully')
             );
         } catch (Exception $e) {
+            throw $e;
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
+
+    public function index(Request $request)
+    {
+        try {
+            $car_models = $this->carModelService->searchCarModel(
+                $request->input('filters', ['is_active' => true]),
+                $request->input('perPage', 5)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $car_models,
+                CarModelResource::class,
+                trans_fallback('messages.car_model.list', 'Car Model retrieved successfully')
+            );
+        } catch (Exception $e) {
+            throw $e;
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred')
             );
@@ -43,15 +65,36 @@ class CarModelController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function adminSearch(CarModelSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-                'car_service_level_id',
-                'car_manufacture_id',
-                'is_active',
-            ]);
+            $filters = $request->validated();
+            $car_models = $this->carModelService->searchCarModel(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
+
+            return ApiResponse::sendResponsePaginated(
+                $car_models,
+                CarModelResource::class, // Add your resource class
+                trans_fallback('messages.car_model.list', 'Car Model retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function search(CarModelSearchRequest $request)
+    {
+        try {
+            $filters = $request->validated();
+            $filters['is_active'] = true;
             $car_models = $this->carModelService->searchCarModel(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
