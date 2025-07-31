@@ -28,7 +28,6 @@ class AdminAuthController extends Controller
     public function login(AdminLoginRequest $request)
     {
         try {
-            DB::beginTransaction();
             $data = $request->validated();
             $admin = Admin::where('email', $request->email)->first();
             if (! $admin || ! Hash::check($request->password, $admin->password)) {
@@ -44,10 +43,8 @@ class AdminAuthController extends Controller
                     'message' => 'Verification code sent to your email.',
                 ]);
             }
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseSuccess($this->formatAdminData($admin), 'Admin logged in successfully', 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
+        } catch (Exception $e) {
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

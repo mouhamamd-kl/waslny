@@ -16,25 +16,22 @@ use App\Models\Admin;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
-
-    // Basic Auth
-    Route::post('test', function () {
-        return Admin::get();
-    });
+    // Route::middleware('auth:admin-api')->group(function () {
     Route::middleware('auth:admin-api')->group(function () {
-        Route::delete('delete-account', [AdminAuthController::class, 'deleteAccount']);
-        Route::post('logout', [AdminAuthController::class, 'logout'])->name('auth.logout');
-        Route::post('2fa/disable', [AdminTwoFactorController::class, 'disable']);
 
-        Route::get('profile',[AdminProfileController::class, 'profile']);
-        Route::post('profile/update',[AdminProfileController::class, 'updateProfile']);
+        Route::delete('delete-account', [AdminAuthController::class, 'deleteAccount'])->name('auth.delete-account');
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('auth.logout');
+        Route::post('2fa/disable', [AdminTwoFactorController::class, 'disable'])->name('auth.2fa.disable');
+
+        Route::get('profile', [AdminProfileController::class, 'profile'])->name('profile.show');
+        Route::post('profile/update', [AdminProfileController::class, 'updateProfile'])->name('profile.update');
     });
 
-    Route::post('login', [AdminAuthController::class, 'login']);
+    Route::post('login', [AdminAuthController::class, 'login'])->name('auth.login');
 
     // Password Reset
-    Route::post('password/email', [AdminPasswordResetController::class, 'sendResetLink']);
-    Route::post('password/reset', [AdminPasswordResetController::class, 'resetPassword']);
+    Route::post('password/email', [AdminPasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::post('password/reset', [AdminPasswordResetController::class, 'resetPassword'])->name('password.reset');
 
     // Verification
     Route::get('verified-success', fn() => view('admin.auth.verified-success'))->name('verification.success');

@@ -12,7 +12,7 @@
 //     Route::post('login', [DriverAuthController::class, 'login'])->middleware('throttle:driver-login');
 //     Route::post('completeProfile',[DriverProfileController::class,'completeProfile'])->middleware('auth:driver-api');
 //     Route::post('completeDriverCar',[DriverProfileController::class,'completeDriverCar'])->middleware('auth:driver-api');
-    
+
 //     Route::delete('delete-account', [DriverAuthController::class, 'deleteAccount'])->middleware('auth:driver-api');
 //     // Two-Factor Authentication (2FA)
 //     Route::post('verify-otp', [DriverTwoFactorController::class, 'verify']);
@@ -37,14 +37,19 @@ Route::prefix('driver')->name('driver.')->group(function () {
     // Authentication Routes
     Route::post('login', [DriverAuthController::class, 'login'])
         ->name('auth.login');
-        // ->middleware('throttle:5,1'); // 5 attempts per minute
-    
-    Route::middleware('auth:driver-api')->group(function () {
+    // ->middleware('throttle:5,1'); // 5 attempts per minute
+
+    // Route::middleware('auth:driver-api')->group(function () {
+    Route::middleware(['auth:driver-api', 'driver.suspended'])->group(function () {
         // Profile Management
         Route::prefix('profile')->name('profile.')->group(function () {
             Route::post('completion', [DriverProfileController::class, 'completeProfile'])
                 ->name('complete');
-                
+            Route::middleware('rider.profile.completed')->group(function () {
+                Route::get('/', [DriverProfileController::class, 'show'])
+                    ->name('show');
+                Route::post('update', [DriverProfileController::class, 'updateProfile']);
+            });
             Route::post('vehicle', [DriverProfileController::class, 'completeDriverCar'])
                 ->name('vehicle.store');
         });
@@ -52,10 +57,10 @@ Route::prefix('driver')->name('driver.')->group(function () {
         // Account Management
         Route::delete('', [DriverAuthController::class, 'deleteAccount'])
             ->name('destroy');
-            
+
         Route::post('logout', [DriverAuthController::class, 'logout'])
             ->name('auth.logout');
-            
+
         Route::post('refresh-token', [DriverAuthController::class, 'refreshToken'])
             ->name('auth.refresh');
     });
@@ -64,7 +69,7 @@ Route::prefix('driver')->name('driver.')->group(function () {
     Route::prefix('otp')->name('otp.')->group(function () {
         Route::post('verify', [DriverTwoFactorController::class, 'verify'])
             ->name('verify');
-            
+
         Route::post('resend', [DriverTwoFactorController::class, 'resend'])
             ->name('resend');
     });

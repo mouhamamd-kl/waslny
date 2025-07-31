@@ -66,7 +66,6 @@ class RiderProfileController extends Controller
         $rider = auth('rider-api')->user();
         // Handle paperwork file upload
         try {
-            DB::beginTransaction();
             if (!$rider->isProfileComplete()) {
                 $validated = $request->validated();
                 
@@ -76,13 +75,11 @@ class RiderProfileController extends Controller
                     trans_fallback('messages.rider.completion_success', 'Rider Profile Completion Success')
                 );
             }
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.rider.error.profile_already_completed', 'Rider Profile Already Completed'),
                 409
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.creation_failed', 'An error occurred'),
                 500,
@@ -94,7 +91,6 @@ class RiderProfileController extends Controller
     public function updateProfile(UpdateRiderProfileRequest $request)
     {
         try {
-            DB::beginTransaction();
             /** @var Rider $rider */ // Add PHPDoc type hint
             $rider = auth('rider-api')->user();
             $data = $request->validated();
@@ -112,13 +108,11 @@ class RiderProfileController extends Controller
                 }
             }
             $rider->update($data);
-            DB::commit();
             return ApiResponse::sendResponseSuccess(
                 new RiderResource($rider),
                 trans_fallback('messages.auth.profile.updated', 'Profile updated successfully')
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.update_failed', 'An error occurred'),
                 500,

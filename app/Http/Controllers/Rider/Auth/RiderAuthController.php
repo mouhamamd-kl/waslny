@@ -27,7 +27,6 @@ class RiderAuthController extends Controller
     public function login(RiderLoginRequest $request)
     {
         try {
-            DB::beginTransaction();
             $data = $request->validated();
 
 
@@ -38,7 +37,6 @@ class RiderAuthController extends Controller
             // $token = $rider->createToken('authToken')->plainTextToken;
             $rider->generateTwoFactorCode();
             $rider->notify(new RiderTwoFactorCode);
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseSuccess(
                 [
                     'requires_otp' => true,
@@ -57,16 +55,13 @@ class RiderAuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            DB::beginTransaction();
             $request->user()->currentAccessToken()->delete();
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseSuccess(
                 [],
                 trans_fallback('messages.auth.logout', 'logged out successfully'),
                 200
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -79,14 +74,11 @@ class RiderAuthController extends Controller
     public function refreshToken(Request $request)
     {
         try {
-            DB::beginTransaction();
             $request->user()->tokens()->delete();
-            DB::commit(); // Never reached
             return response()->json([
                 'token' => $request->user()->createToken('refresh-token')->plainTextToken,
             ]);
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -101,7 +93,6 @@ class RiderAuthController extends Controller
         $rider = $request->user('rider-api'); // Authenticated agent
         // return ApiResponse::sendResponseSuccess($agent, 'Agent account deleted successfully');
 
-        DB::beginTransaction();
         try {
             // Delete uploaded files from S3
             $this->riderSerivce->deleteAssets($rider->id);
@@ -111,10 +102,8 @@ class RiderAuthController extends Controller
 
             // Delete agent from DB
             $rider->delete();
-            DB::commit();
             return ApiResponse::sendResponseSuccess(null, 'Rider account deleted successfully');
         } catch (\Throwable $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

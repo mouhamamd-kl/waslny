@@ -31,6 +31,12 @@ class DriverProfileController extends Controller
     protected DriverCarService $driverCarservice;
     protected DriverService $driverservice;
 
+    public function __construct(DriverCarService $driverCarService, DriverService $driverService)
+    {
+        $this->driverCarservice = $driverCarService;
+        $this->driverservice = $driverService;
+    }
+
     public function profile(Request $request)
     {
         try {
@@ -110,9 +116,8 @@ class DriverProfileController extends Controller
         $driver = auth('driver-api')->user();
         // Handle paperwork file upload
         try {
-            DB::beginTransaction();
             if (!$driver->isDriverCarComplete()) {
-                $data = $request->validate();
+                $data = $request->validated();
                 $data = array_merge($data, [
                     'driver_id' => $driver->id,
                 ]);
@@ -127,19 +132,16 @@ class DriverProfileController extends Controller
                 /** @var DriverCar $driverCar */ // Add PHPDoc type hint
                 $driverCar = $this->driverCarservice->create($data);
                 $this->driverservice->suspendNeedConfirmation($driver->id);
-                DB::commit(); // Never reached
                 return ApiResponse::sendResponseSuccess(
                     new  DriverCarResource($driverCar),
                     trans_fallback('messages.driver.car.created', 'Driver Car Created successfully')
                 );
             }
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseError(
-                trans_fallback('messages.driver.error.car_already_added', 'Driver Profile Already Completed'),
+                trans_fallback('messages.driver.error.car_already_added', 'Driver Car Already Completed'),
                 409
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -151,7 +153,6 @@ class DriverProfileController extends Controller
     public function updateProfile(UpdateDriverProfileRequest $request)
     {
         try {
-            DB::beginTransaction();
             /** @var Driver $driver */ // Add PHPDoc type hint
             $driver = auth('driver-api')->user();
             $data = $request->validated();
@@ -174,14 +175,12 @@ class DriverProfileController extends Controller
 
             $driver->update($data);
 
-            DB::commit();
 
             return ApiResponse::sendResponseSuccess(
                 new DriverResource($driver),
                 trans_fallback('messages.auth.profile.updated', 'Profile updated successfully')
             );
         } catch (\Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.update_failed', 'Failed to update profile'),
                 500,

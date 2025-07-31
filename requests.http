@@ -1,0 +1,3 @@
+GET http://waslny.test/api/testo
+Content-Type: application/json
+Accept: application/json

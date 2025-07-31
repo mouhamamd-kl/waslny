@@ -1,0 +1,29 @@
+{
+	"info": {
+		"_postman_id": "a8a0b3c6-8f9b-4f2e-9e1d-3a2b1c0c3e2d",
+		"name": "Test Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Testo Request",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://waslny.test/api/testo",
+					"protocol": "http",
+					"host": [
+						"waslny",
+						"test"
+					],
+					"path": [
+						"api",
+						"testo"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

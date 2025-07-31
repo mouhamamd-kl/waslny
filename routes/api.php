@@ -20,13 +20,13 @@ use App\Services\TripService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+
+
+
+
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
-// })->middleware('auth:sanctum');
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// })->middleware('auth:rider-api');
 
 
 // Route::get('/test', function (Request $request) {
@@ -44,7 +44,7 @@ Route::get('/trigger-event', function () {
         'قائد الطوفان' => 'القائد يحيى السنوار'
     ]));
     return response()->json(['message' => 'Event triggered']);
-});
+})->name('no-export.test.trigger_event');
 
 
 
@@ -60,17 +60,17 @@ Route::post('/trigger-event2', function (Request $request) {
         'lat' => $request->lat,
         'lng' => $request->lng
     ]);
-});
+})->name('no-export.test.trigger_event2');
 
 
 
 
 // Public upload endpoint with rate limiting
-Route::post('/files/exists', [FileController::class, 'exists']);
+Route::post('/files/exists', [FileController::class, 'exists'])->name('no-export.test.file_exists');
 
 
 
-Route::post('/files', [FileController::class, 'upload']); // 10 requests per
+Route::post('/files', [FileController::class, 'upload'])->name('no-export.test.file_upload'); // 10 requests per
 
 Route::get('/testfile', function () {
     //delete
@@ -104,7 +104,7 @@ Route::get('/testfile', function () {
     //         'message' => $e->getMessage()
     //     ], 500);
     // }
-});
+})->name('no-export.test.test_file');
 
 // Route::post('/files2', function (Request $request) {
 //     //public
@@ -128,7 +128,7 @@ Route::get('/testfile', function () {
 
 
 // Protected delete endpoint
-Route::delete('/files', [FileController::class, 'deleteFile']);
+Route::delete('/files', [FileController::class, 'deleteFile'])->name('no-export.test.file_delete');
 
 
 Route::post('/testFile', function (Request $request) {
@@ -138,7 +138,7 @@ Route::post('/testFile', function (Request $request) {
 
     // Generate temporary URL for private access
     return $path;
-});
+})->name('no-export.test.test_file_upload');
 
 Route::get('/testFile/getpath', function (Request $request) {
     /** @var BaseFileService $service */
@@ -147,7 +147,7 @@ Route::get('/testFile/getpath', function (Request $request) {
 
     // Generate temporary URL for private access
     return $filePath;
-});
+})->name('no-export.test.test_file_get_path');
 
 Route::get('/testFile/geturl', function (Request $request) {
     /** @var BaseFileService $service */
@@ -156,7 +156,7 @@ Route::get('/testFile/geturl', function (Request $request) {
 
     // Generate temporary URL for private access
     return $filePath;
-});
+})->name('no-export.test.test_file_get_url');
 
 Route::get('/testFile/exsist', function (Request $request) {
     /** @var BaseFileService $service */
@@ -165,7 +165,7 @@ Route::get('/testFile/exsist', function (Request $request) {
 
     // Generate temporary URL for private access
     return $filePath;
-});
+})->name('no-export.test.test_file_exists');
 
 Route::delete('/testFile', function (Request $request) {
     /** @var BaseFileService $service */
@@ -174,7 +174,7 @@ Route::delete('/testFile', function (Request $request) {
 
     // Generate temporary URL for private access
     return $status;
-});
+})->name('no-export.test.test_file_delete');
 
 Route::post('/testdriversaved', function (RiderSavedLocationRequest $request) {
 
@@ -187,9 +187,11 @@ Route::post('/testdriversaved', function (RiderSavedLocationRequest $request) {
             'latitude' => $point->getLatitude(),    // or getLatitude() if using geodetic
         ]
     ]);
-});
+})->name('no-export.test.driver_saved_location');
 
-
+Route::get('/testo', function (Request $request) {
+    return response()->json(['message' => 'hello']);
+})->name('no-export.test.simple_test');
 Route::post('/test', function (TripRequest $request) {
 
     $data = $request->validate();
@@ -198,7 +200,7 @@ Route::post('/test', function (TripRequest $request) {
         'success' => true,
         'data' => $data
     ]);
-});
+})->name('no-export.test.trip_request');
 
 
 
@@ -216,149 +218,9 @@ Route::post('/test-functions', function (Request $request) {
         'status' => 'success',
         'message' => 'Event triggered successfully',
     ]);
-});
+})->name('no-export.test.test_functions');
 
 
-Route::post('/trip/find-driver', function (Request $request) {
-    // Authorization
-    if ($request->header('X-Driver-Search-Secret') !== env('DRIVER_SEARCH_SECRET')) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    $tripId = $request->input('trip_id');
-    $trip = Trip::with('rider')->findOrFail($tripId);
-
-    // If driver already found, stop searching
-    if ($trip->driver_id) {
-        return response()->json([
-            'status' => 'completed',
-            'result' => 'driver_found',
-            'driver_id' => $trip->driver_id
-        ]);
-    }
-
-    // Initialize search if first attempt
-    if (!$trip->search_started_at) {
-        $trip->update([
-            'search_started_at' => now(),
-            'search_expires_at' => now()->addMinutes(5)
-        ]);
-    }
-
-    // Find available drivers within radius
-    $drivers = findNearbyDrivers($trip);
-
-    // Send notifications to found drivers
-    foreach ($drivers as $driver) {
-        notifyDriver($trip, $driver);
-    }
-
-    // Check for accepted drivers
-    if ($acceptedDriver = checkForAcceptedDriver($trip)) {
-        $trip->update(['driver_id' => $acceptedDriver->id]);
-        return response()->json([
-            'status' => 'completed',
-            'result' => 'driver_accepted',
-            'driver_id' => $acceptedDriver->id
-        ]);
-    }
-
-    // Expand search radius if no drivers found
-    if ($drivers->isEmpty()) {
-        $trip->increment('driver_search_radius', 1000); // Expand by 1km
-    }
-
-    // Check if search should continue
-    if ($trip->search_expires_at->isPast()) {
-        $trip->update(['trip_status_id' => TripStatusEnum::SystemCancelled->value]);
-        event(new \App\Events\SearchTimeout($trip));
-        return response()->json([
-            'status' => 'completed',
-            'result' => 'search_expired'
-        ]);
-    }
-
-    // Queue next search attempt
-    queueNextSearch($trip);
-
-    return response()->json([
-        'status' => 'searching',
-        'radius' => $trip->driver_search_radius,
-        'notified_drivers' => $drivers->pluck('id')
-    ]);
-});
-
-// Helper methods
-function findNearbyDrivers(Trip $trip)
-{
-    $pickupLocation = $trip->locations()->pickupPoints()->first();
-
-    if (!$pickupLocation) {
-        return collect();
-    }
-
-    $rider = $trip->rider;
-
-    return Driver::where('driver_status_id', 'available') // Available status
-        ->when($rider && $rider->rating !== null, function ($query) use ($rider) {
-            $minRating = max(0, $rider->rating - 1);
-            $maxRating = min(5, $rider->rating + 1);
-            return $query->whereBetween('rating', [$minRating, $maxRating]);
-        })
-        ->notNotifiedForTrip($trip)
-        ->whereRaw(
-            "ST_DWithin(location, ?, ?)",
-            [
-                $pickupLocation->location->toWkt(),
-                $trip->driver_search_radius
-            ]
-        )
-        ->orderByRaw("rating DESC, ST_Distance(location, ?)", [$pickupLocation->location->toWkt()])
-        ->limit(5)
-        ->get();
-}
-
-function notifyDriver(Trip $trip, Driver $driver)
-{
-    // Initialize the TripService
-    $tripService = app(TripService::class); // or inject it in your constructor
-
-    // Get the trip with all relations using the service
-    $tripWithRelations = $tripService->findTripById($trip->id);
-
-    // Convert the trip to an array (or use a Resource if you have one)
-    $tripData = $tripWithRelations->toArray();
-
-    // Send push notification to driver
-    $driver->notify(new TripAvailableForDriver($trip, $driver->id));
-
-    // Record notification
-    TripDriverNotification::create([
-        'trip_id' => $trip->id,
-        'driver_id' => $driver->id,
-        'sent_at' => now(),
-    ]);
-}
-
-function checkForAcceptedDriver(Trip $trip)
-{
-    return TripDriverNotification::where('trip_id', $trip->id)
-        ->where('status', 'accepted')
-        ->first()
-        ?->driver;
-}
-
-function queueNextSearch(Trip $trip)
-{
-    // Queue next search attempt in 15 seconds
-    dispatch(function () use ($trip) {
-        Http::withHeaders([
-            'X-Driver-Search-Secret' => env('DRIVER_SEARCH_SECRET')
-        ])->post(config('app.url') . '/trip/find-driver', [
-            'trip_id' => $trip->id
-        ]);
-    })->delay(now()->addSeconds(15));
-}
 
 
 Route::post('/test-htpp', function (Request $request) {
@@ -431,13 +293,13 @@ Route::post('/test-htpp', function (Request $request) {
         'next_start' => $completed ? null : $nextStart,
         'chunk_size' => $chunkSize
     ]);
-});
+})->name('no-export.test.http_long_polling');
 
 Route::post('/add_website_photo', function (Request $request) {
     $assetService = FileServiceFactory::makeForSystemFiles();
     $url =  $assetService->uploadPublic($request->file('file'));
     return ApiResponse::sendResponseSuccess($url);
-});
+})->name('no-export.test.add_website_photo');
 
 require __DIR__ . '/api/auth/AdminAuth.php';
 require __DIR__ . '/api/auth/DriverAuth.php';
@@ -445,6 +307,7 @@ require __DIR__ . '/api/auth/RiderAuth.php';
 require __DIR__ . '/api/coupon/CouponRoute.php';
 require __DIR__ . '/api/driver/DriverRoute.php';
 require __DIR__ . '/api/payment/PaymentMethodRoute.php';
+require __DIR__ . '/api/payment/MoneyCodeRoute.php';
 
 require __DIR__ . '/api/rider/RiderRoute.php';
 require __DIR__ . '/api/rider/RiderFolderRoute.php';
@@ -455,23 +318,12 @@ require __DIR__ . '/api/trip/TripStatusRoute.php';
 require __DIR__ . '/api/trip/TripTimeTypeRoute.php';
 require __DIR__ . '/api/trip/TripTypeRoute.php';
 
-require __DIR__ . '/api/veichles/CarManufactureRoute.php';
-require __DIR__ . '/api/veichles/CarModelRoute.php';
-require __DIR__ . '/api/veichles/CarServiceLevelRoute.php';
-require __DIR__ . '/api/veichles/CountryRoute.php';
-require __DIR__ . '/api/veichles/PricingRoute.php';
+require __DIR__ . '/api/vehicles/CarManufactureRoute.php';
+require __DIR__ . '/api/vehicles/CarModelRoute.php';
+require __DIR__ . '/api/vehicles/CarServiceLevelRoute.php';
+require __DIR__ . '/api/vehicles/CountryRoute.php';
+require __DIR__ . '/api/vehicles/PricingRoute.php';
 
-
-
-
-
-
-
-
-Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin-api']], function () {
-    require __DIR__ . '/api/admin/suspensions.php';
-});
+require __DIR__ . '/api/admin/suspensions.php';
 
 require __DIR__ . '/api/trip/TripDriverActionsRoute.php';
-
-Route::post('/trip/check-scheduled', [\App\Http\Controllers\ScheduledTripController::class, 'checkScheduledTrips']);

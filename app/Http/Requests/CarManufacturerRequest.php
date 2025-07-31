@@ -7,7 +7,7 @@ use App\Models\Country;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CarManufactureRequest extends BaseRequest
+class CarManufacturerRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.

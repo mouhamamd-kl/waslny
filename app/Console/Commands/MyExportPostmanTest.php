@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Requests\CarManufactureRequest;
+use App\Http\Requests\CarManufacturerRequest;
 use App\Http\Requests\CouponRequest;
 use App\Http\Requests\RiderCompleteProfileRequest;
 use App\Http\Requests\TripRequest;
@@ -19,10 +19,10 @@ use PhpParser\Node\Stmt\Return_;
 use PhpParser\NodeFinder;
 use PhpParser\ParserFactory;
 
-class ExportPostmanTesto extends Command
+class MyExportPostmanTest extends Command
 {
     /** @var string */
-    protected $signature = 'export:postman-testo {--bearer= : The bearer token to use on your endpoints}';
+    protected $signature = 'export:my-postman-test {--bearer= : [DEPRECATED] The bearer token to use on your endpoints}';
 
     /** @var string */
     protected $description = 'Automatically generate a Postman collection for your API routes';
@@ -80,7 +80,29 @@ class ExportPostmanTesto extends Command
         // }
         // return;
 
-        $bearer = $this->option('bearer') ?? false;
+        $authGuards = [];
+        foreach ($this->router->getRoutes() as $route) {
+            foreach ($route->middleware() as $middleware) {
+                if (is_string($middleware) && str_starts_with($middleware, 'auth:')) {
+                    $guard = substr($middleware, 5);
+                    if (!in_array($guard, $authGuards)) {
+                        $authGuards[] = $guard;
+                    }
+                }
+            }
+        }
+
+        $bearerTokens = [];
+        if ($this->option('bearer')) {
+            $this->warn('The --bearer option is deprecated. You will be prompted for tokens for each guard.');
+        }
+
+        foreach ($authGuards as $guard) {
+            $token = $this->ask("Enter bearer token for guard '{$guard}'");
+            if ($token) {
+                $bearerTokens[$guard] = $token;
+            }
+        }
 
         $this->routes = [
             'variable' => [
@@ -110,15 +132,27 @@ class ExportPostmanTesto extends Command
 
 
             foreach ($route->methods as $method) {
-                if ($method == 'HEAD' || empty($middleware) || $middleware[0] !== 'api') {
+                if ($method == 'HEAD' || !in_array('api', $middleware)) {
+                    continue;
+                }
+
+                if (str_starts_with($route->getName(), 'no-export.')) {
                     continue;
                 }
 
                 $routeHeaders = config('api-postman.headers');
                 $auth = null;
-                if ($bearer &&  $middleware) {
-                    $auth['value'] =
-                        $bearer;
+
+                $routeGuard = null;
+                foreach ($middleware as $m) {
+                    if (is_string($m) && str_starts_with($m, 'auth:')) {
+                        $routeGuard = substr($m, 5);
+                        break;
+                    }
+                }
+
+                if ($routeGuard && !empty($bearerTokens[$routeGuard])) {
+                    $auth['value'] = $bearerTokens[$routeGuard];
                 }
 
                 $request = $this->makeItem($route, $method, $routeHeaders, $auth);
@@ -144,6 +178,7 @@ class ExportPostmanTesto extends Command
         }
 
         Storage::put($exportName = "$filename.json", json_encode($this->routes));
+        Storage::disk('local')->put("$filename.json", json_encode($this->routes));
 
         $this->info("Postman Collection Exported: $exportName");
     }
@@ -277,7 +312,14 @@ class ExportPostmanTesto extends Command
                                                     $isFileInput = false;
                                                     $ruleString = $this->ruleToString($rule);
 
-                                                    if (stripos($ruleString, 'file') !== false || stripos($ruleString, 'image') !== false) {
+                                                    if (
+                                                        stripos($ruleString, 'file') !== false ||
+                                                        stripos($ruleString, 'image') !== false ||
+                                                        str_contains($key, 'photo') ||
+                                                        str_contains($key, 'image') ||
+                                                        str_contains($key, 'file') ||
+                                                        str_contains($key, 'document')
+                                                    ) {
                                                         $isFileInput = true;
                                                     }
 
@@ -403,89 +445,6 @@ class ExportPostmanTesto extends Command
             return [];
         }
     }
-    // protected function extractRulesFromClass2(string $className): array
-    // {
-    //     $reflection = new \ReflectionClass($className);
-    //     $source = file_get_contents($reflection->getFileName());
-
-    //     // Find the rules() method
-    //     if (!preg_match('/function\s+rules\s*\([^)]*\)\s*:\s*array\s*{([^}]*)}/s', $source, $matches)) {
-    //         return [];
-    //     }
-
-    //     $methodBody = $matches[1];
-
-    //     // Find the return statement
-    //     if (!preg_match('/return\s*(\[[\s\S]*?\])\s*;/', $methodBody, $returnMatch)) {
-    //         return [];
-    //     }
-
-    //     $arrayString = $returnMatch[1];
-
-    //     // Remove all comments (both // and /** */ styles)
-    //     $cleanedArrayString = preg_replace([
-    //         '/\/\/.*?(\r\n|\n|$)/m',    // Single-line comments
-    //         '/\/\*.*?\*\//s',           // Multi-line comments
-    //     ], '', $arrayString);
-
-    //     // Remove blank lines and extra whitespace
-    //     $cleanedArrayString = preg_replace('/^\s*[\r\n]/m', '', $cleanedArrayString);
-    //     $cleanedArrayString = trim($cleanedArrayString);
-
-    //     print_r($cleanedArrayString);
-
-    //     return [];
-    // }
-
-    // protected function extractRulesFromClass(string $className): array
-    // {
-    //     $reflection = new \ReflectionClass($className);
-    //     $source = file_get_contents($reflection->getFileName());
-
-    //     // Find the rules() method
-    //     if (!preg_match('/function\s+rules\s*\([^)]*\)\s*:\s*array\s*{([^}]*)}/s', $source, $matches)) {
-    //         return [];
-    //     }
-
-    //     $methodBody = $matches[1];
-
-    //     // Find the return statement
-    //     if (!preg_match('/return\s*(\[[\s\S]*?\])\s*;/', $methodBody, $returnMatch)) {
-    //         return [];
-    //     }
-
-    //     $arrayString = $returnMatch[1];
-
-
-    //     // Parse array elements (supports both string and array values)
-    //     $pattern = '/([\'"])(.*?)\1\s*=>\s*(?:(\[[^\]]*\])|([\'"])(.*?)\4)/';
-    //     preg_match_all($pattern, $arrayString, $matches, PREG_SET_ORDER);
-    //     print_r($matches);
-    //     $rules = [];
-    //     foreach ($matches as $match) {
-    //         $key = $match[2]; // Extracted key (e.g., "first_name")
-
-    //         if (!empty($match[3])) {
-    //             // Handle array values (e.g., ['required', 'string'])
-    //             $value = trim($match[3], '[]');
-    //             $value = implode('|', array_map('trim', explode(',', $value)));
-    //         } else {
-    //             // Handle string values (e.g., 'required')
-    //             try {
-    //                 $value = $match[5];
-    //             } catch (Exception $e) {
-    //                 throw $e;
-    //                 $value = [];
-    //             }
-    //         }
-
-    //         $rules[$key] = $value;
-    //     }
-
-    //     return $rules;
-    // }
-
-
     /**
      * Convert rule to string representation
      */

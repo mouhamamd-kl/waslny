@@ -8,6 +8,8 @@ use App\Traits\General\FilterScope;
 use App\Traits\General\ResetOTP;
 use App\Traits\General\Suspendable;
 use App\Traits\General\TwoFactorCodeGenerator;
+use Bavix\Wallet\Interfaces\Wallet;
+use Bavix\Wallet\Traits\HasWallet;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,9 +34,9 @@ enum RiderPhotoType: string
         };
     }
 }
-class Rider  extends Authenticatable
+class Rider  extends Authenticatable implements Wallet
 {
-    use HasFactory, Notifiable, HasApiTokens, TwoFactorCodeGenerator, FilterScope, ResetOTP, Suspendable;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCodeGenerator, FilterScope, ResetOTP, Suspendable, HasWallet;
 
     // =================
     // Configuration
@@ -283,5 +285,10 @@ class Rider  extends Authenticatable
     public function hasPaymentMethod(): bool
     {
         return !is_null($this->defaul_payment_id);
+    }
+
+    public function isAccountSuspended(): bool
+    {
+        return $this->isSuspended();
     }
 }

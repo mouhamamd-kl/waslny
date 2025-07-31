@@ -38,7 +38,8 @@ class DriverCarCompleteRequest extends BaseRequest
             'right_photo' => $this->imageRule(FieldRequirementEnum::REQUIRED),
             'inside_photo' => $this->imageRule(FieldRequirementEnum::REQUIRED),
             'car_model_id' => [
-                'required|exists:car_models,id'
+                'required',
+                'exists:car_models,id'
             ]
         ];
     }

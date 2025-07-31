@@ -271,4 +271,19 @@ class TripController extends Controller
             );
         }
     }
+
+    public function findDriverForTrip(Request $request)
+    {
+        // Authorization
+        if ($request->header('X-Driver-Search-Secret') !== env('DRIVER_SEARCH_SECRET')) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $tripId = $request->input('trip_id');
+        $trip = Trip::with('rider')->findOrFail($tripId);
+
+        $result = $this->trip_service->findDriverForTrip($trip);
+
+        return response()->json($result);
+    }
 }

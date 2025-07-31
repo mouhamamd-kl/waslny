@@ -21,7 +21,6 @@ class RiderTwoFactorController extends Controller
     public function verify(TwoFactorCodeRequest $request)
     {
         try {
-            DB::beginTransaction();
             $request->validated();
             /** @var Rider $rider */ // Add PHPDoc type hint
 
@@ -40,7 +39,6 @@ class RiderTwoFactorController extends Controller
             // Generate authentication token
             $token = $rider->createToken('riderAuthToken')->plainTextToken;
 
-            DB::commit(); // Never reached
             // Determine response based on profile completion
             return $rider->isProfileComplete()
                 ? ApiResponse::sendResponseSuccess(
@@ -60,7 +58,6 @@ class RiderTwoFactorController extends Controller
                     statusCode: 201
                 );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -72,18 +69,15 @@ class RiderTwoFactorController extends Controller
     public function resend(DriverResendOtpRequest $request)
     {
         try {
-            DB::beginTransaction();
             $data = $request->validated();
             $rider = Rider::where('phone', $data->phone)->first();
             $rider->generateTwoFactorCode();
             // $rider->notify(new \App\Notifications\Agent\AgentTwoFactorCode);
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseSuccess(
                 ['message' => 'A new verification code has been sent to your email.'],
                 'OTP code resent successfully.'
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

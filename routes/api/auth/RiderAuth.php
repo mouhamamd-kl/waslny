@@ -38,7 +38,8 @@ Route::prefix('rider')->name('rider.')->group(function () {
             ->name('resend');
     });
 
-    Route::middleware('auth:rider-api')->group(function () {
+    // Route::middleware('auth:rider-api')->group(function () {
+    Route::middleware(['auth:rider-api', 'rider.suspended'])->group(function () {
         // Profile Management
         Route::prefix('profile')->name('profile.')->group(function () {
             Route::post('completion', [RiderProfileController::class, 'completeProfile'])

@@ -32,7 +32,7 @@ class CreateAdminAccountCommand extends Command
             'user_name' => 'Admin',
             'email' => 'mouhammadk44@gmail.com',
             'phone'=>'+963937897938',
-            'password' => 'password123',
+            'password' => 'MyApp@Secure#2024!',
         ];
 
         if (Admin::where('email', $defaultData['email'])->exists()) {

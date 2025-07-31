@@ -7,7 +7,11 @@ use App\Console\Commands\CreateCustomModel;
 use App\Console\Commands\ExportPostmanMyVersion;
 use App\Console\Commands\ExportPostmanTesto;
 use App\Console\Commands\GenerateResources;
+use App\Console\Commands\MyExportPostman;
+use App\Console\Commands\MyExportPostmanTest;
 use App\Helpers\ApiResponse;
+use App\Http\Middleware\EnsureDriverIsNotSuspended;
+use App\Http\Middleware\EnsureRiderIsNotSuspended;
 use App\Http\Middleware\EnsureRiderProfileComplete;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -28,13 +32,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // $middleware->api(prepend: [
+        //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        // ]);
         $middleware->alias([
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
-
         ]);
         $middleware->alias([
-            'rider.profile.completed' => EnsureRiderProfileComplete::class
+            'rider.profile.completed' => EnsureRiderProfileComplete::class,
+            'driver.suspended' => EnsureDriverIsNotSuspended::class,
+            'rider.suspended' => EnsureRiderIsNotSuspended::class
         ]);
     })
 
@@ -60,6 +68,6 @@ return Application::configure(basePath: dirname(__DIR__))
         CreateCustomModel::class,
         GenerateResources::class,
         CreateAdminAccountCommand::class,
-        ExportPostmanTesto::class,
-        ExportPostmanMyVersion::class,
+        MyExportPostman::class,
+        MyExportPostmanTest::class,
     ])->create();

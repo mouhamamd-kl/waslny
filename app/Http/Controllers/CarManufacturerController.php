@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\CarManufactureRequest;
+use App\Http\Requests\CarManufacturerRequest;
 use App\Http\Requests\CarManufacturerSearchRequest;
 use App\Http\Resources\CarManufacturerResource;
 use App\Models\CarManufacturer;
@@ -118,7 +118,7 @@ class CarManufacturerController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(CarManufactureRequest $request)
+    public function store(CarManufacturerRequest $request)
     {
         try {
             $data = $request->validate();
@@ -151,7 +151,7 @@ class CarManufacturerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CarManufactureRequest $request, string $id)
+    public function update(CarManufacturerRequest $request, string $id)
     {
         try {
             $car_manufacture = $this->carManufactureService->update((int) $id, $request->validated());

@@ -329,6 +329,7 @@ return [
             'reinstate_failed' => 'فشل إعادة تفعيل الحساب',
             'profile_already_completed' => 'تم إكمال الملف الشخصي مسبقاً',
             'car_already_added' => 'تمت إضافة المركبة مسبقاً', // New message added here
+            'profile_incomplete' => 'يرجى إكمال ملفك الشخصي قبل الوصول إلى هذه الميزة',
         ],
         'car' => [
             'created' => 'تم إنشاء المركبة بنجاح'

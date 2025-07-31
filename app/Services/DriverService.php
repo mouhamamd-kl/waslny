@@ -17,9 +17,11 @@ class DriverService extends BaseService
     protected array $relations = ['status', 'driverCar', 'trips', 'tripNotifications', 'notifiedTrips', 'completedTrips', 'currentTrip', 'suspensions'];
     protected DriverCarService $driverCarService;
     protected SuspenssionService $suspenssion_service;
-    public function __construct(CacheHelper $cache)
+    public function __construct(CacheHelper $cache, SuspenssionService $suspenssionService, DriverCarService $driverCarService)
     {
         parent::__construct(new Driver, $cache);
+        $this->suspenssion_service = $suspenssionService;
+        $this->driverCarService = $driverCarService;
     }
 
     public function searchDrivers(

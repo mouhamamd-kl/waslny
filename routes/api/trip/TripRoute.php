@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ScheduledTripController;
 use App\Http\Controllers\TripController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,7 +27,7 @@ Route::middleware(['auth:driver-api'])
     });
 
 // Shared routes (accessible by both riders and drivers)
-Route::middleware(['auth:rider-api,driver-api,admin-api'])
+Route::middleware(['auth:rider-api','auth:driver-api','auth:admin-api'])
     ->controller(TripController::class)
     ->prefix('trips')
     ->name('trips.')
@@ -45,3 +46,13 @@ Route::middleware(['auth:admin-api'])
         Route::put('/{trip}', 'update')->name('update');
         Route::delete('/{trip}', 'destroy')->name('destroy');
     });
+
+// Backend-to-backend routes
+Route::controller(TripController::class)
+    ->prefix('trips')
+    ->name('trips.')
+    ->group(function () {
+        Route::post('/find-driver', 'findDriverForTrip')->name('find-driver');
+    });
+
+Route::post('/trips/check-scheduled', [ScheduledTripController::class, 'checkScheduledTrips'])->name('trips.check_scheduled');
