@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Http\Requests;
+
+use App\Models\CarManufacturer;
+use App\Models\CarModel;
+use App\Models\Country;
+use App\Models\Coupon;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class CarModelUpdateRequest extends BaseRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    // public function authorize(): bool
+    // {
+    //     return auth('admin-api')->check();
+    // }
+
+    public function handleAuthorization(): bool
+    {
+        return auth('admin-api')->check();
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => [
+                'sometimes',
+                'string',
+                'unique:' . CarModel::class
+            ],
+            'car_manufacturer_id' => [
+
+                'sometimes',
+                'exists:' . CarManufacturer::class . ',id'
+            ],
+            'car_service_level_id' => [
+
+                'sometimes',
+                'exists:car_service_levels,id'
+            ],
+            'model_year' => [
+
+                'sometimes',
+                'integer',
+                'min:2003',
+                'max:' . now()->year + 1
+            ],
+            'is_active' => [
+
+                'sometimes',
+                'boolean'
+            ]
+        ];
+    }
+}
