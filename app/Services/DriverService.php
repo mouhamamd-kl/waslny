@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\SuspensionReason;
 use App\Enums\SuspensionReasonEnum;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;  // Add this line
 use App\Helpers\CacheHelper;
 use App\Models\Driver;
@@ -43,6 +44,9 @@ class DriverService extends BaseService
         try {
             /** @var Driver $driver */ // Add PHPDoc type hint
             $driver = $this->findById($driverId);
+            if (!$driver) {
+                throw new Exception('Driver not found.');
+            }
             $driver->deletePhotos();
             $this->driverCarService->deleteAssets($driver->driverCar->id);
         } catch (Exception $e) {
@@ -55,6 +59,9 @@ class DriverService extends BaseService
         try {
             /** @var Driver $driver */ // Add PHPDoc type hint
             $driver = $this->findById($driverId);
+            if (!$driver) {
+                throw new Exception('Driver not found.');
+            }
             $driver->suspendForever($suspension_id);
         } catch (Exception $e) {
             throw new Exception('error suspending for driver' . $e);
@@ -65,6 +72,9 @@ class DriverService extends BaseService
         try {
             /** @var Driver $driver */ // Add PHPDoc type hint
             $driver = $this->findById($driverId);
+            if (!$driver) {
+                throw new Exception('Driver not found.');
+            }
             $suspention = $this->suspenssion_service->searchByReason(SuspensionReasonEnum::NEED_REVIEW->value);
             $driver->suspendForever($suspention->id);
         } catch (Exception $e) {
@@ -76,7 +86,10 @@ class DriverService extends BaseService
         try {
             /** @var Driver $driver */ // Add PHPDoc type hint
             $driver = $this->findById($driverId);
-            $driver->suspendTemporarily($suspension_id, $suspended_until);
+            if (!$driver) {
+                throw new Exception('Driver not found.');
+            }
+            $driver->suspendTemporarily($suspension_id, Carbon::parse($suspended_until));
         } catch (Exception $e) {
             throw new Exception('error suspending for driver' . $e);
         }
@@ -86,8 +99,12 @@ class DriverService extends BaseService
         try {
             /** @var Driver $driver */ // Add PHPDoc type hint
             $driver = $this->findById($driverId);
+            if (!$driver) {
+                throw new Exception('Driver not found.');
+            }
             $driver->reinstate();
         } catch (Exception $e) {
+            
             throw new Exception('error activating for driver' . $e);
         }
     }

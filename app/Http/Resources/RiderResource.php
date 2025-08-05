@@ -27,6 +27,9 @@ class RiderResource extends JsonResource
                 return $assetService->getUrl($this->profile_photo);
             }, null),
             'rating' => $this->rating,
+            'wallet' => [
+                'balance' => $this->balance,
+            ],
             'dates' => [
                 'created' => $this->created_at,
                 'updated' => $this->updated_at,

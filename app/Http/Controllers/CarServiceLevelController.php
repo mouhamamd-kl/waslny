@@ -47,7 +47,7 @@ class CarServiceLevelController extends Controller
     public function search(CarServiceLevelSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $car_service_levels = $this->carServiceLevelService->searchCarServiceLevel(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -72,11 +72,10 @@ class CarServiceLevelController extends Controller
     public function store(CarServiceLevelRequest $request)
     {
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $car_service_level = $this->carServiceLevelService->create($data);
             return ApiResponse::sendResponseSuccess(
-                $car_service_level,
-                CarServiceLevelResource::class,
+                new CarServiceLevelResource($car_service_level),
                 trans_fallback('messages.car_service_level.created', 'Car Service Levels retrieved successfully'),
                 201
             );
@@ -93,6 +92,9 @@ class CarServiceLevelController extends Controller
     {
         try {
             $car_service_level = $this->carServiceLevelService->findById($id);
+            if (!$car_service_level) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Service Level not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new CarServiceLevelResource($car_service_level), message: trans_fallback('messages.car_service_level.retrieved', 'Car Service Level Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Service Level not found'), 404);
@@ -105,6 +107,10 @@ class CarServiceLevelController extends Controller
     public function update(CarServiceLevelRequest $request, string $id)
     {
         try {
+            $car_service_level = $this->carServiceLevelService->findById($id);
+            if (!$car_service_level) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Service Level not found'), 404);
+            }
             $car_service_level = $this->carServiceLevelService->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new CarServiceLevelResource($car_service_level),
@@ -123,6 +129,10 @@ class CarServiceLevelController extends Controller
     public function destroy($id)
     {
         try {
+            $car_service_level = $this->carServiceLevelService->findById($id);
+            if (!$car_service_level) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Service Level not found'), 404);
+            }
             $this->carServiceLevelService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.car_service_level.deleted', 'Car Service Level updated successfully')
@@ -140,6 +150,9 @@ class CarServiceLevelController extends Controller
         try {
             /** @var CarServiceLevel $CarServiceLevel */ // Add PHPDoc type hint
             $CarServiceLevel = $this->carServiceLevelService->findById($id);
+            if (!$CarServiceLevel) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Service Level not found'), 404);
+            }
             $CarServiceLevel->deactivate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.car_service_level.deactivated', 'Car Service Level DeActivated successfully')
@@ -156,6 +169,9 @@ class CarServiceLevelController extends Controller
         try {
             /** @var CarServiceLevel $car_model */ // Add PHPDoc type hint
             $CarServiceLevel = $this->carServiceLevelService->findById($id);
+            if (!$CarServiceLevel) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Service Level not found'), 404);
+            }
             $CarServiceLevel->activate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.car_service_level.activated', 'Car Service Level Activated successfully')

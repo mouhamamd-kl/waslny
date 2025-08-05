@@ -35,6 +35,7 @@ class CouponController extends Controller
                 trans_fallback('messages.coupon.list', 'Coupons retrieved successfully')
             );
         } catch (Exception $e) {
+            throw $e;
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred')
             );
@@ -47,7 +48,7 @@ class CouponController extends Controller
     public function search(CouponSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
             $coupons = $this->couponService->searchCoupons(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -72,11 +73,11 @@ class CouponController extends Controller
     public function store(CouponRequest $request)
     {
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $coupon = $this->couponService->create($data);
+            $coupon->refresh(); // Refresh the model to get DB defaults
             return ApiResponse::sendResponseSuccess(
-                $coupon,
-                CouponService::class,
+                new CouponResource($coupon),
                 trans_fallback('messages.coupon.created', 'Coupons Created successfully'),
                 201
             );
@@ -93,6 +94,9 @@ class CouponController extends Controller
     {
         try {
             $coupon = $this->couponService->findById($id);
+            if (!$coupon) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Coupon not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new CouponResource($coupon), message: trans_fallback('messages.coupon.retrieved', 'Coupon Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Coupon not found'), 404);
@@ -105,6 +109,10 @@ class CouponController extends Controller
     public function update(CouponRequest $request, string $id)
     {
         try {
+            $coupon = $this->couponService->findById($id);
+            if (!$coupon) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Coupon not found'), 404);
+            }
             $coupon = $this->couponService->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new CouponResource($coupon),
@@ -123,6 +131,10 @@ class CouponController extends Controller
     public function destroy($id)
     {
         try {
+            $coupon = $this->couponService->findById($id);
+            if (!$coupon) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Coupon not found'), 404);
+            }
             $this->couponService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.coupon.deleted', 'Coupon deleted successfully')
@@ -139,6 +151,9 @@ class CouponController extends Controller
         try {
             /** @var Coupon $coupon */ // Add PHPDoc type hint
             $coupon = $this->couponService->findById($id);
+            if (!$coupon) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Coupon not found'), 404);
+            }
             $coupon->deactivate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.coupon.deactivated', 'Coupon DeActivated successfully')
@@ -155,11 +170,15 @@ class CouponController extends Controller
         try {
             /** @var Coupon $coupon */ // Add PHPDoc type hint
             $coupon = $this->couponService->findById($id);
+            if (!$coupon) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Coupon not found'), 404);
+            }
             $coupon->activate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.coupon.activated', 'Coupon Activated successfully')
             );
         } catch (Exception $e) {
+            throw $e;
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.coupon.error.activation_failed', 'Activation failed: ' . $e->getMessage())
             );

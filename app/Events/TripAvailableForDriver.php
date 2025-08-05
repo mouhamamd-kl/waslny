@@ -40,7 +40,7 @@ class TripAvailableForDriver implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('driver.' . $this->driverId);
+        // return new PrivateChannel('driver.' . $this->driverId);
 
         return new PrivateChannel(
             BroadCastChannelEnum::DRIVER->bind([

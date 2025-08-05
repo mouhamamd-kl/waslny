@@ -16,8 +16,8 @@ class PricingResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
             'price_per_km' => $this->price_per_km,
+            'is_active' => $this->is_active,
             'dates' => [
                 'created' => $this->created_at,
                 'updated' => $this->updated_at,

@@ -131,4 +131,21 @@ class BaseRequest extends FormRequest
     {
         return "{$this->required()}|string|max:255|regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/";
     }
+
+    /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        if ($this->has('is_active')) {
+            $isActive = filter_var($this->input('is_active'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($isActive !== null) {
+                $this->merge([
+                    'is_active' => $isActive,
+                ]);
+            }
+        }
+    }
 }

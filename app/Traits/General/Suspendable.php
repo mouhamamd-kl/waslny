@@ -27,6 +27,9 @@ trait Suspendable
     // In Rider/Driver models
     public function suspendForever($suspendId): AccountSuspension
     {
+        if ($existingSuspension = $this->activeSuspension()) {
+            return $existingSuspension;
+        }
         return $this->suspensions()->create([
             'suspension_id' => $suspendId,
             'is_permanent' => true,
@@ -35,6 +38,9 @@ trait Suspendable
 
     public function suspendTemporarily($suspendId, Carbon $suspended_until): AccountSuspension
     {
+        if ($existingSuspension = $this->activeSuspension()) {
+            return $existingSuspension;
+        }
         return $this->suspensions()->create([
             'suspended_until' => $suspended_until,
             'suspension_id' => $suspendId,
@@ -50,7 +56,7 @@ trait Suspendable
     public function reinstate(): bool
     {
         /** @var AccountSuspension $accountSuspension */ // Add PHPDoc type hint
-        if ($accountSuspension = $this->activeSuspension) {
+        if ($accountSuspension = $this->activeSuspension()) {
             return $accountSuspension->lift();
         }
         return false;
@@ -102,7 +108,7 @@ trait Suspendable
             : 'Suspended until ' . $suspension->suspended_until->format('M d, Y');
     }
 
-    public function getStatusAttribute(): string
+    public function getAccountStatusAttribute(): string
     {
         return $this->isSuspended()
             ? ($this->activeSuspension->is_permanent ? 'banned' : 'suspended')

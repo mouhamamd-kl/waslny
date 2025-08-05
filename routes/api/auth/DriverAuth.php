@@ -45,8 +45,8 @@ Route::prefix('driver')->name('driver.')->group(function () {
         Route::prefix('profile')->name('profile.')->group(function () {
             Route::post('completion', [DriverProfileController::class, 'completeProfile'])
                 ->name('complete');
-            Route::middleware('rider.profile.completed')->group(function () {
-                Route::get('/', [DriverProfileController::class, 'show'])
+            Route::middleware('driver.profile.completed')->group(function () {
+                Route::get('/', [DriverProfileController::class, 'profile'])
                     ->name('show');
                 Route::post('update', [DriverProfileController::class, 'updateProfile']);
             });

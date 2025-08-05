@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\CarManufacturer;
 use App\Models\CarModel;
 use App\Models\Country;
 use App\Models\Coupon;
@@ -36,15 +37,15 @@ class CarModelRequest extends BaseRequest
                 'string',
                 'unique:' . CarModel::class
             ],
-            'car_manufacture_id' => [
+            'car_manufacturer_id' => [
                 $this->isRequired(),
-                'exists:car_manufacturers,id'
+                'exists:' . CarManufacturer::class . ',id'
             ],
             'car_service_level_id' => [
                 $this->isRequired(),
                 'exists:car_service_levels,id'
             ],
-            'year' => [
+            'model_year' => [
                 $this->isRequired(),
                 'integer',
                 'min:2003',

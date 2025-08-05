@@ -19,7 +19,6 @@ class AdminTwoFactorController extends Controller
     public function verify(AdminOtpRequest $request)
     {
         try {
-            DB::beginTransaction();
             $data=$request->validated();
             // $request->validate([
             //     // 'phone' => 'required',
@@ -39,10 +38,8 @@ class AdminTwoFactorController extends Controller
 
             // OTP is valid — reset and return token
             $admin->resetTwoFactorCode();
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseSuccess($this->formatAdminData($admin), 'Admin logged in successfully', 200);
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -54,7 +51,6 @@ class AdminTwoFactorController extends Controller
     public function resend(AdminResendOtpRequest $request)
     {
         try {
-            DB::beginTransaction();
             $data = $request->validated();
             // $validator = Validator::make($request->all(), [
             //     'email' => ['required', 'string', 'email'],
@@ -78,13 +74,11 @@ class AdminTwoFactorController extends Controller
 
             $admin->generateTwoFactorCode();
             $admin->notify(new \App\Notifications\Admin\AdminTwoFactorCode);
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseSuccess(
                 ['message' => 'A new verification code has been sent to your email.'],
                 'OTP code resent successfully.'
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

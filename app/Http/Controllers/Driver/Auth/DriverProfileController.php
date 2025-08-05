@@ -72,7 +72,6 @@ class DriverProfileController extends Controller
         $driver = auth('driver-api')->user();
         // Handle paperwork file upload
         try {
-            DB::beginTransaction();
             if (!$driver->isProfileComplete()) {
                 $data = $request->validated();
 
@@ -88,13 +87,11 @@ class DriverProfileController extends Controller
                     }
                 }
                 $driver->update(attributes: $data);
-                DB::commit(); // Never reached
                 return ApiResponse::sendResponseSuccess(
                     new DriverResource($driver->fresh()),
                     trans_fallback('messages.driver.completion_success', 'Driver Profile Created successfully')
                 );
             }
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.driver.error.profile_already_completed', 'Driver Profile Already Completed'),
                 409

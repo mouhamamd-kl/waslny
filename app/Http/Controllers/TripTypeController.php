@@ -47,7 +47,7 @@ class TripTypeController extends Controller
     public function search(TripTypeSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
             $trip_types = $this->tripTypeService->searchTripType(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -93,6 +93,9 @@ class TripTypeController extends Controller
     {
         try {
             $trip_type = $this->tripTypeService->findById($id);
+            if (!$trip_type) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_type not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new TripTypeResource($trip_type), message: trans_fallback('messages.trip_type.retrieved', 'trip_type Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_type not found'), 404);
@@ -138,7 +141,10 @@ class TripTypeController extends Controller
     {
         try {
             /** @var TripType $triptype */ // Add PHPDoc type hint
-            $triptype = $this->tripTypeService->activate($id);
+            $triptype = $this->tripTypeService->findById($id);
+            if (!$triptype) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_type not found'), 404);
+            }
             $triptype->activate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_type.activated', 'Trip Type Activated successfully')
@@ -154,6 +160,9 @@ class TripTypeController extends Controller
         try {
             /** @var TripType $triptype */ // Add PHPDoc type hint
             $triptype = $this->tripTypeService->findById($id);
+            if (!$triptype) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_type not found'), 404);
+            }
             $triptype->deactivate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_type.deactivated', 'Trip Type DeActivated successfully')

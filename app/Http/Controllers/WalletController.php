@@ -2,64 +2,70 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Wallet;
+use App\Helpers\ApiResponse;
+use App\Http\Resources\SystemWalletResource;
+use App\Services\SystemWalletService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class WalletController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected SystemWalletService $systemWalletService;
+
+    public function __construct(SystemWalletService $systemWalletService)
     {
-        //
+        $this->systemWalletService = $systemWalletService;
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display the system wallet's balance.
      */
-    public function create()
+    public function show()
     {
-        //
+        try {
+            $balance = $this->systemWalletService->getBalance();
+            return ApiResponse::sendResponseSuccess(['balance' => $balance], 'System wallet balance retrieved successfully.');
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError('Failed to retrieve wallet balance: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Credit funds to the system wallet.
      */
-    public function store(Request $request)
+    public function credit(Request $request)
     {
-        //
+        try {
+            $validated = $request->validate([
+                'amount' => 'required|numeric|min:0.01',
+            ]);
+
+            $wallet = $this->systemWalletService->credit($validated['amount']);
+            return ApiResponse::sendResponseSuccess(new SystemWalletResource($wallet), 'Funds credited successfully.');
+        } catch (ValidationException $e) {
+            return ApiResponse::sendResponseError($e->getMessage(), 422);
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError('Credit operation failed: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Display the specified resource.
+     * Debit funds from the system wallet.
      */
-    // public function show(Wallet $wallet)
-    // {
-    //     //
-    // }
+    public function debit(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'amount' => 'required|numeric|min:0.01',
+            ]);
 
-    // /**
-    //  * Show the form for editing the specified resource.
-    //  */
-    // public function edit(Wallet $wallet)
-    // {
-    //     //
-    // }
-
-    // /**
-    //  * Update the specified resource in storage.
-    //  */
-    // public function update(Request $request, Wallet $wallet)
-    // {
-    //     //
-    // }
-
-    // /**
-    //  * Remove the specified resource from storage.
-    //  */
-    // public function destroy(Wallet $wallet)
-    // {
-    //     //
-    // }
+            $wallet = $this->systemWalletService->debit($validated['amount']);
+            return ApiResponse::sendResponseSuccess(new SystemWalletResource($wallet), 'Funds debited successfully.');
+        } catch (ValidationException $e) {
+            return ApiResponse::sendResponseError($e->getMessage(), 422);
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError('Debit operation failed: ' . $e->getMessage());
+        }
+    }
 }

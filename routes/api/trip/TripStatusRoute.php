@@ -11,7 +11,7 @@ Route::middleware(['auth:admin-api'])->controller(TripStatusController::class)
         // Top-level routes
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
-        Route::get('/search', 'search')->name('search');
+        Route::post('/search', 'search')->name('search');
 
         // Routes requiring car_manufacturer parameter
         Route::prefix('{trip_status}')->group(function () {

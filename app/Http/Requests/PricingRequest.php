@@ -35,7 +35,8 @@ class PricingRequest extends BaseRequest
     {
         return [
             'car_service_level_id' => [
-                $this->isRequired() . "exists:car_service_levels,id"
+                $this->isRequired(),
+                "exists:car_service_levels,id"
             ],
             'price_per_km' => [
                 $this->isRequired(),

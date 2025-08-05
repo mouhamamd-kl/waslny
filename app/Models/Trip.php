@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\TripStatusEnum;
 use App\Exceptions\InvalidTransitionException;
 use App\Traits\General\FilterScope;
+use Bavix\Wallet\Models\Transaction;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -258,17 +259,33 @@ class Trip extends Model
         $this->transitionTo(TripStatusEnum::Completed);
         $this->end_time = now();
         $this->save();
+
+        $this->driver->update([
+            'driver_status_id' => DriverStatus::where('name', 'available')->first()->id
+        ]);
+
+        $this->processPayment();
     }
 
     public function cancelByRider(): void
     {
         $this->transitionTo(TripStatusEnum::RiderCancelled);
         $this->save();
+
+        if ($this->driver) {
+            $this->driver->update([
+                'driver_status_id' => DriverStatus::where('name', 'available')->first()->id
+            ]);
+        }
     }
     public function cancelByDriver(): void
     {
         $this->transitionTo(TripStatusEnum::DriverCancelled);
         $this->save();
+
+        $this->driver->update([
+            'driver_status_id' => DriverStatus::where('name', 'available')->first()->id
+        ]);
     }
 
     public function applyCoupon(RiderCoupon $riderCoupon): void
@@ -290,22 +307,13 @@ class Trip extends Model
 
     public function processPayment(): void
     {
-        // $this->rider->wallet->deduct($this->fare);
-        // $this->driver->wallet->add($this->fare * 0.8); // 80% to driver
+        $systemWallet = SystemWallet::first();
 
-        // Transaction::create([
-        //     'wallet_id' => $this->rider->wallet_id,
-        //     'amount' => -$this->fare,
-        //     'type' => 'trip_charge',
-        //     'trip_id' => $this->id
-        // ]);
+        // Rider pays the full fare to the system
+        $this->rider->wallet->pay($systemWallet, $this->fare, ['trip_id' => $this->id]);
 
-        // Transaction::create([
-        //     'wallet_id' => $this->driver->wallet_id,
-        //     'amount' => $this->fare * 0.8,
-        //     'type' => 'trip_earning',
-        //     'trip_id' => $this->id
-        // ]);
+        // System pays the driver their share (80%)
+        $systemWallet->pay($this->driver->wallet, $this->fare * 0.8, ['trip_id' => $this->id]);
     }
 
     public function addLocation(array $locations): TripLocation

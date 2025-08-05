@@ -14,7 +14,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class CouponService extends BaseService
 {
-    protected array $relations = ['trips', 'riderCoupons', 'riders'];
+    protected array $relations = [];
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new Coupon, $cache);

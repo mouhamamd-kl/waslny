@@ -10,7 +10,7 @@ Route::controller(PaymentMethodController::class)
     ->name('payment-method.')
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/search', 'search')->name('search');
+        Route::post('/search', 'search')->name('search');
         Route::get('/{payment_method}', 'show')->name('show');
 
     });

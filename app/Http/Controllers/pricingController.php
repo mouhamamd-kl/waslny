@@ -47,7 +47,7 @@ class PricingController extends Controller
     public function search(PricingSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $pricings = $this->pricingService->searchPricings(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -72,11 +72,10 @@ class PricingController extends Controller
     public function store(PricingRequest $request)
     {
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $pricing = $this->pricingService->create($data);
             return ApiResponse::sendResponseSuccess(
-                $pricing,
-                PricingResource::class,
+                new PricingResource($pricing),
                 trans_fallback('messages.pricing.created', 'Pricing retrieved successfully'),
                 201
             );
@@ -93,6 +92,9 @@ class PricingController extends Controller
     {
         try {
             $pricing = $this->pricingService->findById($id);
+            if (!$pricing) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Pricing not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new PricingResource($pricing), message: trans_fallback('messages.pricing.retrieved', 'Pricing Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Pricing not found'), 404);
@@ -105,6 +107,10 @@ class PricingController extends Controller
     public function update(PricingRequest $request, string $id)
     {
         try {
+            $pricing = $this->pricingService->findById($id);
+            if (!$pricing) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Pricing not found'), 404);
+            }
             $pricing = $this->pricingService->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new PricingResource($pricing),
@@ -123,6 +129,10 @@ class PricingController extends Controller
     public function destroy($id)
     {
         try {
+            $pricing = $this->pricingService->findById($id);
+            if (!$pricing) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Pricing not found'), 404);
+            }
             $this->pricingService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.pricing.deleted', 'Pricing updated successfully')
@@ -137,11 +147,14 @@ class PricingController extends Controller
     public function deActivate($id)
     {
         try {
-            /** @var Coupon $pricing */ // Add PHPDoc type hint
+            /** @var pricing $pricing */ // Add PHPDoc type hint
             $pricing = $this->pricingService->findById($id);
+            if (!$pricing) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Pricing not found'), 404);
+            }
             $pricing->deactivate();
             return ApiResponse::sendResponseSuccess(
-                message: trans_fallback('messages.pricing.deactivated', 'Pricing DeActivated successfully')
+                message: trans_fallback('messages.pricing.deactivated', 'Pricing deactivated successfully')
             );
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(
@@ -153,8 +166,11 @@ class PricingController extends Controller
     public function activate($id)
     {
         try {
-            /** @var Coupon $pricing */ // Add PHPDoc type hint
+            /** @var pricing $pricing */ // Add PHPDoc type hint
             $pricing = $this->pricingService->findById($id);
+            if (!$pricing) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Pricing not found'), 404);
+            }
             $pricing->activate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.pricing.activated', 'Pricing Activated successfully')

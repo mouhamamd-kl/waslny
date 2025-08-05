@@ -22,13 +22,12 @@ class TripSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'is_active' => 'sometimes|boolean',
-            'trip_status_id' => 'sometimes|integer|exists:trip_statuses,id',
-            'trip_type_id' => 'sometimes|integer|exists:trip_types,id',
-            'trip_time_type_id' => 'sometimes|integer|exists:trip_time_types,id',
-            'start_time' => 'sometimes|date',
-            'end_time' => 'sometimes|date|after_or_equal:start_time',
-            'fare' => 'sometimes|numeric',
+            'trip_status_id' => 'sometimes|nullable|integer|exists:trip_statuses,id',
+            'trip_type_id' => 'sometimes|nullable|integer|exists:trip_types,id',
+            'trip_time_type_id' => 'sometimes\nullable|integer|exists:trip_time_types,id',
+            'start_time' => 'sometimes|nullable|date',
+            'end_time' => 'sometimes|nullable|date|after_or_equal:start_time',
+            'fare' => 'sometimes|nullable|numeric',
         ];
     }
 }

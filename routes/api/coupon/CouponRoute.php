@@ -10,7 +10,7 @@ Route::middleware(['auth:admin-api'])->controller(CouponController::class)
         // Top-level routes
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
-        Route::get('/search', 'search')->name('search');
+        Route::post('/search', 'search')->name('search');
 
         // Routes requiring car_manufacturer parameter
         Route::prefix('{coupon}')->group(function () {

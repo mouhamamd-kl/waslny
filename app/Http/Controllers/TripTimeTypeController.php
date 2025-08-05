@@ -48,7 +48,7 @@ class TripTimeTypeController extends Controller
     public function search(TripTimeTypeSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
             $trip_time_types = $this->tripTimeTypeService->searchTripTimeType(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -94,6 +94,9 @@ class TripTimeTypeController extends Controller
     {
         try {
             $trip_time_type = $this->tripTimeTypeService->findById($id);
+            if (!$trip_time_type) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_time_type not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new TripTimeTypeResource($trip_time_type), message: trans_fallback('messages.trip_time_type.retrieved', 'trip_time_type Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_time_type not found'), 404);
@@ -138,9 +141,12 @@ class TripTimeTypeController extends Controller
     public function activate($id)
     {
         try {
-            /** @var TripType $triptype */ // Add PHPDoc type hint
-            $triptype = $this->tripTimeTypeService->activate($id);
-            $triptype->activate();
+            /** @var TripTimeType $tripTimeType */ // Add PHPDoc type hint
+            $tripTimeType = $this->tripTimeTypeService->findById($id);
+            if (!$tripTimeType) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_time_type not found'), 404);
+            }
+            $tripTimeType->activate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_time_type.activated', 'Trip Time Type Activated successfully')
             );
@@ -153,9 +159,12 @@ class TripTimeTypeController extends Controller
     public function deActivate($id)
     {
         try {
-            /** @var TripType $triptype */ // Add PHPDoc type hint
-            $triptype = $this->tripTimeTypeService->findById($id);
-            $triptype->deactivate();
+            /** @var TripTimeType $tripTimeType */ // Add PHPDoc type hint
+            $tripTimeType = $this->tripTimeTypeService->findById($id);
+            if (!$tripTimeType) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_time_type not found'), 404);
+            }
+            $tripTimeType->deactivate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_time_type.deactivated', 'Trip Time Type DeActivated successfully')
             );

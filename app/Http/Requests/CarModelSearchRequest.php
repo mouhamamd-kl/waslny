@@ -22,10 +22,10 @@ class CarModelSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255',
-            'car_service_level_id' => 'sometimes|integer|exists:car_service_levels,id',
-            'car_manufacture_id' => 'sometimes|integer|exists:car_manufacturers,id',
-            'is_active' => 'sometimes|boolean',
+            'name' => 'sometimes|nullable|string|max:255',
+            'car_service_level_id' => 'sometimes|nullable|integer|exists:car_service_levels,id',
+            'car_manufacture_id' => 'sometimes|nullable|integer|exists:car_manufacturers,id',
+            'is_active' => 'sometimes|nullable|boolean',
         ];
     }
 }

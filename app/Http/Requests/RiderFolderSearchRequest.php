@@ -22,8 +22,8 @@ class RiderFolderSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255',
-            'rider_id' => 'sometimes|integer|exists:riders,id',
+            'name' => 'sometimes|nullable|string|max:255',
+            'rider_id' => 'sometimes|nullable|integer|exists:riders,id',
         ];
     }
 }

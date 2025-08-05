@@ -10,7 +10,7 @@ Route::controller(CarManufacturerController::class)
     ->name('car-manufacturers.')
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/search', 'search')->name('search');
+        Route::post('/search', 'search')->name('search');
         Route::get('/{car_manufacturer}', 'show')->name('show');
     });
 
@@ -27,5 +27,5 @@ Route::middleware(['auth:admin-api'])->controller(CarManufacturerController::cla
             Route::post('/activate', 'activate')->name('activate');
             Route::post('/deactivate', 'deActivate')->name('deactivate');
         });
-        Route::get('/search', 'adminSearch')->name('search');
+        Route::post('/search', 'adminSearch')->name('search');
     });

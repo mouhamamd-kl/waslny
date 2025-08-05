@@ -61,20 +61,17 @@ class RiderSavedLocation extends Model
     /**
      * Get location as array [lat, lng]
      */
-    public function getLocationAttribute($value): ?array
-    {
-        return $value ? [$value->getLat(), $value->getLng()] : null;
-    }
 
     /**
      * Set location from array or Point object
      */
-    public function setLocationAttribute($value): void
-    {
-        $this->attributes['location'] = $value instanceof Point
-            ? $value
-            : Point::make($value[0], $value[1]); // [lat, lng]
-    }
+
+    // public function setLocationAttribute($value): void
+    // {
+    //     $this->attributes['location'] = $value instanceof Point
+    //         ? $value
+    //         : Point::make($value[0], $value[1]); // [lat, lng]
+    // }
 
     // =================
     // Scopes
@@ -103,14 +100,14 @@ class RiderSavedLocation extends Model
     /**
      * Convert to GeoJSON feature
      */
-    public function toGeoJsonFeature(): array
-    {
-        return [
-            'type' => 'Feature',
-            'properties' => $this->only(['id', 'name', 'folder_id']),
-            'geometry' => $this->location->toArray()
-        ];
-    }
+    // public function toGeoJsonFeature(): array
+    // {
+    //     return [
+    //         'type' => 'Feature',
+    //         'properties' => $this->only(['id', 'name', 'folder_id']),
+    //         'geometry' => $this->location->toArray()
+    //     ];
+    // }
 
     /**
      * Check if location belongs to a rider

@@ -27,9 +27,9 @@ class MoneyCodeController extends Controller
                 filters: $request->input('filters', []),
                 perPage: $request->input('perPage', 10)
             );
-            return ApiResponse::sendResponsePaginated($moneyCodes, MoneyCodeResource::class, 'Money codes retrieved successfully');
+            return ApiResponse::sendResponsePaginated($moneyCodes, MoneyCodeResource::class, trans_fallback('messages.money_code.list', 'Money codes retrieved successfully'));
         } catch (Exception $e) {
-            return ApiResponse::sendResponseError($e->getMessage());
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.generic', 'An error occurred. Please try again later'), 500, $e->getMessage());
         }
     }
 
@@ -37,15 +37,21 @@ class MoneyCodeController extends Controller
     {
         try {
             $moneyCode = $this->moneyCodeService->createMoneyCode($request->validated());
-            return ApiResponse::sendResponseSuccess(new MoneyCodeResource($moneyCode), 'Money code created successfully');
+            return ApiResponse::sendResponseSuccess(new MoneyCodeResource($moneyCode), trans_fallback('messages.money_code.created', 'Money code created successfully'));
         } catch (Exception $e) {
-            return ApiResponse::sendResponseError($e->getMessage());
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'Creation failed'), 500, $e->getMessage());
         }
     }
 
-    public function show(MoneyCode $moneyCode)
+    public function show($id)
     {
-        return ApiResponse::sendResponseSuccess(new MoneyCodeResource($moneyCode->load('rider')), 'Money code retrieved successfully');
+        $moneyCode = $this->moneyCodeService->findMoneyCode($id);
+
+        if (!$moneyCode) {
+            return ApiResponse::sendResponseError(trans_fallback('messages.money_code.error.not_found', 'Money code not found'), 404);
+        }
+
+        return ApiResponse::sendResponseSuccess(new MoneyCodeResource($moneyCode->load('rider')), trans_fallback('messages.money_code.retrieved', 'Money code retrieved successfully'));
     }
 
     public function redeem(Request $request)
@@ -55,19 +61,25 @@ class MoneyCodeController extends Controller
             /** @var Rider $rider */
             $rider = $request->user();
             $moneyCode = $this->moneyCodeService->redeemMoneyCode($request->input('code'), $rider);
-            return ApiResponse::sendResponseSuccess(new MoneyCodeResource($moneyCode), 'Money code redeemed successfully');
+            return ApiResponse::sendResponseSuccess(new MoneyCodeResource($moneyCode), trans_fallback('messages.money_code.redeemed', 'Money code redeemed successfully'));
         } catch (Exception $e) {
-            return ApiResponse::sendResponseError($e->getMessage());
+            return ApiResponse::sendResponseError(trans_fallback('messages.money_code.error.invalid', 'Invalid or already used money code'), 422, $e->getMessage());
         }
     }
 
-    public function destroy(MoneyCode $moneyCode)
+    public function destroy($id)
     {
+        $moneyCode = $this->moneyCodeService->findMoneyCode($id);
+
+        if (!$moneyCode) {
+            return ApiResponse::sendResponseError(trans_fallback('messages.money_code.error.not_found', 'Money code not found'), 404);
+        }
+
         try {
             $this->moneyCodeService->delete($moneyCode->id);
-            return ApiResponse::sendResponseSuccess([], 'Money code deleted successfully');
+            return ApiResponse::sendResponseSuccess([], trans_fallback('messages.money_code.deleted', 'Money code deleted successfully'));
         } catch (Exception $e) {
-            return ApiResponse::sendResponseError($e->getMessage());
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.delete_failed', 'Deletion failed'), 500, $e->getMessage());
         }
     }
 }

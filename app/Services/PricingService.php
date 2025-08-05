@@ -34,4 +34,17 @@ class PricingService extends BaseService
                 withCount: []
             );
     }
+
+    public function activatePricing(Pricing $pricing): void
+    {
+        DB::transaction(function () use ($pricing) {
+            // Deactivate all other pricings for the same car service level
+            Pricing::where('car_service_level_id', $pricing->car_service_level_id)
+                ->where('id', '!=', $pricing->id)
+                ->update(['is_active' => false]);
+
+            // Activate the new pricing
+            $pricing->update(['is_active' => true]);
+        });
+    }
 }

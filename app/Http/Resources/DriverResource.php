@@ -32,6 +32,9 @@ class DriverResource extends JsonResource
                 return $assetDriverLicense->getUrl($this->driver_license_photo);
             }, null),
             'rating' => $this->rating,
+            'wallet' => [
+                'balance' => $this->balance,
+            ],
             'driver_status' => new DriverStatusResource($this->whenLoaded('status')),
             'dates' => [
                 'created' => $this->created_at,

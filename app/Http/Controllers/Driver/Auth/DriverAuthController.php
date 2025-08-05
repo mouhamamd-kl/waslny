@@ -22,8 +22,7 @@ class DriverAuthController extends Controller
     {
 
         try {
-            DB::beginTransaction();
-            $data = $request->validated();
+         $data = $request->validated();
             // $rider = Rider::where('phone', $request->phone)->first();
             $driver = Driver::firstOrCreate(
                 [
@@ -34,7 +33,6 @@ class DriverAuthController extends Controller
             $driver->generateTwoFactorCode();
             $driver->notify(new DriverTwoFactorCode);
 
-            DB::commit();
             return ApiResponse::sendResponseSuccess(
                 [
                     'requires_otp' => true,
@@ -42,7 +40,6 @@ class DriverAuthController extends Controller
                 trans_fallback('messages.auth.verification.sent', 'Verification Code has been sent')
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -54,16 +51,13 @@ class DriverAuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         try {
-            DB::beginTransaction();
             $request->user()->currentAccessToken()->delete();
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseSuccess(
                 [],
                 trans_fallback('messages.auth.logout', 'logged out successfully'),
                 200
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -76,14 +70,11 @@ class DriverAuthController extends Controller
     public function refreshToken(Request $request): JsonResponse
     {
         try {
-            DB::beginTransaction();
             $request->user()->tokens()->delete();
-            DB::commit(); // Never reached
             return response()->json([
                 'token' => $request->user()->createToken('refresh-token')->plainTextToken,
             ]);
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -99,17 +90,14 @@ class DriverAuthController extends Controller
         // return ApiResponse::sendResponseSuccess($agent, 'Agent account deleted successfully');
 
         try {
-            DB::beginTransaction();
             // Delete uploaded files from S3
             $this->driverService->deleteAssets($driver->id);
             // Revoke tokens
             $driver->tokens()->delete();
             // Delete agent from DB
             $driver->delete();
-            DB::commit();
             return ApiResponse::sendResponseSuccess(null, 'Driver account deleted successfully');
         } catch (\Throwable $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

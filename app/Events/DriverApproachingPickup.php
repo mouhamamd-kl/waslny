@@ -2,6 +2,11 @@
 
 namespace App\Events;
 
+use App\Enums\channels\BroadCastChannelEnum;
+use App\Http\Resources\DriverResource;
+use App\Http\Resources\TripResource;
+use App\Models\Driver;
+use App\Models\Trip;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -15,23 +20,58 @@ class DriverApproachingPickup implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $trip;
+    public $driver;
+
     /**
      * Create a new event instance.
+     *
+     * @param array $tripData
+     * @param int $driverId
      */
-    public function __construct()
+    public function __construct(Trip $trip, Driver $driver)
     {
-        //
+        $this->trip = $trip;
+        $this->driver = $driver;
     }
 
     /**
-     * Get the channels the event should broadcast on.
+     * The channel the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return Channel
      */
-    public function broadcastOn(): array
+    public function broadcastOn()
+    {
+        // return new PrivateChannel('driver.' . $this->driverId);
+
+        return new PrivateChannel(
+            BroadCastChannelEnum::TRIP->bind([
+                $this->trip->riderId
+            ])
+        );
+    }
+
+    /**
+     * The event's broadcast name.
+     *
+     * @return string
+     */
+    public function broadcastAs()
+    {
+        return 'driver.approaching.pickup';
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            'trip' => (new TripResource($this->trip))->resolve(),
+            'driver' => (new DriverResource($this->driver))->resolve(),
+            'sent_at' => now()->toISOString()
         ];
     }
 }

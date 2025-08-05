@@ -18,6 +18,12 @@
         { "src": "/(.*\\.\\w+)$", "dest": "/public/$1" },
         { "src": "/(.*)", "dest": "/api/index.php" }
     ],
+    "crons": [
+        {
+            "path": "/api/schedule",
+            "schedule": "* * * * *"
+        }
+    ],
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "true",
@@ -56,7 +62,7 @@
         "DB_HOST": "aws-0-us-east-2.pooler.supabase.com",
         "DB_PORT": "6543",
         "DB_DATABASE": "postgres",
-        "DB_USERNAME": "postgres.cqrlbirnwzidgerehsdq ",
+        "DB_USERNAME": "postgres.cqrlbirnwzidgerehsdq",
         "DB_PASSWORD": "SswRGLfMbr9Cfc5",
 
         "BROADCAST_CONNECTION": "pusher",

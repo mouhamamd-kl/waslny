@@ -7,6 +7,7 @@ use App\Services\BaseFileService;
 use App\Services\FileServiceFactory;
 use App\Traits\General\FilterScope;
 use App\Traits\General\ResetOTP;
+use App\Traits\General\TwoFactorCode;
 use App\Traits\General\TwoFactorCodeGenerator;
 use Exception;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -29,7 +30,7 @@ enum AdminPhotoType: string
 }
 class Admin extends Authenticatable
 {
-    use HasFactory, Notifiable, TwoFactorCodeGenerator, FilterScope, HasApiTokens, ResetOTP;
+    use HasFactory, Notifiable, TwoFactorCode, FilterScope, HasApiTokens, ResetOTP;
 
     // =================
     // Configuration
@@ -42,6 +43,7 @@ class Admin extends Authenticatable
         'birth_date' => 'date',
         'two_factor_expires_at' => 'datetime',
         'avg_rating' => 'float',
+        'two_factor_enabled' => 'boolean',
     ];
     public function sendEmailVerificationNotification()
     {

@@ -1,29 +1,23 @@
 <?php
 
-use App\Http\Controllers\Admin\DriverSuspensionController;
-use App\Http\Controllers\Admin\RiderSuspensionController;
+use App\Http\Controllers\SuspensionController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:admin-api'])->prefix('suspensions')->group(function () {
-    Route::controller(DriverSuspensionController::class)
-        ->prefix('drivers')
-        ->name('suspensions.drivers.')
-        ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::post('/', 'store')->name('store');
-            Route::get('/{suspension}', 'show')->name('show');
-            Route::put('/{suspension}', 'update')->name('update');
-            Route::delete('/{suspension}', 'destroy')->name('destroy');
-        });
+Route::middleware(['auth:admin-api'])->controller(SuspensionController::class)
+    ->prefix('suspensions')
+    ->name('suspensions.') // Optional name prefix
+    ->group(function () {
+        // Top-level routes
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::post('/search', 'search')->name('search');
 
-    Route::controller(RiderSuspensionController::class)
-        ->prefix('riders')
-        ->name('suspensions.riders.')
-        ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::post('/', 'store')->name('store');
-            Route::get('/{suspension}', 'show')->name('show');
-            Route::put('/{suspension}', 'update')->name('update');
-            Route::delete('/{suspension}', 'destroy')->name('destroy');
+        // Routes requiring car_manufacturer parameter
+        Route::prefix('{coupon}')->group(function () {
+            Route::get('/', 'show')->name('show');
+            Route::put('/', 'update')->name('update');
+            Route::delete('/', 'destroy')->name('destroy');
+            Route::post('/activate', 'activate')->name('activate');
+            Route::post('/deactivate', 'deActivate')->name('deactivate');
         });
-});
+    });

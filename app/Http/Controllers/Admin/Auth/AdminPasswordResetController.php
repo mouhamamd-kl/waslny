@@ -41,7 +41,6 @@ class AdminPasswordResetController extends Controller
     public function resetPassword(AdminResetPasswordRequest $request)
     {
         try {
-            DB::beginTransaction();
             $data = $request->validated();
 
             $status = Password::broker('admins')->reset(
@@ -52,7 +51,6 @@ class AdminPasswordResetController extends Controller
                     ])->save();
                 }
             );
-            DB::commit(); // Never reached
             return $status === Password::PASSWORD_RESET
                 ? ApiResponse::sendResponseSuccess(
                     null,
@@ -63,7 +61,6 @@ class AdminPasswordResetController extends Controller
                     400
                 );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

@@ -47,7 +47,7 @@ class TripStatusController extends Controller
     public function search(TripStatusSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
             $trip_statuses = $this->tripStatusService->searchTripStatus(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -93,6 +93,9 @@ class TripStatusController extends Controller
     {
         try {
             $trip_status = $this->tripStatusService->findById($id);
+            if (!$trip_status) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip Status not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new TripStatusResource($trip_status), message: trans_fallback('messages.trip_status.retrieved', 'Trip Status Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip Status not found'), 404);
@@ -105,6 +108,10 @@ class TripStatusController extends Controller
     public function update(TripStatusRequest $request, string $id)
     {
         try {
+            $trip_status = $this->tripStatusService->findById($id);
+            if (!$trip_status) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip Status not found'), 404);
+            }
             $trip_status = $this->tripStatusService->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new TripStatusResource($trip_status),
@@ -123,6 +130,10 @@ class TripStatusController extends Controller
     public function destroy($id)
     {
         try {
+            $trip_status = $this->tripStatusService->findById($id);
+            if (!$trip_status) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip Status not found'), 404);
+            }
             $this->tripStatusService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_status.deleted', 'Trip Status updated successfully')

@@ -51,7 +51,7 @@ class RiderController extends Controller
     public function search(RiderSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
             $riders = $this->riderService->searchRiders(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -78,6 +78,9 @@ class RiderController extends Controller
     {
         try {
             $rider = $this->riderService->findById($id);
+            if (!$rider) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new RiderResource($rider), message: trans_fallback('messages.rider.retrieved', 'Rider Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider  not found'), 404);
@@ -91,9 +94,16 @@ class RiderController extends Controller
     public function suspendForever($id, SuspendAccountForeverRequest $request)
     {
         try {
-            $validatedData = $request->validate();
+            $rider = $this->riderService->findById($id);
+            if (!$rider) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider not found'), 404);
+            }
+            if ($rider->isAccountSuspended()) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.rider.error.already_suspended', 'Rider is already suspended.'));
+            }
+            $validatedData = $request->validated();
             /** @var Rider $rider */ // Add PHPDoc type hint
-            $rider = $this->riderService->suspendForever(riderId: $id, suspension_id: $request->suspension_id);
+            $rider = $this->riderService->suspendForever(riderId: $id, suspension_id: $validatedData['suspension_id']);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.rider.suspended', 'Rider Suspended successfully')
             );
@@ -106,9 +116,17 @@ class RiderController extends Controller
     public function suspendTemporarily($id, SuspendAccountTemporarilyRequest $request)
     {
         try {
-            $validatedData = $request->validate();
+            $rider = $this->riderService->findById($id);
+            if (!$rider) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider not found'), 404);
+            }
+
+            if ($rider->isAccountSuspended()) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.rider.error.already_suspended', 'Rider is already suspended.'));
+            }
+            $validatedData = $request->validated();
             /** @var Rider $rider */ // Add PHPDoc type hint
-            $rider = $this->riderService->suspendTemporarily(riderId: $id, suspension_id: $request->suspension_id, suspended_until: $request->suspended_until);
+            $rider = $this->riderService->suspendTemporarily(riderId: $id, suspension_id: $validatedData['suspension_id'], suspended_until: $validatedData['suspended_until']);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.rider.suspended', 'Rider Suspended successfully')
             );
@@ -123,6 +141,10 @@ class RiderController extends Controller
     public function reinstate($id)
     {
         try {
+            $rider = $this->riderService->findById($id);
+            if (!$rider) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider not found'), 404);
+            }
             /** @var Rider $rider */ // Add PHPDoc type hint
             $rider = $this->riderService->activate($id);
             return ApiResponse::sendResponseSuccess(

@@ -24,7 +24,6 @@ class DriverTwoFactorController extends Controller
     public function verify(TwoFactorCodeRequest $request)
     {
         try {
-            DB::beginTransaction();
             $request->validated();
             /** @var Driver $driver */ // Add PHPDoc type hint
 
@@ -57,7 +56,6 @@ class DriverTwoFactorController extends Controller
             // Generate authentication token
             $token = $driver->createToken('driverAuthToken')->plainTextToken;
             // Determine response based on profile completion
-            DB::commit(); // Never reached
 
             if ($driver->isProfileComplete() && $driver->isDriverCarComplete()) {
 
@@ -90,7 +88,6 @@ class DriverTwoFactorController extends Controller
                 );
             }
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -102,19 +99,16 @@ class DriverTwoFactorController extends Controller
     public function resend(DriverResendOtpRequest $request)
     {
         try {
-            DB::beginTransaction();
             $data = $request->validated();
 
             $driver = Driver::where('phone', $data->phone)->first();
             $driver->generateTwoFactorCode();
-            DB::commit(); // Never reached
             // $rider->notify(new \App\Notifications\Agent\AgentTwoFactorCode);
             return ApiResponse::sendResponseSuccess(
                 ['message' => 'A new verification code has been sent to your email.'],
                 'OTP code resent successfully.'
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

@@ -69,7 +69,6 @@ class AdminProfileController extends Controller
     public function updateProfile(UpdateAdminProfileRequest $request)
     {
         try {
-            DB::beginTransaction();
             /** @var Admin $admin */ // Add PHPDoc type hint
             $admin = auth('admin-api')->user();
             $data = $request->validated();
@@ -95,14 +94,12 @@ class AdminProfileController extends Controller
 
             $admin->update($data);
 
-            DB::commit();
 
             return ApiResponse::sendResponseSuccess(
                 new AdminResource($admin),
                 trans_fallback('messages.auth.profile.updated', 'Profile updated successfully')
             );
         } catch (Exception $e) {
-            DB::rollBack();
             // In your try-catch blocks:
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),

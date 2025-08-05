@@ -61,32 +61,7 @@ class TripRequest extends BaseRequest
                 'exists:payment_methods,id'
             ],
 
-            // Date/time validation
-            'requested_time' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    $datetime = Carbon::createFromFormat('Y-m-d H:i', $value);
-
-                    if (!$datetime) {
-                        $fail('Invalid datetime format. Use YYYY-MM-DD HH:MM.');
-                    }
-
-                    if ($datetime->isPast()) {
-                        $fail('The start time must be in the future.');
-                    }
-                },
-            ],
-
-            //Trip Locations Validation
-            'locations' => ['array', 'min:2', 'required', 'filled'],
-            'locations.*' => [
-                new JsonValidatorRule(['location', 'location_order', 'location_type']),
-                new TripLocationTypesRule,
-                new TripLocationOrderRule,
-            ],
-            'locations.*.location' => [new GeometryGeojsonRule([Point::class]),],
-            'locations.*.location_order' => ['integer', 'min:1', 'distinct'],
-            'locations.*.location_type' => [Rule::enum(LocationTypeEnum::class)],
+            'current_location' => [new GeometryGeojsonRule([Point::class]),],
 
             // 'locations.*.estimated_arrival_time' => [
             //     'required',

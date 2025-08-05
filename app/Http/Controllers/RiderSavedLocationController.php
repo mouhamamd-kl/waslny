@@ -36,6 +36,7 @@ class RiderSavedLocationController extends Controller
                 trans_fallback('messages.rider_saved_location.list', 'Rider Location Folder retrieved successfully')
             );
         } catch (Exception $e) {
+            throw $e;
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred')
             );
@@ -80,8 +81,7 @@ class RiderSavedLocationController extends Controller
             $validatedData['rider_id'] = $request->user()->id;
             $rider_saved_location = $this->rider_saved_location_service->create($validatedData);
             return ApiResponse::sendResponseSuccess(
-                $rider_saved_location,
-                RiderSavedLocationResource::class,
+                new RiderSavedLocationResource($rider_saved_location),
                 trans_fallback('messages.rider_saved_location.created', 'Rider Location Folder retrieved successfully'),
                 201
             );
@@ -98,6 +98,9 @@ class RiderSavedLocationController extends Controller
     {
         try {
             $rider_saved_location = $this->rider_saved_location_service->findById($id);
+            if (!$rider_saved_location) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider Saved Location not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new RiderSavedLocationResource($rider_saved_location), message: trans_fallback('messages.rider_saved_location.retrieved', 'rider_saved_location Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider Saved Location not found'), 404);
@@ -110,6 +113,10 @@ class RiderSavedLocationController extends Controller
     public function update(RiderSavedLocationRequest $request, string $id)
     {
         try {
+            $rider_saved_location = $this->rider_saved_location_service->findById($id);
+            if (!$rider_saved_location) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider Saved Location not found'), 404);
+            }
             $rider_saved_location = $this->rider_saved_location_service->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new RiderSavedLocationResource($rider_saved_location),
@@ -128,6 +135,10 @@ class RiderSavedLocationController extends Controller
     public function destroy($id)
     {
         try {
+            $rider_saved_location = $this->rider_saved_location_service->findById($id);
+            if (!$rider_saved_location) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider Saved Location not found'), 404);
+            }
             $this->rider_saved_location_service->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.rider_saved_location.deleted', 'Rider Saved Location updated successfully')

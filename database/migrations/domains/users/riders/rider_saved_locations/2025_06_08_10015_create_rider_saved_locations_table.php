@@ -19,7 +19,7 @@ return new class extends Migration
                 ->constrained('riders')
                 ->onDelete('cascade');
             $table->foreignIdFor(RiderFolder::class)
-                ->constrained('riders')
+                ->constrained('rider_folders')
                 ->onDelete('cascade');
             $table->magellanPoint('location', 4326);
 

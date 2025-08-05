@@ -11,7 +11,7 @@ Route::middleware(['auth:rider-api','rider.profile.completed'])->group(function 
         ->group(function () {
             // Collection routes
             Route::get('/', 'index')->name('index');
-            Route::get('/search', 'search')->name('search');
+            Route::post('/search', 'search')->name('search');
             Route::post('/', 'store')->name('store');
 
             // Resource routes

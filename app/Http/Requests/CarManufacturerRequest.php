@@ -37,7 +37,7 @@ class CarManufacturerRequest extends BaseRequest
             ],
             'country_id' => [
                 $this->isRequired(),
-                'exists:car_models,id',
+                'exists:countries,id',
             ],
             'is_active' => [
                 $this->isRequired(),

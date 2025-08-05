@@ -42,7 +42,7 @@ class DriverAssigned implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('rider.' . $this->trip->rider_id);
+        return new PrivateChannel('riders.' . $this->trip->rider_id);
     }
 
     /**

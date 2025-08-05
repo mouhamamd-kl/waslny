@@ -56,12 +56,9 @@ class AdminAuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            DB::beginTransaction();
             $request->user()->currentAccessToken()->delete();
-            DB::commit(); // Never reached
             return ApiResponse::sendResponseSuccess([], 'Logged out successfully', 200);
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,
@@ -74,14 +71,11 @@ class AdminAuthController extends Controller
     public function refreshToken(Request $request)
     {
         try {
-            DB::beginTransaction();
             $request->user()->tokens()->delete();
-            DB::commit(); // Never reached
             return response()->json([
                 'token' => $request->user()->createToken('refresh-token')->plainTextToken,
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

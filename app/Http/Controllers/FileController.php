@@ -69,7 +69,6 @@ class FileController extends Controller
 
             if (! $storage->exists($path)) {
                 Log::warning("File not found for deletion: {$path} on disk: {$disk}");
-                dd($storage->exists($path));
                 return true; // Consider non-existent files as successfully deleted
             }
 

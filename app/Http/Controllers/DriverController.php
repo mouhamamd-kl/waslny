@@ -53,7 +53,7 @@ class DriverController extends Controller
     public function search(DriverSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
             $drivers = $this->driverService->searchDrivers(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -79,6 +79,9 @@ class DriverController extends Controller
     {
         try {
             $driver = $this->driverService->findById($id);
+            if (!$driver) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new DriverResource($driver), message: trans_fallback('messages.driver.retrieved', 'Driver  Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver  not found'), 404);
@@ -106,9 +109,13 @@ class DriverController extends Controller
     public function suspendForever($id, SuspendAccountForeverRequest $request)
     {
         try {
-            $validatedData = $request->validate();
+            $driver = $this->driverService->findById($id);
+            if (!$driver) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver not found'), 404);
+            }
+            $validatedData = $request->validated();
             /** @var Driver $driver */ // Add PHPDoc type hint
-            $driver = $this->driverService->suspendForever(driverId: $id, suspension_id: $request->suspension_id);
+            $this->driverService->suspendForever(driverId: $id, suspension_id: $request->suspension_id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.driver.suspended', 'Driver Suspended successfully')
             );
@@ -121,9 +128,13 @@ class DriverController extends Controller
     public function suspendTemporarily($id, SuspendAccountTemporarilyRequest $request)
     {
         try {
-            $validatedData = $request->validate();
+            $driver = $this->driverService->findById($id);
+            if (!$driver) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver not found'), 404);
+            }
+            $validatedData = $request->validated();
             /** @var Driver $driver */ // Add PHPDoc type hint
-            $driver = $this->driverService->suspendTemporarily(driverId: $id, suspension_id: $request->suspension_id, suspended_until: $request->suspended_until);
+            $this->driverService->suspendTemporarily(driverId: $id, suspension_id: $request->suspension_id, suspended_until: $request->suspended_until);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.driver.suspended', 'Driver Suspended successfully')
             );
@@ -138,8 +149,12 @@ class DriverController extends Controller
     public function reinstate($id)
     {
         try {
+            $driver = $this->driverService->findById($id);
+            if (!$driver) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver not found'), 404);
+            }
             /** @var Driver $driver */ // Add PHPDoc type hint
-            $driver = $this->driverService->activate($id);
+            $this->driverService->activate($id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.driver.reinstate', 'Driver Reinstate successfully')
             );

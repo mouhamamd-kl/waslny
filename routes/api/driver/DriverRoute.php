@@ -19,7 +19,7 @@ Route::middleware(['auth:admin-api'])
     ->name('admin.drivers.')   // Namespaced naming
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/search', 'search')->name('search');
+        Route::post('/search', 'search')->name('search');
         Route::post('/{driver}/suspendForever', 'suspendForever')->name('suspend');
         Route::post('/{driver}/suspendTemporarily', 'suspendTemporarily')->name('suspend');
         Route::post('/{driver}/reinstate', 'reinstate')->name('reinstate');

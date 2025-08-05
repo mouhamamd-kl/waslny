@@ -9,6 +9,7 @@ use App\Services\FileServiceFactory;
 use App\Traits\General\FilterScope;
 use App\Traits\General\ResetOTP;
 use App\Traits\General\Suspendable;
+use App\Traits\General\TwoFactorCode;
 use App\Traits\General\TwoFactorCodeGenerator;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
@@ -43,7 +44,7 @@ enum DriverPhotoType: string
 
 class Driver extends Authenticatable implements Wallet
 {
-    use HasFactory, Notifiable, HasApiTokens, TwoFactorCodeGenerator, FilterScope, ResetOTP, Suspendable, HasWallet;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet;
     use Suspendable {
         suspendTemporarily as protected traitSuspendTemp;
         suspendForever as protected traitSuspendForever;

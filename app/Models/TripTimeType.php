@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\Activatable;
+use App\Traits\General\ActiveScope;
 use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,13 +13,16 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class TripTimeType extends Model
 {
-    use HasFactory, FilterScope;
+    use HasFactory, FilterScope, ActiveScope,Activatable;
 
     /**
      * Configuration
      */
     protected $table = 'trip_time_types';
     protected $guarded = ['id']; // Guard against mass assignment
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     // Default trip type constants
     public const Instant = 'instant';
@@ -61,19 +66,6 @@ class TripTimeType extends Model
     /**
      * Business Logic
      */
-    public function activate(): void
-    {
-        $this->update(['is_active' => true]);
-    }
-
-    public function deactivate(): void
-    {
-        $this->update(['is_active' => false]);
-    }
-    public function isActive(): bool
-    {
-        return $this->is_active;
-    }
 
     public function isScheduled(): bool
     {

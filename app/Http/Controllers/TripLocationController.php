@@ -68,6 +68,9 @@ class TripLocationController extends Controller
         if ($request->location_id) {
             /** @var TripLocation $tripLocation */ // Add PHPDoc type hint
             $tripLocation = $this->tripLocationService->findById($requestData['location_id']);
+            if (!$tripLocation) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip Location not found'), 404);
+            }
         } else {
             $tripLocation = $this->tripLocationService->getNextPendingTripLocation($tripId);
         }

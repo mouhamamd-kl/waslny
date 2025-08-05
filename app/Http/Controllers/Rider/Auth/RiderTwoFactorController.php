@@ -33,11 +33,29 @@ class RiderTwoFactorController extends Controller
             ) {
                 return ApiResponse::sendResponseError('Invalid or expired code.', 403);
             }
+
+            if ($rider->isSuspended()) {
+                // Get the specific suspension message
+                /** @var Suspension $suspension */ // Add PHPDoc type hint
+                $suspension = $rider->activeSuspension()->first();
+
+                return ApiResponse::sendResponseError(
+                    message: $suspension->user_msg,
+                    statusCode: 403, // Forbidden
+                    data: [
+                        'suspension_reason' => $suspension->reason,
+                        'suspended_at' => $suspension->created_at,
+                    ]
+                );
+            }
+
             // Clear OTP after successful verification
             $rider->resetTwoFactorCode();
 
             // Generate authentication token
             $token = $rider->createToken('riderAuthToken')->plainTextToken;
+
+
 
             // Determine response based on profile completion
             return $rider->isProfileComplete()

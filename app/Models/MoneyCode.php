@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\General\ActiveScope;
+use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +13,7 @@ use Illuminate\Support\Str;
 class MoneyCode extends Model
 {
     use HasFactory;
-
+    use FilterScope, ActiveScope;
     protected $guarded = ['id'];
 
     protected $casts = [

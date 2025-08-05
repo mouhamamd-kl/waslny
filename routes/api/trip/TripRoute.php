@@ -42,7 +42,7 @@ Route::middleware(['auth:admin-api'])
     ->name('admin.trips.')
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/search', 'search')->name('search');
+        Route::post('/search', 'search')->name('search');
         Route::put('/{trip}', 'update')->name('update');
         Route::delete('/{trip}', 'destroy')->name('destroy');
     });

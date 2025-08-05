@@ -9,7 +9,7 @@ Route::controller(CarModelController::class)
     ->name('car-models.')  // Corrected name prefix
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/search', 'search')->name('search');
+        Route::post('/search', 'search')->name('search');
         Route::get('/{car_model}', 'show')->name('show');
     });
 

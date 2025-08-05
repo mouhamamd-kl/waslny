@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\FileController;
 use App\Http\Requests\RiderSavedLocationRequest;
 use App\Http\Requests\TripRequest;
+use App\Models\CarModel;
 use App\Models\Driver;
 use App\Models\Trip;
 use App\Models\TripDriverNotification;
@@ -24,9 +25,9 @@ use Illuminate\Support\Facades\Storage;
 
 
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:rider-api');
+// Route::get('/test', function (Request $request) {
+//     return CarModel::where('name','Civic')->get();
+// });
 
 
 // Route::get('/test', function (Request $request) {
@@ -327,3 +328,6 @@ require __DIR__ . '/api/vehicles/PricingRoute.php';
 require __DIR__ . '/api/admin/suspensions.php';
 
 require __DIR__ . '/api/trip/TripDriverActionsRoute.php';
+
+// Telegram Bot Integration
+Route::post('/telegram/webhook', [App\Http\Controllers\Api\TelegramController::class, 'webhook'])->name('no-export.test.add_website_photo');

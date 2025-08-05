@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\SuspensionReason;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;  // Add this line
 use App\Helpers\CacheHelper;
 use App\Models\Rider;
@@ -49,7 +50,7 @@ class RiderService extends BaseService
         try {
             /** @var Rider $rider */ // Add PHPDoc type hint
             $rider = $this->findById($riderId);
-            $rider->suspend($suspension_id);
+            $rider->suspendForever($suspension_id);
         } catch (Exception $e) {
             throw new Exception('error suspending for rider' . $e);
         }
@@ -59,7 +60,7 @@ class RiderService extends BaseService
         try {
             /** @var Rider $rider */ // Add PHPDoc type hint
             $rider = $this->findById($riderId);
-            $rider->suspendTemporarily($suspension_id, $suspended_until);
+            $rider->suspendTemporarily($suspension_id, Carbon::parse($suspended_until));
         } catch (Exception $e) {
             throw new Exception('error suspending for rider' . $e);
         }

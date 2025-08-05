@@ -42,6 +42,7 @@ class SearchTimeout implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
+            new PrivateChannel('riders.' . $this->trip->rider_id),
             new PrivateChannel($this->getChannelName()),
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\SuspensionReasonEnum;
+use App\Traits\Activatable;
 use App\Traits\General\ActiveScope;
 use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,12 +12,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Suspension extends Model
 {
-    use FilterScope, ActiveScope, HasFactory;
+    use FilterScope, Activatable, ActiveScope,HasFactory;
     // =================
     // Configuration
     // =================
     protected $table = 'suspensions';
     protected $guarded = ['id'];
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     // =================
     // Relationships
@@ -49,17 +53,4 @@ class Suspension extends Model
     // =================
     // Business Logic
     // =================
-    public function activate(): void
-    {
-        $this->update(['is_active' => true]);
-    }
-
-    public function deactivate(): void
-    {
-        $this->update(['is_active' => false]);
-    }
-    public function isActive(): bool
-    {
-        return $this->is_active;
-    }
 }

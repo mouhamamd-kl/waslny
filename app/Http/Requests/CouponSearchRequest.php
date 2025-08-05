@@ -22,16 +22,16 @@ class CouponSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => 'sometimes|string|max:255',
-            'start_date' => 'sometimes|date',
-            'end_date' => 'sometimes|date|after_or_equal:start_date',
-            'max_max_uses' => 'sometimes|integer',
-            'min_max_uses' => 'sometimes|integer|lte:max_max_uses',
-            'max_used_count' => 'sometimes|integer',
-            'min_used_count' => 'sometimes|integer|lte:max_used_count',
-            'max_percent' => 'sometimes|decimal:2',
-            'min_percent' => 'sometimes|decimal:2|lte:max_percent',
-            'is_active' => 'sometimes|boolean',
+            'code' => 'sometimes|nullable|string|max:255',
+            'start_date' => 'sometimes|nullable|date',
+            'end_date' => 'sometimes|nullable|date|after_or_equal:start_date',
+            'max_max_uses' => 'sometimes|nullable|integer',
+            'min_max_uses' => 'sometimes|nullable|integer|lte:max_max_uses',
+            'max_used_count' => 'sometimes|nullable|integer',
+            'min_used_count' => 'sometimes|nullable|integer|lte:max_used_count',
+            'max_percent' => 'sometimes|nullable|decimal:2',
+            'min_percent' => 'sometimes|nullable|decimal:2|lte:max_percent',
+            'is_active' => 'sometimes|nullable|boolean',
         ];
     }
 }

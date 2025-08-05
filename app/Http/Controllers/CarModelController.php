@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ApiResponse;
 use App\Http\Requests\CarModelRequest;
 use App\Http\Requests\CarModelSearchRequest;
+use App\Http\Requests\CarModelUpdateRequest;
 use App\Http\Resources\CarModelResource;
 use App\Models\CarModel;
 use App\Services\CarModelService;
@@ -68,7 +69,7 @@ class CarModelController extends Controller
     public function adminSearch(CarModelSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $car_models = $this->carModelService->searchCarModel(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -93,7 +94,7 @@ class CarModelController extends Controller
     public function search(CarModelSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $filters['is_active'] = true;
             $car_models = $this->carModelService->searchCarModel(
                 filters: $filters,
@@ -119,11 +120,10 @@ class CarModelController extends Controller
     public function store(CarModelRequest $request)
     {
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $car_model = $this->carModelService->create($data);
             return ApiResponse::sendResponseSuccess(
-                $car_model,
-                CarModelResource::class,
+                new CarModelResource($car_model),
                 trans_fallback('messages.car_model.created', 'Car Models retrieved successfully'),
                 201
             );
@@ -140,6 +140,9 @@ class CarModelController extends Controller
     {
         try {
             $car_model = $this->carModelService->findById($id);
+            if (!$car_model) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Model not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new CarModelResource($car_model), message: trans_fallback('messages.car_model.retrieved', 'Car Model Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Model not found'), 404);
@@ -149,9 +152,13 @@ class CarModelController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CarModelRequest $request, string $id)
+    public function update(CarModelUpdateRequest $request, string $id)
     {
         try {
+            $car_model = $this->carModelService->findById($id);
+            if (!$car_model) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Model not found'), 404);
+            }
             $car_model = $this->carModelService->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new CarModelResource($car_model),
@@ -170,6 +177,10 @@ class CarModelController extends Controller
     public function destroy($id)
     {
         try {
+            $car_model = $this->carModelService->findById($id);
+            if (!$car_model) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Model not found'), 404);
+            }
             $this->carModelService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.car_model.deleted', 'Car Model updated successfully')
@@ -187,6 +198,9 @@ class CarModelController extends Controller
         try {
             /** @var CarModel $car_model */ // Add PHPDoc type hint
             $car_model = $this->carModelService->findById($id);
+            if (!$car_model) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Model not found'), 404);
+            }
             $car_model->deactivate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.car_model.deactivated', 'Car Model DeActivated successfully')
@@ -203,6 +217,9 @@ class CarModelController extends Controller
         try {
             /** @var CarModel $car_model */ // Add PHPDoc type hint
             $car_model = $this->carModelService->findById($id);
+            if (!$car_model) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Model not found'), 404);
+            }
             $car_model->activate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.car_model.activated', 'Car Model Activated successfully')

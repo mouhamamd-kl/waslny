@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\CacheHelper;
 use App\Models\MoneyCode;
 use App\Models\Rider;
 use Exception;
@@ -9,9 +10,11 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class MoneyCodeService extends BaseService
 {
-    public function __construct()
+    protected array $relations = ['rider'];
+
+    public function __construct(CacheHelper $cache)
     {
-        parent::__construct(new MoneyCode);
+        parent::__construct(new MoneyCode, $cache);
     }
 
     public function createMoneyCode(array $data): MoneyCode
@@ -59,8 +62,20 @@ class MoneyCodeService extends BaseService
         return $this->model->where('code', $code)->first();
     }
 
+    public function findMoneyCode(int $id): ?MoneyCode
+    {
+        return $this->findById($id);
+    }
+
     public function listMoneyCodes(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        return $this->paginatedList(filters: $filters, perPage: $perPage);
+        return $this->toggleCache(config('app.enable_caching'))
+            ->paginatedList(
+                filters: $filters,
+                relations: $this->relations,
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
+            );
     }
 }

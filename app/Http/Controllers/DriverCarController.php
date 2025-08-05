@@ -17,7 +17,6 @@ class DriverCarController extends Controller
     public function update(UpdateDriverCarRequest $request)
     {
         try {
-            DB::beginTransaction();
             /** @var Driver $driver */ // Add PHPDoc type hint
             $driver = auth('driver-api')->user();
             $data = $request->validated();
@@ -32,7 +31,6 @@ class DriverCarController extends Controller
                     }
                 }
             }
-            DB::commit();
 
             return ApiResponse::sendResponseSuccess(
                 new DriverCarResource($driver),
@@ -40,7 +38,6 @@ class DriverCarController extends Controller
             );
         } catch (\Exception $e) {
             throw $e;
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.update_failed', 'Failed to update profile'),
                 500,

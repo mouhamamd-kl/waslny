@@ -22,10 +22,10 @@ class PricingSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'car_service_level_id' => 'sometimes|integer|exists:car_service_levels,id',
-            'min_price_per_km' => 'sometimes|numeric|lte:max_price_per_km',
-            'max_price_per_km' => 'sometimes|numeric|gte:min_price_per_km',
-            'is_active' => 'sometimes|boolean',
+            'car_service_level_id' => 'sometimes|nullable|integer|exists:car_service_levels,id',
+            'min_price_per_km' => 'sometimes|nullable|numeric',
+            'max_price_per_km' => 'sometimes|nullable|numeric',
+            'is_active' => 'sometimes|nullable|boolean',
         ];
     }
 }

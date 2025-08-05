@@ -48,7 +48,7 @@ class RiderFolderController extends Controller
     public function search(RiderFolderSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
             $filters['rider_id'] = auth('rider-api')->user()->id;
             $rider_folders = $this->riderFolderService->searchRiderFolders(
                 filters: $filters,
@@ -78,8 +78,7 @@ class RiderFolderController extends Controller
             $validatedData['rider_id'] = $request->user()->id;
             $rider_folder = $this->riderFolderService->create($validatedData);
             return ApiResponse::sendResponseSuccess(
-                $rider_folder,
-                RiderFolderResource::class,
+                new RiderFolderResource($rider_folder),
                 trans_fallback('messages.rider_location_folder.created', 'Rider Location Folder retrieved successfully'),
                 201
             );
@@ -96,6 +95,9 @@ class RiderFolderController extends Controller
     {
         try {
             $rider_folder = $this->riderFolderService->findById($id);
+            if (!$rider_folder) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'rider_location_folder not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new RiderFolderResource($rider_folder), message: trans_fallback('messages.rider_location_folder.retrieved', 'rider_location_folder Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'rider_location_folder not found'), 404);
@@ -108,6 +110,10 @@ class RiderFolderController extends Controller
     public function update(RiderFolderRequest $request, string $id)
     {
         try {
+            $rider_folder = $this->riderFolderService->findById($id);
+            if (!$rider_folder) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'rider_location_folder not found'), 404);
+            }
             $rider_folder = $this->riderFolderService->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new RiderFolderResource($rider_folder),
@@ -126,6 +132,10 @@ class RiderFolderController extends Controller
     public function destroy($id)
     {
         try {
+            $rider_folder = $this->riderFolderService->findById($id);
+            if (!$rider_folder) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'rider_location_folder not found'), 404);
+            }
             $this->riderFolderService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.rider_location_folder.deleted', 'rider_location_folder updated successfully')

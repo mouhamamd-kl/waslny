@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Activatable;
 use App\Traits\General\ActiveScope;
 use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CarManufacturer extends Model
 {
-    use HasFactory, FilterScope, ActiveScope;
+    use HasFactory, FilterScope, ActiveScope,Activatable;
 
     // =================
     // Configuration
@@ -52,18 +53,4 @@ class CarManufacturer extends Model
     // =================
     // Business Logic
     // =================
-    public function activate(): void
-    {
-        $this->update(['is_active' => true]);
-    }
-
-    public function deactivate(): void
-    {
-        $this->update(['is_active' => false]);
-    }
-
-    public function isActive(): bool
-    {
-        return $this->is_active;
-    }
 }

@@ -11,6 +11,7 @@ use App\Console\Commands\MyExportPostman;
 use App\Console\Commands\MyExportPostmanTest;
 use App\Helpers\ApiResponse;
 use App\Http\Middleware\EnsureDriverIsNotSuspended;
+use App\Http\Middleware\EnsureDriverProfileComplete;
 use App\Http\Middleware\EnsureRiderIsNotSuspended;
 use App\Http\Middleware\EnsureRiderProfileComplete;
 use Illuminate\Auth\AuthenticationException;
@@ -41,6 +42,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'rider.profile.completed' => EnsureRiderProfileComplete::class,
+            'driver.profile.completed' => EnsureDriverProfileComplete::class,
+
             'driver.suspended' => EnsureDriverIsNotSuspended::class,
             'rider.suspended' => EnsureRiderIsNotSuspended::class
         ]);

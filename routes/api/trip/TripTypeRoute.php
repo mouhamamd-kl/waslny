@@ -10,7 +10,7 @@ Route::controller(TripTypeController::class)
     ->name('trip-type.')
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/search', 'search')->name('search');
+        Route::post('/search', 'search')->name('search');
         Route::get('/{trip_type}', 'show')->name('show');
     });
 

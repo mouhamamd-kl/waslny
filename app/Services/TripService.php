@@ -49,25 +49,9 @@ class TripService extends BaseService
         return $this->findById(id: $id, relations: $this->relations);
     }
 
-    public function findDriverForTrip(Trip $trip): array
+    // trip_flow
+    public function findAndAssignDriver(Trip $trip): ?Driver
     {
-        // If driver already found, stop searching
-        if ($trip->driver_id) {
-            return [
-                'status' => 'completed',
-                'result' => 'driver_found',
-                'driver_id' => $trip->driver_id
-            ];
-        }
-
-        // Initialize search if first attempt
-        if (!$trip->search_started_at) {
-            $trip->update([
-                'search_started_at' => now(),
-                'search_expires_at' => now()->addMinutes(5)
-            ]);
-        }
-
         // Find available drivers within radius
         $drivers = $this->findNearbyDrivers($trip);
 
@@ -79,11 +63,7 @@ class TripService extends BaseService
         // Check for accepted drivers
         if ($acceptedDriver = $this->checkForAcceptedDriver($trip)) {
             $trip->update(['driver_id' => $acceptedDriver->id]);
-            return [
-                'status' => 'completed',
-                'result' => 'driver_accepted',
-                'driver_id' => $acceptedDriver->id
-            ];
+            return $acceptedDriver;
         }
 
         // Expand search radius if no drivers found
@@ -91,25 +71,70 @@ class TripService extends BaseService
             $trip->increment('driver_search_radius', 1000); // Expand by 1km
         }
 
-        // Check if search should continue
-        if ($trip->search_expires_at->isPast()) {
-            $trip->update(['trip_status_id' => TripStatusEnum::SystemCancelled->value]);
-            event(new SearchTimeout($trip));
-            return [
-                'status' => 'completed',
-                'result' => 'search_expired'
-            ];
-        }
-
-        // Queue next search attempt
-        $this->queueNextSearch($trip);
-
-        return [
-            'status' => 'searching',
-            'radius' => $trip->driver_search_radius,
-            'notified_drivers' => $drivers->pluck('id')
-        ];
+        return null;
     }
+
+    // public function findDriverForTrip(Trip $trip): array
+    // {
+    //     // If driver already found, stop searching
+    //     if ($trip->driver_id) {
+    //         return [
+    //             'status' => 'completed',
+    //             'result' => 'driver_found',
+    //             'driver_id' => $trip->driver_id
+    //         ];
+    //     }
+
+    //     // Initialize search if first attempt
+    //     if (!$trip->search_started_at) {
+    //         $trip->update([
+    //             'search_started_at' => now(),
+    //             'search_expires_at' => now()->addMinutes(5)
+    //         ]);
+    //     }
+
+    //     // Find available drivers within radius
+    //     $drivers = $this->findNearbyDrivers($trip);
+
+    //     // Send notifications to found drivers
+    //     foreach ($drivers as $driver) {
+    //         $this->notifyDriver($trip, $driver);
+    //     }
+
+    //     // Check for accepted drivers
+    //     if ($acceptedDriver = $this->checkForAcceptedDriver($trip)) {
+    //         $trip->update(['driver_id' => $acceptedDriver->id]);
+    //         return [
+    //             'status' => 'completed',
+    //             'result' => 'driver_accepted',
+    //             'driver_id' => $acceptedDriver->id
+    //         ];
+    //     }
+
+    //     // Expand search radius if no drivers found
+    //     if ($drivers->isEmpty()) {
+    //         $trip->increment('driver_search_radius', 1000); // Expand by 1km
+    //     }
+
+    //     // Check if search should continue
+    //     if ($trip->search_expires_at->isPast()) {
+    //         $trip->update(['trip_status_id' => TripStatusEnum::SystemCancelled->value]);
+    //         event(new SearchTimeout($trip));
+    //         return [
+    //             'status' => 'completed',
+    //             'result' => 'search_expired'
+    //         ];
+    //     }
+
+    //     // Queue next search attempt
+    //     $this->queueNextSearch($trip);
+
+    //     return [
+    //         'status' => 'searching',
+    //         'radius' => $trip->driver_search_radius,
+    //         'notified_drivers' => $drivers->pluck('id')
+    //     ];
+    // }
 
     private function findNearbyDrivers(Trip $trip): Collection
     {
@@ -161,15 +186,15 @@ class TripService extends BaseService
             ?->driver;
     }
 
-    private function queueNextSearch(Trip $trip): void
-    {
-        // Queue next search attempt in 15 seconds
-        dispatch(function () use ($trip) {
-            Http::withHeaders([
-                'X-Driver-Search-Secret' => env('DRIVER_SEARCH_SECRET')
-            ])->post(config('app.url') . '/trip/find-driver', [
-                'trip_id' => $trip->id
-            ]);
-        })->delay(now()->addSeconds(15));
-    }
+    // private function queueNextSearch(Trip $trip): void
+    // {
+    //     // Queue next search attempt in 15 seconds
+    //     dispatch(function () use ($trip) {
+    //         Http::withHeaders([
+    //             'X-Driver-Search-Secret' => env('DRIVER_SEARCH_SECRET')
+    //         ])->post(config('app.url') . '/trip/find-driver', [
+    //             'trip_id' => $trip->id
+    //         ]);
+    //     })->delay(now()->addSeconds(15));
+    // }
 }

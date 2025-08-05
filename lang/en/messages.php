@@ -351,4 +351,16 @@ return [
         'update_failed' => 'Update failed',
         'delete_failed' => 'Deletion failed',
     ],
+
+    'money_code' => [
+        'created' => 'Money code created successfully',
+        'redeemed' => 'Money code redeemed successfully',
+        'deleted' => 'Money code deleted successfully',
+        'retrieved' => 'Money code retrieved successfully',
+        'list' => 'Money codes list retrieved successfully',
+        'error' => [
+            'not_found' => 'Money code not found',
+            'invalid' => 'Invalid or already used money code',
+        ]
+    ],
 ];

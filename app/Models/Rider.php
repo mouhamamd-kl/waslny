@@ -7,22 +7,19 @@ use App\Services\FileServiceFactory;
 use App\Traits\General\FilterScope;
 use App\Traits\General\ResetOTP;
 use App\Traits\General\Suspendable;
-use App\Traits\General\TwoFactorCodeGenerator;
+use App\Traits\General\TwoFactorCode;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 enum RiderPhotoType: string
 {
@@ -36,7 +33,11 @@ enum RiderPhotoType: string
 }
 class Rider  extends Authenticatable implements Wallet
 {
-    use HasFactory, Notifiable, HasApiTokens, TwoFactorCodeGenerator, FilterScope, ResetOTP, Suspendable, HasWallet;
+    // =================
+    // Traits
+    // =================
+
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet;
 
     // =================
     // Configuration
@@ -105,18 +106,18 @@ class Rider  extends Authenticatable implements Wallet
      */
     public function Ridercoupons()
     {
-        return $this->hasMany(RiderCoupon::class)->withTimestamps();
+        return $this->hasMany(RiderCoupon::class);
     }
     public function coupons()
     {
-        return $this->belongsToMany(Notification::class, 'rider_coupons', 'rider_id', 'coupon_id')->withTimestamps();
+        return $this->belongsToMany(Coupon::class, 'rider_coupons', 'rider_id', 'coupon_id');
     }
 
-    // **
     public function suspensions()
     {
         return $this->morphMany(AccountSuspension::class, 'suspendable');
     }
+
     // =================
     // Accessors & Mutators
     // =================
@@ -148,15 +149,9 @@ class Rider  extends Authenticatable implements Wallet
             : FileServiceFactory::makeForRiderProfile()->getUrl($this->profile_photo);
     }
 
-
-
     // =================
     // Scopes
     // =================
-
-    /**
-     * Filter riders by parameters
-     */
 
     //TODO make this work idiot bitch
     // public function scopeActive(Builder $query): Builder
@@ -250,16 +245,6 @@ class Rider  extends Authenticatable implements Wallet
         $this->two_factor_expires_at = now()->addMinutes(5);
         $this->save();
     }
-
-    // public function suspend(): void
-    // {
-    //     $this->update(['suspended' => true]);
-    // }
-
-    // public function reinstate(): void
-    // {
-    //     $this->update(['suspended' => false]);
-    // }
 
     /**
      * Update rider rating based on completed trips

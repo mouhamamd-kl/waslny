@@ -28,7 +28,7 @@ class CarManufacturerController extends Controller
         try {
             $car_manufactures = $this->carManufactureService->searchCarManufacture(
                 filters: $request->input('filters', []),
-                perPage: $request->input('perPage', 10000)
+                perPage: $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $car_manufactures,
@@ -50,7 +50,7 @@ class CarManufacturerController extends Controller
         try {
             $car_manufactures = $this->carManufactureService->searchCarManufacture(
                 filters: $request->input('filters', ['is_active' => true]),
-                perPage: $request->input('perPage', 10000)
+                perPage: $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $car_manufactures,
@@ -70,7 +70,7 @@ class CarManufacturerController extends Controller
     public function adminSearch(CarManufacturerSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
             $car_manufactures = $this->carManufactureService->searchCarManufacture(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -95,7 +95,7 @@ class CarManufacturerController extends Controller
     public function search(CarManufacturerSearchRequest $request)
     {
         try {
-            $filters = $request->validated();
+            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
             $filters['is_active'] = true;
             $car_manufactures = $this->carManufactureService->searchCarManufacture(
                 filters: $filters,
@@ -121,11 +121,10 @@ class CarManufacturerController extends Controller
     public function store(CarManufacturerRequest $request)
     {
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $car_manufacture = $this->carManufactureService->create($data);
             return ApiResponse::sendResponseSuccess(
-                $car_manufacture,
-                CarManufacturerResource::class,
+                new CarManufacturerResource($car_manufacture),
                 trans_fallback('messages.car_manufacture.created', 'Car Manufactures retrieved successfully'),
                 201
             );
@@ -142,6 +141,9 @@ class CarManufacturerController extends Controller
     {
         try {
             $car_manufacture = $this->carManufactureService->findById($id);
+            if (!$car_manufacture) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Manufacture not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new CarManufacturerResource($car_manufacture), message: trans_fallback('messages.car_manufacture.retrieved', 'Car Manufacture Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Manufacture not found'), 404);
@@ -154,6 +156,10 @@ class CarManufacturerController extends Controller
     public function update(CarManufacturerRequest $request, string $id)
     {
         try {
+            $car_manufacture = $this->carManufactureService->findById($id);
+            if (!$car_manufacture) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Manufacture not found'), 404);
+            }
             $car_manufacture = $this->carManufactureService->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new CarManufacturerResource($car_manufacture),
@@ -172,6 +178,10 @@ class CarManufacturerController extends Controller
     public function destroy($id)
     {
         try {
+            $car_manufacture = $this->carManufactureService->findById($id);
+            if (!$car_manufacture) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Manufacture not found'), 404);
+            }
             $this->carManufactureService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.car_manufacture.deleted', 'Car Manufacture updated successfully')
@@ -188,6 +198,9 @@ class CarManufacturerController extends Controller
         try {
             /** @var CarManufacturer $car_manufacture */ // Add PHPDoc type hint
             $car_manufacture = $this->carManufactureService->findById($id);
+            if (!$car_manufacture) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Manufacture not found'), 404);
+            }
             $car_manufacture->deactivate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.car_manufacture.deactivated', 'Car Manufacture DeActivated successfully')
@@ -204,6 +217,9 @@ class CarManufacturerController extends Controller
         try {
             /** @var CarManufacturer $car_manufacture */ // Add PHPDoc type hint
             $car_manufacture = $this->carManufactureService->findById($id);
+            if (!$car_manufacture) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Manufacture not found'), 404);
+            }
             $car_manufacture->activate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.car_manufacture.activated', 'Car Manufacture Activated successfully')

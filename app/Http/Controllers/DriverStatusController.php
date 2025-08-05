@@ -77,7 +77,7 @@ class DriverStatusController extends Controller
             $driver_status = $this->driverStatusService->create($data);
             return ApiResponse::sendResponseSuccess(
                 $driver_status,
-                driverStatusService::class,
+                DriverStatusResource::class,
                 trans_fallback('messages.driver_status.created', 'Driver Statuses Created successfully'),
                 201
             );
@@ -94,6 +94,9 @@ class DriverStatusController extends Controller
     {
         try {
             $driver_status = $this->driverStatusService->findById($id);
+            if (!$driver_status) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver Status not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new DriverStatusResource($driver_status), message: trans_fallback('messages.driver_status.retrieved', 'Driver Status Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver Status not found'), 404);
@@ -106,6 +109,10 @@ class DriverStatusController extends Controller
     public function update(DriverStatusRequest $request, string $id)
     {
         try {
+            $driver_status = $this->driverStatusService->findById($id);
+            if (!$driver_status) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver Status not found'), 404);
+            }
             $driver_status = $this->driverStatusService->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new DriverStatusResource($driver_status),
@@ -124,6 +131,10 @@ class DriverStatusController extends Controller
     public function destroy($id)
     {
         try {
+            $driver_status = $this->driverStatusService->findById($id);
+            if (!$driver_status) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver Status not found'), 404);
+            }
             $this->driverStatusService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.driver_status.deleted', 'Driver Status deleted successfully')

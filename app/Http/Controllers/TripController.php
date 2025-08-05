@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LocationTypeEnum;
 use App\Enums\TripStatusEnum;
+use App\Enums\TripTypeEnum;
 use App\Events\TripCancelledByDriver;
 use App\Events\TripCancelledByRider;
 use App\Events\TripCompleted;
+use App\Events\TripCreated;
 use App\Helpers\ApiResponse;
+use App\Http\Requests\SubmitDriverReviewRequest;
+use App\Http\Requests\SubmitRiderReviewRequest;
 use App\Http\Requests\TripRequest;
 use App\Http\Requests\TripSearchRequest;
 use App\Http\Resources\TripResource;
@@ -120,9 +125,13 @@ class TripController extends Controller
     }
 
 
-    public function completeTrip(Trip $trip)
+    public function completeTrip($id)
     {
         try {
+            $trip = $this->trip_service->findById($id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+            }
             $trip->completeTrip();
 
             event(new TripCompleted($trip));
@@ -134,17 +143,44 @@ class TripController extends Controller
     }
 
     // Rider submits review (rating + notes + tip)
-    public function submitRiderReview($id, Request $request)
+    public function submitRiderReview($id, SubmitRiderReviewRequest $request)
     {
-        // Validate: rating, notes, tip_amount
-        // Process rider review
+        $trip = $this->trip_service->findById($id);
+        if (!$trip) {
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+        }
+
+        $data = $request->validated();
+
+        $trip->update([
+            'driver_rating' => $data['rating'],
+            'driver_review_notes' => $data['notes'],
+            'tip_amount' => $data['tip_amount'],
+        ]);
+
+        $trip->driver->recalculateRating();
+
+        return ApiResponse::sendResponseSuccess([], 'Review submitted successfully.');
     }
 
     // Driver submits review (rating + notes)
-    public function submitDriverReview($id, Request $request)
+    public function submitDriverReview($id, SubmitDriverReviewRequest $request)
     {
-        // Validate: rating, notes
-        // Process driver review
+        $trip = $this->trip_service->findById($id);
+        if (!$trip) {
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+        }
+
+        $data = $request->validated();
+
+        $trip->update([
+            'rider_rating' => $data['rating'],
+            'rider_review_notes' => $data['notes'],
+        ]);
+
+        $trip->rider->recalculateRating();
+
+        return ApiResponse::sendResponseSuccess([], 'Review submitted successfully.');
     }
 
     public function cancelTripByRider(Request $request)
@@ -178,47 +214,77 @@ class TripController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    // trip_flow
     public function store(TripRequest $request)
     {
         try {
-            DB::beginTransaction();
-            $data = $request->validated();
+            /** @var Rider $rider */ // Add PHPDoc type hint
             $rider = auth('rider-api')->user();
-            $tripData = [
-                'rider_id' => $rider->id,
-                'trip_type_id' => $request->trip_type_id,
-                'coupon_id' => $request->coupon_id,
-                'requested_time' => $request->requested_time,
-                'payment_method_id' => $request->payment_method_id,
-                'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching)->id,
-            ];
-            $trip = $this->trip_service->create($tripData);
 
-            $locations = $data['locations'];
-
-            foreach ($locations as $location) {
-                TripLocation::create([
-                    'location' => $location['location'],
-                    'location_order' => $location['location_order'],
-                    'location_type' => $location['location_type'],
-                    'trip_id' => $trip->id,
-                ]);
+            if ($rider->trips()->whereHas('status', function ($query) {
+                $query->where('name', '!=', TripStatusEnum::Completed->value);
+            })->exists()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip.error.already_in_trip', 'You are already in a trip')
+                );
             }
-            DB::commit(); // Never reached
-            fireAndForgetRequest(config('functions.driver_search_url'), [
-                'headers' => [
-                    'X-Driver-Search-Secret' => config('functions.driver_search_secret'),
-                    'Content-Type' => 'application/json',
-                ],
-                'body' => json_encode(['trip_id' => $trip->id]),
-            ]);
+
+            $trip = null;
+            DB::transaction(function () use ($request, &$trip, $rider) {
+                $data = $request->validated();
+                $tripType = TripTypeEnum::tryFrom($request->trip_type_id);
+
+                $tripData = [
+                    'rider_id' => $rider->id,
+                    'trip_type_id' => $request->trip_type_id,
+                    'coupon_id' => $request->coupon_id,
+                    'requested_time' => $request->requested_time,
+                    'payment_method_id' => $request->payment_method_id,
+                    'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching)->id,
+                    'search_started_at' => now(),
+                    'search_expires_at' => now()->addMinutes(5)
+                ];
+                $trip = $this->trip_service->create($tripData);
+
+                $locations = $data['locations'];
+                $pickupLocation = null;
+
+                foreach ($locations as $key => $location) {
+                    if ($tripType === TripTypeEnum::ROUND_TRIP && $location['location_type'] === LocationTypeEnum::DropOff->value) {
+                        $locations[$key]['location_type'] = LocationTypeEnum::Stop->value;
+                    }
+                    $tripLocation = TripLocation::create([
+                        'location' => $location['location'],
+                        'location_order' => $location['location_order'],
+                        'location_type' => $locations[$key]['location_type'],
+                        'trip_id' => $trip->id,
+                    ]);
+                    if ($location['location_type'] === LocationTypeEnum::Pickup->value) {
+                        $pickupLocation = $tripLocation;
+                    }
+                }
+
+                if ($tripType === TripTypeEnum::ROUND_TRIP && $pickupLocation) {
+                    TripLocation::create([
+                        'location' => $pickupLocation->location,
+                        'location_order' => count($locations) + 1,
+                        'location_type' => LocationTypeEnum::DropOff->value,
+                        'trip_id' => $trip->id,
+                    ]);
+                }
+            });
+
+            // Dispatch the event after the transaction has been successfully committed
+            if ($trip) {
+                event(new TripCreated($trip));
+            }
+
             return ApiResponse::sendResponseSuccess(
                 new TripResource($trip),
                 trans_fallback('messages.trip.created', 'Trip Created successfully'),
                 201
             );
         } catch (Exception $e) {
-            DB::rollBack();
             return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'trip Creation Failed') . $e->getMessage());
         }
     }
@@ -231,6 +297,9 @@ class TripController extends Controller
     {
         try {
             $trip = $this->trip_service->findById($id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+            }
             return ApiResponse::sendResponseSuccess(data: new TripResource($trip), message: trans_fallback('messages.trip.retrieved', 'trip Retrived Successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip not found'), 404);
@@ -243,6 +312,10 @@ class TripController extends Controller
     public function update(TripRequest $request, string $id)
     {
         try {
+            $trip = $this->trip_service->findById($id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+            }
             $trip = $this->trip_service->update((int) $id, $request->validated());
             return ApiResponse::sendResponseSuccess(
                 new TripResource($trip),
@@ -261,6 +334,10 @@ class TripController extends Controller
     public function destroy($id)
     {
         try {
+            $trip = $this->trip_service->findById($id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+            }
             $this->trip_service->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip.deleted', 'trip updated successfully')
@@ -272,18 +349,18 @@ class TripController extends Controller
         }
     }
 
-    public function findDriverForTrip(Request $request)
-    {
-        // Authorization
-        if ($request->header('X-Driver-Search-Secret') !== env('DRIVER_SEARCH_SECRET')) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+    // public function findDriverForTrip(Request $request)
+    // {
+    //     // Authorization
+    //     if ($request->header('X-Driver-Search-Secret') !== env('DRIVER_SEARCH_SECRET')) {
+    //         return response()->json(['error' => 'Unauthorized'], 401);
+    //     }
 
-        $tripId = $request->input('trip_id');
-        $trip = Trip::with('rider')->findOrFail($tripId);
+    //     $tripId = $request->input('trip_id');
+    //     $trip = Trip::with('rider')->findOrFail($tripId);
 
-        $result = $this->trip_service->findDriverForTrip($trip);
+    //     $result = $this->trip_service->findDriverForTrip($trip);
 
-        return response()->json($result);
-    }
+    //     return response()->json($result);
+    // }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\FileServiceFactory;
+use App\Traits\Activatable;
 use App\Traits\General\ActiveScope;
 use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PaymentMethod extends Model
 {
-    use FilterScope, ActiveScope;
+    use FilterScope, ActiveScope,Activatable;
     // =================
     // Configuration
     // =================
@@ -71,17 +72,4 @@ class PaymentMethod extends Model
     // =================
     // Business Logic
     // =================
-    public function activate(): void
-    {
-        $this->update(['is_active' => true]);
-    }
-
-    public function deactivate(): void
-    {
-        $this->update(['is_active' => false]);
-    }
-    public function isActive(): bool
-    {
-        return $this->is_active;
-    }
 }

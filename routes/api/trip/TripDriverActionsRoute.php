@@ -12,4 +12,6 @@ Route::middleware(['auth:driver-api'])
         Route::post('/location', 'updateLocation')->name('update_location');
         Route::post('/arrive', 'arrive')->name('arrive');
         Route::post('/start', 'start')->name('start');
+        Route::post('/complete-location/{tripLocation}', 'completeLocation')->name('complete_location');
+        Route::post('/complete', 'complete')->name('complete');
     });

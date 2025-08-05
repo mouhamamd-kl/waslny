@@ -22,12 +22,12 @@ class DriverSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'sometimes|string|max:255',
-            'last_name' => 'sometimes|string|max:255',
-            'driver_status_id' => 'sometimes|integer|exists:driver_statuses,id',
-            'max_rating' => 'sometimes|numeric|min:1|max:5',
-            'min_rating' => 'sometimes|numeric|min:1|max:5|lt:max_rating',
-            'created_at' => 'sometimes|date',
+            'first_name' => 'sometimes|nullable|string|max:255',
+            'last_name' => 'sometimes|nullable|string|max:255',
+            'driver_status_id' => 'sometimes|nullable|integer|exists:driver_statuses,id',
+            'max_rating' => 'sometimes|nullable|numeric|min:1|max:5',
+            'min_rating' => 'sometimes|nullable|numeric|min:1|max:5|lt:max_rating',
+            'created_at' => 'sometimes|nullable|date',
         ];
     }
 }

@@ -22,9 +22,9 @@ class TripTypeSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string|max:255',
-            'is_active' => 'sometimes|boolean',
+            'name' => 'sometimes|nullable|string|max:255',
+            'description' => 'sometimes|nullable|string|max:255',
+            'is_active' => 'sometimes|nullable|boolean',
         ];
     }
 }

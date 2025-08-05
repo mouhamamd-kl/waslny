@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Activatable;
 use App\Traits\General\ActiveScope;
 use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ use Carbon\Carbon;
 
 class Coupon extends Model
 {
-    use HasFactory, FilterScope;
+    use HasFactory, FilterScope, Activatable;
 
     // =================
     // Configuration
@@ -23,7 +24,7 @@ class Coupon extends Model
 
     protected $guarded = ['id'];
 
-    protected $casts = [];
+    protected $casts = ['is_active' => 'boolean'];
     // Add this line to explicitly set the factory class
     // =================
     // Relationships
@@ -54,20 +55,20 @@ class Coupon extends Model
     /**
      * Get formatted discount amount
      */
-    public function getFormattedAmountAttribute(): string
-    {
-        return $this->isPercentage()
-            ? "{$this->amount}%"
-            : config('app.currency_symbol') . number_format($this->amount, 2);
-    }
+    // public function getFormattedAmountAttribute(): string
+    // {
+    //     return $this->isPercentage()
+    //         ? "{$this->amount}%"
+    //         : config('app.currency_symbol') . number_format($this->amount, 2);
+    // }
 
     /**
      * Set code to uppercase
      */
-    public function setCodeAttribute($value): void
-    {
-        $this->attributes['code'] = strtoupper($value);
-    }
+    // public function setCodeAttribute($value): void
+    // {
+    //     $this->attributes['code'] = strtoupper($value);
+    // }
 
     // =================
     // Scopes
@@ -151,13 +152,4 @@ class Coupon extends Model
     // =================
     // Business Logic
     // =================
-    public function activate(): void
-    {
-        $this->update(['is_active' => true]);
-    }
-
-    public function deactivate(): void
-    {
-        $this->update(['is_active' => false]);
-    }
 }

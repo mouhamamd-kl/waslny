@@ -4,10 +4,10 @@ namespace App\Enums\channels;
 
 enum BroadCastChannelEnum: string
 {
-    case RIDER = 'rider.{riderId}';
-    case DRIVER = 'driver.{driverId}';
+    case RIDER = 'riders.{riderId}';
+    case DRIVER = 'drivers.{driverId}';
     case DRIVERS_ONLINE = 'online-drivers';
-    case TRIP = 'trip.{tripId}';
+    case TRIP = 'trips.{tripId}';
 
     public function pattern(): string
     {
