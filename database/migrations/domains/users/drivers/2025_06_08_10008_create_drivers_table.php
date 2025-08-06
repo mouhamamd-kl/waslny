@@ -32,9 +32,7 @@ return new class extends Migration
             $table->magellanPoint('location', 4326)->nullable();
 
 
-            $table->foreignIdFor(DriverStatus::class)->nullable()
-                ->constrained('driver_statuses')
-                ->onDelete('cascade');
+            $table->foreignIdFor(DriverStatus::class)->nullable();
 
             // $table->boolean('suspended')->default(true);
             // $table->enum('suspension_reason', SuspensionReason::values())
