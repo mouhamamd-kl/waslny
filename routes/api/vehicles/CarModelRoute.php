@@ -19,7 +19,6 @@ Route::middleware(['auth:admin-api'])->controller(CarModelController::class)
     ->name('car-models.')
     ->group(function () {
         Route::post('/', 'store')->name('store');
-
         Route::prefix('{car_model}')->group(function () {
             Route::put('/', 'update')->name('update');
             Route::delete('/', 'destroy')->name('destroy');

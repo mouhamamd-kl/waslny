@@ -19,7 +19,6 @@ Route::middleware(['auth:admin-api'])->controller(CarManufacturerController::cla
     ->prefix('car-manufacturers')
     ->name('car-manufacturers.')
     ->group(function () {
-        Route::get('/', 'adminIndex')->name('index');
         Route::post('/', 'store')->name('store');
         Route::prefix('{car_manufacturer}')->group(function () {
             Route::put('/', 'update')->name('update');
