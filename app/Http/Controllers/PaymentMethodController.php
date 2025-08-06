@@ -24,8 +24,12 @@ class PaymentMethodController extends Controller
     public function index(Request $request)
     {
         try {
+            $filters = [];
+            if (!auth('admin-api')) {
+                $filters['is_active'] = true;
+            }
             $payment_methods = $this->paymentMethodService->searchPaymentMethods(
-                $request->input('filters', []),
+                $request->input('filters', $filters),
                 $request->input('perPage', 5)
             );
             return ApiResponse::sendResponsePaginated(
