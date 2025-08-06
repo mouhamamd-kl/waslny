@@ -8,6 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class SuspensionService extends BaseService
 {
+    protected array $relations=[];
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new Suspension, $cache);

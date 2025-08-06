@@ -19,12 +19,14 @@ class SuspensionSeeder extends Seeder
     {
         foreach (SuspensionReasonEnum::cases() as $reason) {
             Suspension::updateOrCreate(
-                // Match records by 'name'
-                ['reason' => $reason->value],
+                // Match records by 'code'
+                ['code' => $reason->value],
                 // Update/create these attributes
                 [
+                    'reason' => $reason->value,
                     'admin_msg' => $reason->adminMessage(),
                     'user_msg' => $reason->message(),
+                    'is_system_defined' => true,
                 ]
             );
         }

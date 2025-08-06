@@ -23,7 +23,11 @@ class SuspensionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function adminIndex(Request $request)
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
     {
         try {
             $suspensions = $this->suspensionService->searchSuspension(
@@ -45,58 +49,10 @@ class SuspensionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
-        try {
-            $suspensions = $this->suspensionService->searchSuspension(
-                filters: $request->input('filters', ['is_active' => true]),
-                perPage: $request->input('per_page', 10)
-            );
-            return ApiResponse::sendResponsePaginated(
-                $suspensions,
-                SuspensionResource::class,
-                trans_fallback('messages.suspension.list', 'Suspension retrieved successfully')
-            );
-        } catch (Exception $e) {
-            return ApiResponse::sendResponseError(
-                trans_fallback('messages.error.generic', 'An error occurred')
-            );
-        }
-    }
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function adminSearch(SuspensionSearchRequest $request)
-    {
-        try {
-            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
-            $suspensions = $this->suspensionService->searchSuspension(
-                filters: $filters,
-                perPage: $request->input('per_page', 10),
-            );
-
-            return ApiResponse::sendResponsePaginated(
-                $suspensions,
-                SuspensionResource::class, // Add your resource class
-                trans_fallback('messages.suspension.list', 'Suspension retrieved successfully'),
-            );
-        } catch (Exception $e) {
-            return ApiResponse::sendResponseError(
-                'Search failed: ' . $e->getMessage(),
-                500
-            );
-        }
-    }
-
-    /**
-     * Display a listing of the resource.
-     */
     public function search(SuspensionSearchRequest $request)
     {
         try {
-            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
-            $filters['is_active'] = true;
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $suspensions = $this->suspensionService->searchSuspension(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -105,7 +61,7 @@ class SuspensionController extends Controller
             return ApiResponse::sendResponsePaginated(
                 $suspensions,
                 SuspensionResource::class, // Add your resource class
-                trans_fallback('messages.suspension.list', 'Suspension retrieved successfully'),
+                trans_fallback('messages.suspension.list', 'Suspensions list retrieved successfully'),
             );
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(
@@ -125,7 +81,7 @@ class SuspensionController extends Controller
             $suspension = $this->suspensionService->create($data);
             return ApiResponse::sendResponseSuccess(
                 new SuspensionResource($suspension),
-                trans_fallback('messages.suspension.created', 'Suspensions retrieved successfully'),
+                trans_fallback('messages.suspension.created', 'Suspension created successfully'),
                 201
             );
         } catch (Exception $e) {
@@ -178,9 +134,16 @@ class SuspensionController extends Controller
     public function destroy($id)
     {
         try {
+            /** @var Suspension $suspension */ // Add PHPDoc type hint
             $suspension = $this->suspensionService->findById($id);
             if (!$suspension) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Suspension not found'), 404);
+            }
+            if ($suspension->is_system()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.suspension.error.system_suspension_delete_failed', ['reason' => $suspension->reason]),
+                    403
+                );
             }
             $this->suspensionService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
@@ -201,13 +164,19 @@ class SuspensionController extends Controller
             if (!$suspension) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Suspension not found'), 404);
             }
+            if ($suspension->is_system()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.suspension.error.system_suspension_deactivation_failed', ['reason' => $suspension->reason]),
+                    403
+                );
+            }
             $suspension->deactivate();
             return ApiResponse::sendResponseSuccess(
-                message: trans_fallback('messages.suspension.deactivated', 'Suspension DeActivated successfully')
+                message: trans_fallback('messages.suspension.deactivated', 'Suspension deactivated successfully')
             );
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(
-                trans_fallback('messages.suspension.error.deactivation_failed', 'DeActivation failed: ' . $e->getMessage())
+                trans_fallback('messages.suspension.error.deactivation_failed', 'Deactivation failed: ' . $e->getMessage())
             );
         }
     }
@@ -220,9 +189,15 @@ class SuspensionController extends Controller
             if (!$suspension) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Suspension not found'), 404);
             }
+            if ($suspension->is_system()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.suspension.error.system_suspension_activation_failed', ['reason' => $suspension->reason]),
+                    403
+                );
+            }
             $suspension->activate();
             return ApiResponse::sendResponseSuccess(
-                message: trans_fallback('messages.suspension.activated', 'Suspension Activated successfully')
+                message: trans_fallback('messages.suspension.activated', 'Suspension activated successfully')
             );
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(

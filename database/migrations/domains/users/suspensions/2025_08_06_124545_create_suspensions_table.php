@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('suspensions', function (Blueprint $table) {
             $table->id();
             $table->string('reason');
+            $table->string('code')->unique()->nullable();
+            $table->boolean('is_system_defined')->default(false);
             $table->string('admin_msg');
             $table->string('user_msg');
             $table->boolean('is_active')->default(true);

@@ -13,7 +13,7 @@ Route::middleware(['auth:admin-api'])->controller(SuspensionController::class)
         Route::post('/search', 'search')->name('search');
 
         // Routes requiring car_manufacturer parameter
-        Route::prefix('{coupon}')->group(function () {
+        Route::prefix('{suspension}')->group(function () {
             Route::get('/', 'show')->name('show');
             Route::put('/', 'update')->name('update');
             Route::delete('/', 'destroy')->name('destroy');

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Suspension extends Model
 {
-    use FilterScope, Activatable, ActiveScope,HasFactory;
+    use FilterScope, Activatable, ActiveScope, HasFactory;
     // =================
     // Configuration
     // =================
@@ -20,6 +20,7 @@ class Suspension extends Model
     protected $guarded = ['id'];
     protected $casts = [
         'is_active' => 'boolean',
+        'is_system_defined' => 'boolean',
     ];
 
     // =================
@@ -35,7 +36,7 @@ class Suspension extends Model
     // =================
     public function toEnum(): SuspensionReasonEnum
     {
-        return SuspensionReasonEnum::from($this->reason);
+        return SuspensionReasonEnum::from($this->code);
     }
     public function reason(): string
     {
@@ -53,4 +54,8 @@ class Suspension extends Model
     // =================
     // Business Logic
     // =================
+    public function is_system(): bool
+    {
+        return $this->is_system_defined;
+    }
 }

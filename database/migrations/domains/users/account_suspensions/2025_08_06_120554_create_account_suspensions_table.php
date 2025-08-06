@@ -15,7 +15,8 @@ return new class extends Migration
         Schema::create('account_suspensions', function (Blueprint $table) {
             $table->id();
             $table->morphs('suspendable');  // Creates suspendable_id + suspendable_type
-            $table->foreignIdFor(Suspension::class);
+            $table->foreignIdFor(Suspension::class)->constrained('driver_statuses')
+                ->onDelete('cascade');
             $table->timestamp('lifted_at')->nullable();
             $table->boolean('is_permanent')->default(false); // New flag
             $table->timestamp('suspended_until')->nullable();

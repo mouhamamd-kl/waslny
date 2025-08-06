@@ -8,7 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class SuspenssionService extends BaseService
 {
-    protected array $relations = ['accountSuspension'];
+    protected array $relations = [];
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new Suspension, $cache);
@@ -31,5 +31,10 @@ class SuspenssionService extends BaseService
     public function searchByReason(String $reason): ?Suspension
     {
         return $this->search_first(filters: ['reason' => $reason]);
+    }
+
+    public function searchByCode(String $code): ?Suspension
+    {
+        return $this->search_first(filters: ['code' => $code]);
     }
 }
