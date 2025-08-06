@@ -348,7 +348,7 @@ return [
             'updated' => 'تم تحديث الملف الشخصي بنجاح',
         ],
         'error' => [
-            'update_failed' => 'Failed to update profile',
+            'update_failed' => 'فشل تحديث الملف الشخصي',
         ]
     ],
     'error' => [
@@ -367,6 +367,23 @@ return [
         'error' => [
             'not_found' => 'رمز المال غير موجود',
             'invalid' => 'رمز المال غير صالح أو مستخدم بالفعل',
+        ]
+    ],
+
+    'suspension' => [
+        'created' => 'تم إنشاء التعليق بنجاح',
+        'updated' => 'تم تحديث التعليق بنجاح',
+        'deleted' => 'تم حذف التعليق بنجاح',
+        'retrieved' => 'تم استرجاع التعليق بنجاح',
+        'list' => 'تم استرجاع قائمة التعليقات بنجاح',
+        'activated' => 'تم تفعيل التعليق بنجاح',
+        'deactivated' => 'تم إيقاف التعليق بنجاح',
+        'error' => [
+            'activation_failed' => 'فشل تفعيل التعليق',
+            'deactivation_failed' => 'فشل إيقاف التعليق',
+            'system_suspension_delete_failed' => "لا يمكن حذف سبب التعليق ':reason' لأنه من أسباب النظام.",
+            'system_suspension_activation_failed' => "لا يمكن تفعيل سبب التعليق ':reason' لأنه من أسباب النظام.",
+            'system_suspension_deactivation_failed' => "لا يمكن تعطيل سبب التعليق ':reason' لأنه من أسباب النظام.",
         ]
     ],
 ];

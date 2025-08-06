@@ -363,4 +363,21 @@ return [
             'invalid' => 'Invalid or already used money code',
         ]
     ],
+
+    'suspension' => [
+        'created' => 'Suspension created successfully',
+        'updated' => 'Suspension updated successfully',
+        'deleted' => 'Suspension deleted successfully',
+        'retrieved' => 'Suspension retrieved successfully',
+        'list' => 'Suspensions list retrieved successfully',
+        'activated' => 'Suspension activated successfully',
+        'deactivated' => 'Suspension deactivated successfully',
+        'error' => [
+            'activation_failed' => 'Failed to activate suspension',
+            'deactivation_failed' => 'Failed to deactivate suspension',
+            'system_suspension_delete_failed' => "Suspension ':reason' is a system suspension and cannot be deleted.",
+            'system_suspension_activation_failed' => "Suspension ':reason' is a system suspension and cannot be activated.",
+            'system_suspension_deactivation_failed' => "Suspension ':reason' is a system suspension and cannot be deactivated.",
+        ]
+    ],
 ];
