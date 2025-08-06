@@ -20,7 +20,6 @@ Route::middleware(['auth:admin-api'])->controller(TripTimeTypeController::class)
     ->name('trip-time-type.')
     ->group(function () {
         Route::post('/', 'store')->name('store');
-        
         Route::prefix('{trip_time_type}')->group(function () {
             Route::put('/', 'update')->name('update');
             Route::delete('/', 'destroy')->name('destroy');
