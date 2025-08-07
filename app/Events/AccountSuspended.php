@@ -36,9 +36,9 @@ class AccountSuspended implements ShouldBroadcastNow
         $key = $this->user instanceof Driver ? 'driverId' : 'riderId';
 
         return new PrivateChannel(
-            $channel->bind([
-                $key => $this->user->id
-            ])
+            $channel->bind(
+                 $this->user->id
+            )
         );
     }
 

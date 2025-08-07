@@ -14,12 +14,9 @@ enum BroadCastChannelEnum: string
         return $this->value;
     }
 
-    public function bind(array $parameters): string
+    public function bind(string $parameter): string
     {
-        return str_replace(
-            array_map(fn($k) => '{' . $k . '}', array_keys($parameters)),
-            array_values($parameters),
-            $this->value
-        );
+        $pattern = '/\{[^}]+\}/';
+        return preg_replace($pattern, $parameter, $this->value);
     }
 }

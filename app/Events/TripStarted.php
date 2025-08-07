@@ -28,9 +28,9 @@ class TripStarted implements ShouldBroadcastNow
     public function broadcastOn()
     {
         return new PrivateChannel(
-            BroadCastChannelEnum::TRIP->bind([
-                $this->trip->id
-            ])
+            BroadCastChannelEnum::TRIP->bind(
+                'trip', $this->trip->id
+            )
         );
     }
 

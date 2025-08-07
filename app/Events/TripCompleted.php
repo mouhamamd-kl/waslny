@@ -25,17 +25,17 @@ class TripCompleted implements ShouldBroadcastNow
     public function __construct(Trip $trip)
     {
         $this->trip = $trip;
-        $this->tripChannel = BroadCastChannelEnum::TRIP->bind([
-            $trip->id
-        ]);
+        $this->tripChannel = BroadCastChannelEnum::TRIP->bind(
+            'trip', $trip->id
+        );
     }
 
     public function broadcastOn()
     {
         return new PrivateChannel(
-            BroadCastChannelEnum::TRIP->bind([
-                $this->trip->id
-            ])
+            BroadCastChannelEnum::TRIP->bind(
+                'trip', $this->trip->id
+            )
         );
     }
 

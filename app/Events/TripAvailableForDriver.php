@@ -43,9 +43,9 @@ class TripAvailableForDriver implements ShouldBroadcastNow
         // return new PrivateChannel('driver.' . $this->driverId);
 
         return new PrivateChannel(
-            BroadCastChannelEnum::DRIVER->bind([
-                $this->driverId
-            ])
+            BroadCastChannelEnum::DRIVER->bind(
+                'driver', $this->driverId
+            )
         );
     }
 

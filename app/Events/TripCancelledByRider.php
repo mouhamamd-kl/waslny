@@ -28,9 +28,9 @@ class TripCancelledByRider implements ShouldBroadcastNow
     public function broadcastOn()
     {
         return new PrivateChannel(
-            BroadCastChannelEnum::DRIVER->bind([
-                $this->driverId
-            ])
+            BroadCastChannelEnum::DRIVER->bind(
+                'driver', $this->driverId
+            )
         );
     }
 

@@ -45,9 +45,9 @@ class DriverApproachingPickup implements ShouldBroadcastNow
         // return new PrivateChannel('driver.' . $this->driverId);
 
         return new PrivateChannel(
-            BroadCastChannelEnum::TRIP->bind([
-                $this->trip->riderId
-            ])
+            BroadCastChannelEnum::TRIP->bind(
+                'trip', $this->trip->id
+            )
         );
     }
 
