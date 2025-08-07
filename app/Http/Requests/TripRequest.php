@@ -51,6 +51,7 @@ class TripRequest extends BaseRequest
             ],
 
             'coupon_id' => [
+                'nullable',
                 'sometimes',
                 'exists:coupons,id',
                 new ActiveCoupon,
@@ -61,7 +62,17 @@ class TripRequest extends BaseRequest
                 'exists:payment_methods,id'
             ],
 
-            'current_location' => [new GeometryGeojsonRule([Point::class]),],
+
+            'locations' => ['array', 'min:2', 'required', 'filled'],
+            'locations' => [new TripLocationTypesRule],
+            'locations.*' => [
+                new JsonValidatorRule(['location', 'location_order', 'location_type']),
+                new TripLocationOrderRule,
+            ],
+            'locations.*.location' => [new GeometryGeojsonRule([Point::class]),],
+            'locations.*.location_order' => ['integer', 'min:1', 'distinct'],
+            'locations.*.location_type' => [Rule::enum(LocationTypeEnum::class)],
+
 
             // 'locations.*.estimated_arrival_time' => [
             //     'required',

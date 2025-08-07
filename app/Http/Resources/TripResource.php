@@ -41,16 +41,16 @@ class TripResource extends JsonResource
                 new TripTimeTypeResource($this->whenLoaded('timeType'));
             }, null),
             // 'location' => new TripLocationResource($this->whenLoaded('locations')),
-            'location' => $this->when($this->locations()->exists(), function () {
+            'locations' => $this->when($this->locations()->exists(), function () {
                 new TripLocationResource($this->whenLoaded('locations'));
             }, null),
             // 'coupon' => $this->whenLoaded('coupon'),
-            'coupon' => $this->when($this->coupon()->exists(), function () {
-                new TripLocationResource($this->whenLoaded('coupon'));
+            'coupon' => $this->when($this->riderCoupon()->exists(), function () {
+                new CouponResource($this->whenLoaded('riderCoupon')->coupon());
             }, null),
             // 'payment_method' => new PaymentMethodResource($this->whenLoaded('paymentMethod')),
             'payment_method' => $this->when($this->paymentMethod()->exists(), function () {
-                new TripLocationResource($this->whenLoaded('paymentMethod'));
+                new PaymentMethodResource($this->whenLoaded('paymentMethod'));
             }, null),
             'start_time' => $this->start_time,
             'requested_time' => $this->requested_time,
@@ -58,7 +58,7 @@ class TripResource extends JsonResource
             'duration_minutes' => $this->durationInMinutes(),
             'distance' => [
                 'meters' => $this->distance,
-                'kilometers' => $this->distanceInKm(),
+                'kilometers' => $this->distanceInKm,
             ],
             'fare' => [
                 'amount' => $this->fare,

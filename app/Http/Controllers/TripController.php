@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\channels\BroadCastChannelEnum;
 use App\Enums\LocationTypeEnum;
 use App\Enums\TripStatusEnum;
 use App\Enums\TripTypeEnum;
@@ -20,6 +21,7 @@ use App\Models\TripLocation;
 use App\Models\TripStatus;
 use App\Services\TripService;
 use App\Services\TripStatusService;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -218,9 +220,9 @@ class TripController extends Controller
     public function store(TripRequest $request)
     {
         try {
+
             /** @var Rider $rider */ // Add PHPDoc type hint
             $rider = auth('rider-api')->user();
-
             if ($rider->trips()->whereHas('status', function ($query) {
                 $query->where('name', '!=', TripStatusEnum::Completed->value);
             })->exists()) {
@@ -237,8 +239,9 @@ class TripController extends Controller
                 $tripData = [
                     'rider_id' => $rider->id,
                     'trip_type_id' => $request->trip_type_id,
+                    'trip_time_type_id' => $request->trip_time_type_id,
                     'coupon_id' => $request->coupon_id,
-                    'requested_time' => $request->requested_time,
+                    'requested_time' => now(),
                     'payment_method_id' => $request->payment_method_id,
                     'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching)->id,
                     'search_started_at' => now(),
@@ -254,7 +257,7 @@ class TripController extends Controller
                         $locations[$key]['location_type'] = LocationTypeEnum::Stop->value;
                     }
                     $tripLocation = TripLocation::create([
-                        'location' => $location['location'],
+                        'location' => Point::makeGeodetic($location['location']['coordinates'][0], $location['location']['coordinates'][1]),
                         'location_order' => $location['location_order'],
                         'location_type' => $locations[$key]['location_type'],
                         'trip_id' => $trip->id,
@@ -277,14 +280,18 @@ class TripController extends Controller
             // Dispatch the event after the transaction has been successfully committed
             if ($trip) {
                 event(new TripCreated($trip));
+                return ApiResponse::sendResponseSuccess(
+                    [
+                        'trip' => new TripResource($trip),
+                        'channel' => 'trips.' . $trip->id
+                    ],
+                    trans_fallback('messages.trip.created', 'Trip Created successfully'),
+                    201
+                );
             }
-
-            return ApiResponse::sendResponseSuccess(
-                new TripResource($trip),
-                trans_fallback('messages.trip.created', 'Trip Created successfully'),
-                201
-            );
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'trip Creation Failed'));
         } catch (Exception $e) {
+            throw $e;
             return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'trip Creation Failed') . $e->getMessage());
         }
     }

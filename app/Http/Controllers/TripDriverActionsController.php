@@ -31,9 +31,14 @@ class TripDriverActionsController extends Controller
         $this->tripLocationService = $tripLocationService;
     }
 
-    public function accept(Request $request, Trip $trip)
+    public function accept(Request $request, $id)
     {
         try {
+            $trip = $this->tripService->findById($id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+            }
+
             if ($trip->driver_id) {
                 return ApiResponse::sendResponseError('Trip has already been accepted.');
             }
@@ -57,9 +62,14 @@ class TripDriverActionsController extends Controller
         }
     }
 
-    public function updateLocation(Request $request, Trip $trip)
+    public function updateLocation(Request $request, $id)
     {
         try {
+            $trip = $this->tripService->findById($id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+            }
+
             $location = $request->validate([
                 'location' => 'required',
             ]);
@@ -72,9 +82,14 @@ class TripDriverActionsController extends Controller
         }
     }
 
-    public function arrive(Request $request, Trip $trip)
+    public function arrive(Request $request, $id)
     {
         try {
+            $trip = $this->tripService->findById($id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+            }
+
             $trip->transitionTo(TripStatusEnum::DriverArrived);
 
             event(new DriverArrived($trip));
@@ -85,9 +100,14 @@ class TripDriverActionsController extends Controller
         }
     }
 
-    public function start(Request $request, Trip $trip)
+    public function start(Request $request, $id)
     {
         try {
+            $trip = $this->tripService->findById($id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+            }
+
             $trip->startTrip();
 
             event(new TripStarted($trip));
@@ -102,8 +122,13 @@ class TripDriverActionsController extends Controller
         }
     }
 
-    public function completeLocation(Request $request, Trip $trip)
+    public function completeLocation(Request $request, $id)
     {
+        $trip = $this->tripService->findById($id);
+        if (!$trip) {
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+        }
+
         if ($trip->isCompleted()) {
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.trip_location.error.trip_completed', 'Cannot edit a completed trip')
@@ -143,9 +168,13 @@ class TripDriverActionsController extends Controller
         return ApiResponse::sendResponseSuccess([], 'Location completed successfully.', 200);
     }
 
-    public function complete(Request $request, Trip $trip)
+    public function complete(Request $request, $id)
     {
         try {
+            $trip = $this->tripService->findById($id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+            }
             $trip->completeTrip();
 
             event(new TripCompleted($trip));

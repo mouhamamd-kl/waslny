@@ -18,10 +18,9 @@ class TripLocationTypesRule implements ValidationRule
         $typeCounts = array_count_values(
             array_column($value, 'location_type')
         );
-
         $hasOnePickup = isset($typeCounts[LocationTypeEnum::Pickup->value]) &&
             $typeCounts[LocationTypeEnum::Pickup->value] === 1;
-        if (!$$hasOnePickup) {
+        if (!$hasOnePickup) {
             $fail(trans_fallback('validation.trip_location_types.pickup', 'Trip Location Must Have One PickUp'));
         }
         $hasOneDropoff = isset($typeCounts[LocationTypeEnum::DropOff->value]) &&

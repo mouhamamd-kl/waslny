@@ -35,7 +35,7 @@ Route::controller(TripController::class)
             Route::get('/driver/list', 'driverIndex')->name('driver.index');
             Route::get('/driver/{trip}', 'show')->name('driver.show');
             Route::post('/driver/cancel', 'cancelTripByDriver')->name('driver.cancel');
-            Route::post('/driver/{trip}/complete', 'completeTrip')->name('driver.complete');
+            // Route::post('/driver/{trip}/complete', 'completeTrip')->name('driver.complete');
         });
 
         //================================================================
