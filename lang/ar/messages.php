@@ -330,7 +330,12 @@ return [
             'profile_already_completed' => 'تم إكمال الملف الشخصي مسبقاً',
             'car_already_added' => 'تمت إضافة المركبة مسبقاً', // New message added here
             'profile_incomplete' => 'يرجى إكمال ملفك الشخصي قبل الوصول إلى هذه الميزة',
+            'location_update_failed' => 'فشل تحديث الموقع',
+            'status_update_failed' => 'فشل تحديث الحالة',
         ],
+        'location_updated' => 'تم تحديث الموقع بنجاح.',
+        'status_online' => 'تم تحديث الحالة إلى متصل.',
+        'status_offline' => 'تم تحديث الحالة إلى غير متصل.',
         'car' => [
             'created' => 'تم إنشاء المركبة بنجاح'
         ]

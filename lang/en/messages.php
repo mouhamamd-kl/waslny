@@ -322,7 +322,12 @@ return [
         'error' => [
             'suspension_failed' => 'Failed to suspend account',
             'reinstate_failed' => 'Failed to reinstate account',
+            'location_update_failed' => 'Failed to update location',
+            'status_update_failed' => 'Failed to update status',
         ],
+        'location_updated' => 'Location updated successfully.',
+        'status_online' => 'Status updated to online.',
+        'status_offline' => 'Status updated to offline.',
         'car' => [
             'created' => 'Vehicle created successfully'
         ]
