@@ -44,4 +44,11 @@ return [
         'public_bucket' => env('AWS_BUCKET_PUBLIC'),
         'private_bucket' => env('AWS_BUCKET_PRIVATE'),
     ],
+
+    'firebase' => [
+        'credentials' => [
+            'file' => env('FIREBASE_CREDENTIALS'),
+            'auto_discovery' => true,
+        ],
+    ],
 ];
