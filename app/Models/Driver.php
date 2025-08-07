@@ -11,8 +11,10 @@ use App\Traits\General\ResetOTP;
 use App\Traits\General\Suspendable;
 use App\Traits\General\TwoFactorCode;
 use App\Traits\General\TwoFactorCodeGenerator;
+use App\Traits\HasDeviceToken;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -44,7 +46,7 @@ enum DriverPhotoType: string
 
 class Driver extends Authenticatable implements Wallet
 {
-    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken;
     use Suspendable {
         suspendTemporarily as protected traitSuspendTemp;
         suspendForever as protected traitSuspendForever;
@@ -65,6 +67,7 @@ class Driver extends Authenticatable implements Wallet
     protected $guarded = ['id'];
 
     protected $casts = [
+        'location' => Point::class,
         'birth_date' => 'date',
         'two_factor_expires_at' => 'datetime',
         'avg_rating' => 'float',
@@ -75,7 +78,7 @@ class Driver extends Authenticatable implements Wallet
     // =================
     public function status(): BelongsTo
     {
-        return $this->belongsTo(DriverStatus::class, 'status_id');
+        return $this->belongsTo(DriverStatus::class, 'driver_status_id');
     }
 
     public function driverCar(): HasOne
@@ -333,7 +336,8 @@ class Driver extends Authenticatable implements Wallet
     {
         $statusId = DriverStatus::firstWhere('name', $status)?->id;
         if ($statusId) {
-            $this->update(['status_id' => $statusId]);
+            $this->driver_status_id = $statusId;
+            $this->save();
         }
     }
 

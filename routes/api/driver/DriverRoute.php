@@ -12,6 +12,14 @@ Route::controller(DriverController::class)
         // Route::put('/{driver}', 'update')->name('update');
     });
 
+Route::middleware('auth:driver-api')->controller(DriverController::class)->prefix('driver')->name('driver.')->group(
+    function () {
+        Route::post('/update-location', 'updateLocation')->name('update-location');
+        Route::post('/switch-to-online', 'SwitchToOnlineStatus')->name('switch-to-online');
+        Route::post('/switch-to-offline', 'SwitchToOfflineStatus')->name('switch-to-offline');
+    }
+);
+
 // Admin management routes (require admin authentication)
 Route::middleware(['auth:admin-api'])
     ->controller(DriverController::class)

@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\DriverStatusEnum;
 use App\Enums\SuspensionReason;
 use App\Helpers\ApiResponse;
 use App\Http\Requests\DriverUpdateRequest;
 use App\Http\Requests\SuspendAccountForeverRequest;
 use App\Http\Requests\SuspendAccountRequest;
 use App\Http\Requests\DriverSearchRequest;
+use App\Http\Requests\DriverUpdateLocationRequest;
 use App\Http\Requests\SuspendAccountTemporarilyRequest;
 use App\Http\Requests\UpdateDriverProfileRequest;
 use Illuminate\Http\UploadedFile;
 use App\Http\Resources\DriverResource;
 use App\Models\Driver;
+use App\Models\DriverStatus;
 use App\Services\DriverService;
 use Exception;
 use Illuminate\Http\Request;
@@ -53,7 +56,7 @@ class DriverController extends Controller
     public function search(DriverSearchRequest $request)
     {
         try {
-            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $drivers = $this->driverService->searchDrivers(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -145,6 +148,72 @@ class DriverController extends Controller
         }
     }
 
+    public function updateLocation(DriverUpdateLocationRequest $request)
+    {
+        $location = $request->validated();
+        /** @var Driver $driver */ // Add PHPDoc type hint
+        $driver = auth('driver-api')->user();
+        try {
+            if (!$driver) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.error.not_found', 'Driver not found')
+                );
+            }
+            $driver->location = $location;
+            return ApiResponse::sendResponseSuccess(
+                [],
+                trans_fallback('messages.driver.location_updated', 'Location updated successfully.')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.driver.error.location_update_failed', 'Failed to update location: ' . $e->getMessage())
+            );
+        }
+    }
+
+    public function SwitchToOnlineStatus(Request $request)
+    {
+        /** @var Driver $driver */ // Add PHPDoc type hint
+        $driver = auth('driver-api')->user();
+        try {
+            if (!$driver) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.error.not_found', 'Driver not found')
+                );
+            }
+            $driver->setStatus(DriverStatusEnum::STATUS_AVAILABLE);
+            return ApiResponse::sendResponseSuccess(
+                [],
+                trans_fallback('messages.driver.status_online', 'Status updated to online.')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.driver.error.status_update_failed', 'Failed to update status: ' . $e->getMessage())
+            );
+        }
+    }
+    public function SwitchToOfflineStatus(Request $request)
+    {
+        /** @var Driver $driver */ // Add PHPDoc type hint
+        $driver = auth('driver-api')->user();
+        try {
+            if (!$driver) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.error.not_found', 'Driver not found')
+                );
+            }
+            $driver->setStatus(DriverStatusEnum::STATUS_OFFLINE);
+            return ApiResponse::sendResponseSuccess(
+                [],
+                trans_fallback('messages.driver.status_offline', 'Status updated to offline.')
+            );
+        } catch (Exception $e) {
+            throw $e;
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.driver.error.status_update_failed', 'Failed to update status: ' . $e->getMessage())
+            );
+        }
+    }
 
     public function reinstate($id)
     {
