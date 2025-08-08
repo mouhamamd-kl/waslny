@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
+
+
 use App\Constants\DiskNames;
 use App\Enums\TripStatusEnum;
 use App\Events\TestEvent;
@@ -8,7 +12,6 @@ use App\Events\TripAvailableForDriver;
 use App\Helpers\ApiResponse;
 use App\Services\FileServiceFactory;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\FileController;
 use App\Http\Requests\RiderSavedLocationRequest;
@@ -25,7 +28,9 @@ use App\Models\Rider;
 use App\Events\TestQueuedNotification;
 use App\Notifications\TestFirebaseNotification;
 
-
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok']);
+});
 Route::get('/test-queued-job', function () {
     for ($i = 0; $i < 10; $i++) {
         event(new TestQueuedNotification('This is a test queued job.'));
