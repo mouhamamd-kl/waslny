@@ -21,9 +21,35 @@ use App\Services\TripService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Rider;
+use App\Events\TestQueuedNotification;
+use App\Notifications\TestFirebaseNotification;
 
 
+Route::get('/test-queued-job', function () {
+    for ($i = 0; $i < 10; $i++) {
+        event(new TestQueuedNotification('This is a test queued job.'));
+    }
+});
 
+
+Route::get('/test-firebase/{type}/{id}', function ($type, $id) {
+    if ($type === 'driver') {
+        $user = Driver::find($id);
+    } elseif ($type === 'rider') {
+        $user = Rider::find($id);
+    } else {
+        return response()->json(['error' => 'Invalid user type'], 400);
+    }
+
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+
+    $user->notify(new TestFirebaseNotification());
+
+    return response()->json(['message' => 'Test notification sent.']);
+})->name('no-export');
 
 // Route::get('/test', function (Request $request) {
 //     return CarModel::where('name','Civic')->get();
@@ -328,6 +354,11 @@ require __DIR__ . '/api/vehicles/PricingRoute.php';
 require __DIR__ . '/api/admin/suspensions.php';
 
 require __DIR__ . '/api/trip/TripDriverActionsRoute.php';
+
+Route::get('/test-log', function () {
+    Log::info('This is a test log message from Laravel.');
+    return 'Log message sent!';
+})->name('no-export.test.log');
 
 // Telegram Bot Integration
 Route::post('/telegram/webhook', [App\Http\Controllers\Api\TelegramController::class, 'webhook'])->name('no-export.test.add_website_photo');

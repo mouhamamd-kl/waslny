@@ -2,14 +2,12 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class TripTimeTypeSearchRequest extends FormRequest
+class TripTimeTypeSearchRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function handleAuthorization(): bool
     {
         return true;
     }

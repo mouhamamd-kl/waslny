@@ -186,6 +186,18 @@ class TripService extends BaseService
             ?->driver;
     }
 
+
+    public function createTrip($data)
+    {
+        return Trip::create(
+            [
+                'rider_id' => $data->rider_id,
+                'driver_id' => $data->driver_id,
+                
+            ]
+        );
+    }
+
     // private function queueNextSearch(Trip $trip): void
     // {
     //     // Queue next search attempt in 15 seconds

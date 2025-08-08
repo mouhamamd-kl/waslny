@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreSuspensionRequest extends FormRequest
+class StoreSuspensionRequest extends BaseRequest
 {
     // /**
     //  * Determine if the user is authorized to make this request.
@@ -18,7 +17,7 @@ class StoreSuspensionRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function handleAuthorization(): bool
+    protected function handleAuthorization(): bool
     {
         return auth('admin-api')->check();;
     }

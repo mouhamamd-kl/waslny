@@ -4,12 +4,12 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RiderSearchRequest extends FormRequest
+class RiderSearchRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function handleAuthorization(): bool
     {
         return true;
     }

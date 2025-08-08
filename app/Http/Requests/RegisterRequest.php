@@ -6,9 +6,9 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
-class RegisterRequest extends FormRequest
+class RegisterRequest extends BaseRequest
 {
-    public function authorize()
+    public function handleAuthorization():bool
     {
         return true;
     }

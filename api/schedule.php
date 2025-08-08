@@ -1,27 +1,39 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-// Secure the endpoint
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
-use App\Events\TestNotification;
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+$response = $kernel->handle($request = Request::capture());
 
-if (!isset($_SERVER['HTTP_X_CRON_SECRET']) || $_SERVER['HTTP_X_CRON_SECRET'] !== getenv('CRON_SECRET')) {
-    http_response_code(401);
-    die('Unauthorized');
+// Handle request directly without Laravel router
+try {
+    if ($request->header('X-Cron-Secret') !== env('CRON_SECRET')) {
+        throw new Exception('Unauthorized');
+    }
+
+    $command = 'php ' . realpath(__DIR__ . '/../artisan') . ' queue:work';
+    passthru($command);    // Run multiple queue workers in the background
+    // for ($i = 0; $i < 3; $i++) {
+    //     $command = 'php ' . realpath(__DIR__ . '/../artisan') . ' queue:work --stop-when-empty --tries=1';
+    //     $output = [];
+    //     $return_var = 0;
+    //     exec($command, $output, $return_var);
+    //     Log::info('Queue worker output: ' . implode("\n", $output));
+    // }
+
+    http_response_code(200);
+    echo json_encode(['message' => 'Queue processing started']);
+} catch (Exception $e) {
+    Log::info($e);
+    http_response_code(400);
+    echo json_encode([
+        'error' => $e->getMessage(),
+    ]);
 }
 
-// Forward Vercel requests to normal index.php
-require __DIR__ . '/../public/index.php';
-
-// Create a new kernel instance
-$kernel = app()->make(Illuminate\Contracts\Console\Kernel::class);
-
-event(new TestNotification([
-    'قائد الطوفان' => 'القائد يحيى السنوار'
-]));
-
-// Call the schedule:run command
-$kernel->call('schedule:run');
-
-// Manually call the scheduled trip commands
-$kernel->call('trips:process-scheduled');
-$kernel->call('trips:activate-scheduled');
+$response->send();
+$kernel->terminate($request, $response);

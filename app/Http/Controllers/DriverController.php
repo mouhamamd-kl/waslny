@@ -12,6 +12,7 @@ use App\Http\Requests\DriverSearchRequest;
 use App\Http\Requests\DriverUpdateLocationRequest;
 use App\Http\Requests\SuspendAccountTemporarilyRequest;
 use App\Http\Requests\UpdateDriverProfileRequest;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\UploadedFile;
 use App\Http\Resources\DriverResource;
 use App\Models\Driver;
@@ -150,7 +151,8 @@ class DriverController extends Controller
 
     public function updateLocation(DriverUpdateLocationRequest $request)
     {
-        $location = $request->validated();
+        $validatedData = $request->validated();
+        $location = $validatedData['location'];
         /** @var Driver $driver */ // Add PHPDoc type hint
         $driver = auth('driver-api')->user();
         try {
@@ -159,7 +161,7 @@ class DriverController extends Controller
                     trans_fallback('messages.error.not_found', 'Driver not found')
                 );
             }
-            $driver->location = $location;
+            $driver->setLocation($location);
             return ApiResponse::sendResponseSuccess(
                 [],
                 trans_fallback('messages.driver.location_updated', 'Location updated successfully.')

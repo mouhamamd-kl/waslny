@@ -340,6 +340,11 @@ class Driver extends Authenticatable implements Wallet
             $this->save();
         }
     }
+    public function setLocation(Point $point)
+    {
+        $this->location = $point;
+        $this->save();
+    }
 
     public function recalculateRating(): void
     {

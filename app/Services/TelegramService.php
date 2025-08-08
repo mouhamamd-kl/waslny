@@ -4,9 +4,11 @@
 
 namespace App\Services;
 
+use App\Events\TestNotification;
 use App\Models\Admin;
 use App\Models\Driver;
 use App\Models\Rider;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
@@ -14,18 +16,33 @@ class TelegramService
 {
     public function handle($update)
     {
-        $message = $update->getMessage();
-        $chatId = $message->getChat()->getId();
-        $text = $message->getText();
+        Log::info('Telegram update received:', $update->all());
+        event(new TestNotification([
+            'قائد الطوفان' => 'القائد يحيى السنوار'
+        ]));
 
-        if ($text === '/start') {
-            $this->askForRole($chatId);
-            return;
+        if ($update->getMessage()) {
+            $from = $update->getMessage()->getFrom();
+            if ($from) {
+                $lang = $from->getLanguageCode();
+                App::setLocale($lang);
+            }
         }
 
-        if ($message->getContact()) {
-            $this->handleContact($message);
-            return;
+        if ($update->getMessage()) {
+            $message = $update->getMessage();
+            $chatId = $message->getChat()->getId();
+            $text = $message->getText();
+
+            if ($text === '/start') {
+                $this->askForRole($chatId);
+                return;
+            }
+
+            if ($message->getContact()) {
+                $this->handleContact($message);
+                return;
+            }
         }
 
         if (isset($update['callback_query'])) {
@@ -39,15 +56,15 @@ class TelegramService
         $keyboard = [
             'inline_keyboard' => [
                 [
-                    ['text' => 'I am a Driver', 'callback_data' => 'role_driver'],
-                    ['text' => 'I am a Rider', 'callback_data' => 'role_rider'],
+                    ['text' => trans('telegram.driver'), 'callback_data' => 'role_driver'],
+                    ['text' => trans('telegram.rider'), 'callback_data' => 'role_rider'],
                 ]
             ]
         ];
 
         Telegram::sendMessage([
             'chat_id' => $chatId,
-            'text' => 'Welcome! Please select your role:',
+            'text' => trans('telegram.welcome'),
             'reply_markup' => json_encode($keyboard)
         ]);
     }
@@ -73,7 +90,7 @@ class TelegramService
         $keyboard = [
             'keyboard' => [
                 [
-                    ['text' => 'Share My Phone Number', 'request_contact' => true]
+                    ['text' => trans('telegram.share_phone'), 'request_contact' => true]
                 ]
             ],
             'resize_keyboard' => true,
@@ -82,7 +99,7 @@ class TelegramService
 
         Telegram::sendMessage([
             'chat_id' => $chatId,
-            'text' => 'Please share your phone number to verify your account.',
+            'text' => trans('telegram.request_phone'),
             'reply_markup' => json_encode($keyboard)
         ]);
     }
@@ -91,6 +108,7 @@ class TelegramService
     {
         $chatId = $message->getChat()->getId();
         $phoneNumber = $message->getContact()->getPhoneNumber();
+        $phoneNumber =  str_replace("963", "0", $phoneNumber);
 
         // Retrieve the role from cache
         $role = cache('telegram_role_' . $chatId);
@@ -98,7 +116,7 @@ class TelegramService
         if (!$role) {
             Telegram::sendMessage([
                 'chat_id' => $chatId,
-                'text' => 'Session expired. Please start over by sending /start.'
+                'text' => trans('telegram.session_expired')
             ]);
             return;
         }
@@ -108,15 +126,21 @@ class TelegramService
         if ($user) {
             // Your existing OTP generation logic goes here
             $otp = $this->getOtpForUser($user);
-
-            Telegram::sendMessage([
-                'chat_id' => $chatId,
-                'text' => "Your OTP is: {$otp}"
-            ]);
+            if ($otp == '' || $otp == null) {
+                Telegram::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => trans('telegram.no_otp')
+                ]);
+            } else {
+                Telegram::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => trans('telegram.otp_message', ['otp' => $otp])
+                ]);
+            }
         } else {
             Telegram::sendMessage([
                 'chat_id' => $chatId,
-                'text' => 'Sorry, we could not find an account matching your phone number and role.'
+                'text' => trans('telegram.no_otp')
             ]);
         }
 

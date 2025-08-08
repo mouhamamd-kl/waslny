@@ -22,7 +22,7 @@ class TripCreated implements ShouldBroadcastNow
     {
         $this->trip = $trip;
         $this->tripChannel = BroadCastChannelEnum::TRIP->bind(
-            'trip', $trip->id
+            $trip->id
         );
     }
 
@@ -30,7 +30,7 @@ class TripCreated implements ShouldBroadcastNow
     {
         return new PrivateChannel(
             BroadCastChannelEnum::RIDER->bind(
-                'rider', $this->trip->rider_id
+                $this->trip->rider_id
             )
         );
     }

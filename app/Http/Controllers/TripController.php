@@ -220,9 +220,9 @@ class TripController extends Controller
     public function store(TripRequest $request)
     {
         try {
-
-            /** @var Rider $rider */ // Add PHPDoc type hint
+            /** @var Rider $rider */
             $rider = auth('rider-api')->user();
+
             if ($rider->trips()->whereHas('status', function ($query) {
                 $query->where('name', '!=', TripStatusEnum::Completed->value);
             })->exists()) {
@@ -231,71 +231,73 @@ class TripController extends Controller
                 );
             }
 
-            $trip = null;
-            DB::transaction(function () use ($request, &$trip, $rider) {
-                $data = $request->validated();
-                $tripType = TripTypeEnum::tryFrom($request->trip_type_id);
+            $data = $request->validated();
+            $tripType = TripTypeEnum::tryFrom($request->trip_type_id);
 
-                $tripData = [
-                    'rider_id' => $rider->id,
-                    'trip_type_id' => $request->trip_type_id,
-                    'trip_time_type_id' => $request->trip_time_type_id,
-                    'coupon_id' => $request->coupon_id,
-                    'requested_time' => now(),
-                    'payment_method_id' => $request->payment_method_id,
-                    'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching)->id,
-                    'search_started_at' => now(),
-                    'search_expires_at' => now()->addMinutes(5)
+            $tripData = [
+                'rider_id' => $rider->id,
+                'trip_type_id' => $request->trip_type_id,
+                'trip_time_type_id' => $request->trip_time_type_id,
+                'coupon_id' => $request->coupon_id,
+                'requested_time' => now(),
+                'payment_method_id' => $request->payment_method_id,
+                'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching)->id,
+                'search_started_at' => now(),
+                'search_expires_at' => now()->addMinutes(5)
+            ];
+
+            $trip = $this->trip_service->create($tripData);
+
+            $locations = $data['locations'];
+            $tripLocations = [];
+            $pickupLocation = null;
+
+            foreach ($locations as $key => $location) {
+                $locationType = $location['location_type'];
+                if ($tripType === TripTypeEnum::ROUND_TRIP && $locationType === LocationTypeEnum::DropOff->value) {
+                    $locationType = LocationTypeEnum::Stop->value;
+                }
+
+                $tripLocations[] = [
+                    'location' => Point::makeGeodetic($location['location']['coordinates'][0], $location['location']['coordinates'][1]),
+                    'location_order' => $location['location_order'],
+                    'location_type' => $locationType,
+                    'trip_id' => $trip->id,
                 ];
-                $trip = $this->trip_service->create($tripData);
 
-                $locations = $data['locations'];
-                $pickupLocation = null;
-
-                foreach ($locations as $key => $location) {
-                    if ($tripType === TripTypeEnum::ROUND_TRIP && $location['location_type'] === LocationTypeEnum::DropOff->value) {
-                        $locations[$key]['location_type'] = LocationTypeEnum::Stop->value;
-                    }
-                    $tripLocation = TripLocation::create([
-                        'location' => Point::makeGeodetic($location['location']['coordinates'][0], $location['location']['coordinates'][1]),
-                        'location_order' => $location['location_order'],
-                        'location_type' => $locations[$key]['location_type'],
-                        'trip_id' => $trip->id,
-                    ]);
-                    if ($location['location_type'] === LocationTypeEnum::Pickup->value) {
-                        $pickupLocation = $tripLocation;
-                    }
+                if ($location['location_type'] === LocationTypeEnum::Pickup->value) {
+                    $pickupLocation = $tripLocations[count($tripLocations) - 1];
                 }
+            }
 
-                if ($tripType === TripTypeEnum::ROUND_TRIP && $pickupLocation) {
-                    TripLocation::create([
-                        'location' => $pickupLocation->location,
-                        'location_order' => count($locations) + 1,
-                        'location_type' => LocationTypeEnum::DropOff->value,
-                        'trip_id' => $trip->id,
-                    ]);
-                }
-            });
+            if ($tripType === TripTypeEnum::ROUND_TRIP && $pickupLocation) {
+                $tripLocations[] = [
+                    'location' => $pickupLocation['location'],
+                    'location_order' => count($locations) + 1,
+                    'location_type' => LocationTypeEnum::DropOff->value,
+                    'trip_id' => $trip->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
 
-            // Dispatch the event after the transaction has been successfully committed
+            TripLocation::insert($tripLocations);
+
+            $trip = $this->trip_service->findTripById($trip->id);
             if ($trip) {
                 event(new TripCreated($trip));
-                return ApiResponse::sendResponseSuccess(
-                    [
-                        'trip' => new TripResource($trip),
-                        'channel' => 'trips.' . $trip->id
-                    ],
-                    trans_fallback('messages.trip.created', 'Trip Created successfully'),
-                    201
-                );
             }
-            return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'trip Creation Failed'));
+            return ApiResponse::sendResponseSuccess(
+                new TripResource($trip),
+                trans_fallback('messages.trip.created', 'Trip Created successfully'),
+                201
+            );
         } catch (Exception $e) {
-            throw $e;
-            return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'trip Creation Failed') . $e->getMessage());
+            // It's better to log the exception and return a generic error message
+            \Illuminate\Support\Facades\Log::error('Trip creation failed: ' . $e->getMessage());
+            return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'Trip Creation Failed'));
         }
     }
-
 
     /**
      * Display the specified resource.

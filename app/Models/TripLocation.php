@@ -109,6 +109,12 @@ class TripLocation extends Model
         return $this->location->distanceTo($location->location);
     }
 
+    public function setLocation(Point $point)
+    {
+        $this->location = $point;
+        $this->save();
+    }
+
     public function isPickup(): bool
     {
         return $this->location_type === 'pickup';

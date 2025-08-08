@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AdminResetPasswordRequest extends FormRequest
+class AdminResetPasswordRequest extends BaseRequest
 {
 
     /**

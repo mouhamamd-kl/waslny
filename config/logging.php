@@ -18,7 +18,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => env('VERCEL') ? 'stderr' : env('LOG_CHANNEL', 'stack'),
 
     /*
     |--------------------------------------------------------------------------

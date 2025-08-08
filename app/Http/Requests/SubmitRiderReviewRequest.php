@@ -2,16 +2,14 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class SubmitRiderReviewRequest extends FormRequest
+class SubmitRiderReviewRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
+    protected function handleAuthorization(): bool
     {
         return auth('rider-api')->check();
     }

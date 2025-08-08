@@ -50,7 +50,7 @@ class AccountSuspension extends Model
     public function scopeActive($query)
     {
         return $query->where(function ($q) {
-            $q->where('is_permanent', true)
+            $q->whereRaw('is_permanent = true')
                 ->orWhere('suspended_until', '>', now());
         })->whereNull('lifted_at');
     }

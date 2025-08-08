@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\TripCreated;
+use App\Listeners\StartDriverSearch;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(
+            TripCreated::class,
+            StartDriverSearch::class,
+        );
+
         $mainPath = database_path('migrations');
         $directories = glob($mainPath . '/domains/*/*', GLOB_ONLYDIR);
         $directories2 = glob($mainPath . '/domains/*/*/*', GLOB_ONLYDIR);

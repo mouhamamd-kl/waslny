@@ -8,6 +8,7 @@ use App\Traits\General\FilterScope;
 use App\Traits\General\ResetOTP;
 use App\Traits\General\Suspendable;
 use App\Traits\General\TwoFactorCode;
+use App\Traits\HasDeviceToken;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Exception;
@@ -37,7 +38,7 @@ class Rider  extends Authenticatable implements Wallet
     // Traits
     // =================
 
-    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken;
 
     // =================
     // Configuration

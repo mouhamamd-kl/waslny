@@ -2,6 +2,11 @@
     "version": 2,
     "framework": null,
     "functions": {
+        "api/schedule.php": {
+            "runtime": "vercel-php@0.7.3",
+            "memory": 1024,
+            "maxDuration": 300
+        },
         "api/index2.php": {
             "runtime": "vercel-php@0.7.3",
             "memory": 1024,
@@ -13,6 +18,11 @@
         {
             "src": "/api/driver-search",
             "dest": "/api/index2.php",
+            "methods": ["POST"]
+        },
+          {
+            "src": "/api/schedule",
+            "dest": "/api/schedule.php",
             "methods": ["POST"]
         },
         { "src": "/(.*\\.\\w+)$", "dest": "/public/$1" },
@@ -60,7 +70,7 @@
         "DB_PASSWORD": "SswRGLfMbr9Cfc5",
 
         "BROADCAST_CONNECTION": "pusher",
-        "QUEUE_CONNECTION": "database",
+        "QUEUE_CONNECTION": "redis",
 
         "CACHE_STORE": "database",
         "CACHE_PREFIX": "",
@@ -80,8 +90,7 @@
         "MAIL_FROM_ADDRESS": "mouhammadk44@gmail.com",
         "MAIL_FROM_NAME": "test",
 
-        "TELEGRAM_API_TOKEN": "AAHhBwAANUrvsM50I_x0QO3rhu3mTRGo1bPjEBgev9hD4A",
-        "TELEGRAM_BOT_TOKEN": "8021940964:AAFT9yoTuoXs-C4CS9C9BdBacQu9dJPSn00",
+        "TELEGRAM_BOT_TOKEN": "8404390559:AAEg_kOtrBmj5VnbBYA2GAi875vbtWZrk44",
 
         "FILESYSTEM_DISK": "supabase",
         "AWS_ACCESS_KEY_ID": "9cec04e49e90ee5501478e710b383dd6",
@@ -104,6 +113,7 @@
 
         "DRIVER_SEARCH_URL": "https://waslny-self.vercel.app/api/api/test-htpp",
         "DRIVER_SEARCH_SECRET": "base64:A+m6qeo+ZUuB0umZYlbysicjn1iswH0w+/qyZU+KC6o=",
-        "CRON_SECRET": "a3f8b2c1d5e7a9b4c8d6f2a1b5e9c3d8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2"
+        "CRON_SECRET": "a3f8b2c1d5e7a9b4c8d6f2a1b5e9c3d8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2",
+        "FIREBASE_CREDENTIALS":"./firebase_credentials.json"
     }
 }
