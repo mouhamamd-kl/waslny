@@ -29,3 +29,4 @@ yarn-error.log
 backend_api_test.json
 backend_api_test_with_example.json
 example_for_request.json
+firebase_credentials.json
