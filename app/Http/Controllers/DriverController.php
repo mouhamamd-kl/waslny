@@ -16,6 +16,8 @@ use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\UploadedFile;
 use App\Http\Resources\DriverResource;
 use App\Models\Driver;
+use App\Events\DriverLocationUpdatedForDashboard;
+use App\Events\TripDriverLocationUpdated;
 use App\Models\DriverStatus;
 use App\Services\DriverService;
 use Exception;
@@ -162,6 +164,10 @@ class DriverController extends Controller
                 );
             }
             $driver->setLocation($location);
+
+            event(new DriverLocationUpdatedForDashboard($driver->id, $location));
+
+
             return ApiResponse::sendResponseSuccess(
                 [],
                 trans_fallback('messages.driver.location_updated', 'Location updated successfully.')
