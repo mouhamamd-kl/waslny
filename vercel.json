@@ -2,6 +2,11 @@
     "version": 2,
     "framework": null,
     "functions": {
+        "api/worker.php": {
+            "runtime": "vercel-php@0.7.3",
+            "memory": 1024,
+            "maxDuration": 300
+        },
         "api/schedule.php": {
             "runtime": "vercel-php@0.7.3",
             "memory": 1024,
@@ -20,7 +25,12 @@
             "dest": "/api/index2.php",
             "methods": ["POST"]
         },
-          {
+        {
+            "src": "/api/worker",
+            "dest": "/api/worker.php",
+            "methods": ["POST"]
+        },
+        {
             "src": "/api/schedule",
             "dest": "/api/schedule.php",
             "methods": ["POST"]
@@ -72,7 +82,7 @@
         "BROADCAST_CONNECTION": "pusher",
         "QUEUE_CONNECTION": "redis",
 
-        "CACHE_STORE": "database",
+        "CACHE_STORE": "redis",
         "CACHE_PREFIX": "",
 
         "MEMCACHED_HOST": "127.0.0.1",
