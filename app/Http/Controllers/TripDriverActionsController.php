@@ -74,7 +74,7 @@ class TripDriverActionsController extends Controller
                 'location' => 'required',
             ]);
 
-            event(new DriverLocationUpdated($trip->id, $location));
+            event(new DriverLocationUpdated($trip->id, $trip->driver_id, $location));
 
             return ApiResponse::sendResponseSuccess([], 'Location updated successfully.', 200);
         } catch (Exception $e) {
