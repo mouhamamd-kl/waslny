@@ -27,11 +27,22 @@ use App\Notifications\TestFirebaseNotification;
 
 
 Route::get('/test-queued-job', function () {
-    for ($i = 0; $i < 10; $i++) {
-        event(new TestQueuedNotification('This is a test queued job.'));
+    for ($i = 0; $i < 20; $i++) {
+        event(new TestQueuedNotification('This is a test queued job.'.now()));
     }
 });
 
+Route::get('/test-notfication', function () {
+    event(new TestNotification([
+        'قائد الطوفان' => 'القائد يحيى السنوار'
+    ]));
+});
+
+Route::get('/test-worker', function () {
+    $command = 'php ' . realpath(__DIR__ . '/../artisan') . ' queue:work';
+    passthru($command);
+    return "hello";
+});
 
 Route::get('/test-firebase/{type}/{id}', function ($type, $id) {
     if ($type === 'driver') {
@@ -354,6 +365,8 @@ require __DIR__ . '/api/vehicles/PricingRoute.php';
 require __DIR__ . '/api/admin/suspensions.php';
 
 require __DIR__ . '/api/trip/TripDriverActionsRoute.php';
+
+require __DIR__ . '/api/dashboard.php';
 
 Route::get('/test-log', function () {
     Log::info('This is a test log message from Laravel.');
