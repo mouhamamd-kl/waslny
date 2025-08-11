@@ -11,17 +11,37 @@ use Illuminate\Support\Facades\Broadcast;
 //     return (int) $user->id === (int) $id;
 // });
 
+// Broadcast::channel(BroadCastChannelEnum::RIDER->pattern(), function (Rider $rider, $riderId) {
+//     return (int) $rider->id === (int) $riderId && $rider->isSuspended() === false;
+// }, ['guards' => ['rider-api']]);
+
+// Broadcast::channel(BroadCastChannelEnum::DRIVER->pattern(), function (Driver $driver, $driverId) {
+//     return  (int) $driver->id === (int) $driverId && $driver->isSuspended() === false;
+// }, ['guards' => ['driver-api']]);
+
+// Broadcast::channel(BroadCastChannelEnum::DRIVERS_ONLINE->pattern(), function (Driver $driver) {
+//     return $driver->id;
+// }, ['guards' => ['driver-api']]);
+
+// Broadcast::channel(BroadCastChannelEnum::TRIP->pattern(), function ($user, $tripId) {
+//     return Trip::where('id', $tripId)
+//         ->where(function ($query) use ($user) {
+//             $query->where('user_id', $user->id)
+//                 ->orWhere('driver_id', $user->id);
+//         })->exists();
+// }, ['guards' => ['rider-api', 'driver-api']]);
+
 Broadcast::channel(BroadCastChannelEnum::RIDER->pattern(), function (Rider $rider, $riderId) {
     return (int) $rider->id === (int) $riderId && $rider->isSuspended() === false;
-}, ['guards' => ['rider-api']]);
+});
 
 Broadcast::channel(BroadCastChannelEnum::DRIVER->pattern(), function (Driver $driver, $driverId) {
     return  (int) $driver->id === (int) $driverId && $driver->isSuspended() === false;
-}, ['guards' => ['driver-api']]);
+});
 
 Broadcast::channel(BroadCastChannelEnum::DRIVERS_ONLINE->pattern(), function (Driver $driver) {
     return $driver->id;
-}, ['guards' => ['driver-api']]);
+});
 
 Broadcast::channel(BroadCastChannelEnum::TRIP->pattern(), function ($user, $tripId) {
     return Trip::where('id', $tripId)
@@ -29,4 +49,4 @@ Broadcast::channel(BroadCastChannelEnum::TRIP->pattern(), function ($user, $trip
             $query->where('user_id', $user->id)
                 ->orWhere('driver_id', $user->id);
         })->exists();
-}, ['guards' => ['rider-api', 'driver-api']]);
+});

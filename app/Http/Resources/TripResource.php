@@ -40,10 +40,11 @@ class TripResource extends JsonResource
             'time_type' => $this->when($this->timeType()->exists(), function () {
                 return  new TripTimeTypeResource($this->whenLoaded('timeType'));
             }, null),
+            'locations'=>  TripLocationResource::collection($this->whenLoaded('locations')),
             // 'location' => new TripLocationResource($this->whenLoaded('locations')),
-            'locations' => $this->when($this->locations()->exists(), function () {
-                return TripLocationResource::collection($this->whenLoaded('locations'));
-            }, []),
+            // 'locations' => $this->when($this->locations()->exists(), function () {
+            //     return TripLocationResource::collection($this->whenLoaded('locations'));
+            // }, []),
             // 'coupon' => $this->whenLoaded('coupon'),
             'coupon' => $this->when($this->riderCoupon()->exists(), function () {
                 return   new CouponResource($this->whenLoaded('riderCoupon')->coupon());
