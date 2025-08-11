@@ -28,21 +28,26 @@ use App\Notifications\TestFirebaseNotification;
 
 Route::get('/test-queued-job', function () {
     for ($i = 0; $i < 20; $i++) {
-        event(new TestQueuedNotification('This is a test queued job.'.now()));
+        event(new TestQueuedNotification('This is a test queued job.' . now()));
     }
-});
+})->name('no-export');
 
 Route::get('/test-notfication', function () {
     event(new TestNotification([
         'قائد الطوفان' => 'القائد يحيى السنوار'
     ]));
-});
+})->name('no-export');
+
+
+Route::post('/test', function () {
+    return "hello";
+})->name('no-export');
 
 Route::get('/test-worker', function () {
     $command = 'php ' . realpath(__DIR__ . '/../artisan') . ' queue:work';
     passthru($command);
     return "hello";
-});
+})->name('no-export');
 
 Route::get('/test-firebase/{type}/{id}', function ($type, $id) {
     if ($type === 'driver') {

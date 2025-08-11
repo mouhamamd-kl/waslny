@@ -63,8 +63,13 @@ class TripRequest extends BaseRequest
             ],
 
 
+            // Old validation rules for locations
             'locations' => ['array', 'min:2', 'required', 'filled'],
             'locations' => [new TripLocationTypesRule],
+
+            // Combined and corrected validation rules for locations
+            // 'locations' => ['required', 'array', 'min:2', 'filled', new TripLocationTypesRule],
+
             'locations.*' => [
                 new JsonValidatorRule(['location', 'location_order', 'location_type']),
                 new TripLocationOrderRule,

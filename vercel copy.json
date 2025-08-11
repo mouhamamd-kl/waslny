@@ -65,9 +65,9 @@
 
         "MEMCACHED_HOST": "127.0.0.1",
 
-        "REDIS_HOST": "tls://gusc1-direct-stinkbug-31708.upstash.io",
-        "REDIS_PORT": "31708",
-        "REDIS_PASSWORD": "0b009fecf109404aa1f47ab52d432614",
+        "REDIS_HOST": "tls://uncommon-marlin-27897.upstash.io",
+        "REDIS_PORT": "6379",
+        "REDIS_PASSWORD": "AWz5AAIjcDE0Y2I4MmI4ODdjNzU0MWI3YWRmNzNiMzUwOGI2NGU0ZnAxMA",
 
         "MAIL_MAILER": "smtp",
         "MAIL_HOST": "smtp.gmail.com",

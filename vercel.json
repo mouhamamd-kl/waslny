@@ -87,9 +87,9 @@
 
         "MEMCACHED_HOST": "127.0.0.1",
 
-        "REDIS_HOST": "tls://gusc1-direct-stinkbug-31708.upstash.io",
-        "REDIS_PORT": "31708",
-        "REDIS_PASSWORD": "0b009fecf109404aa1f47ab52d432614",
+        "REDIS_HOST": "tls://uncommon-marlin-27897.upstash.io",
+        "REDIS_PORT": "6379",
+        "REDIS_PASSWORD": "AWz5AAIjcDE0Y2I4MmI4ODdjNzU0MWI3YWRmNzNiMzUwOGI2NGU0ZnAxMA",
 
         "MAIL_MAILER": "smtp",
         "MAIL_HOST": "smtp.gmail.com",
@@ -124,6 +124,6 @@
         "DRIVER_SEARCH_URL": "https://waslny-self.vercel.app/api/api/test-htpp",
         "DRIVER_SEARCH_SECRET": "base64:A+m6qeo+ZUuB0umZYlbysicjn1iswH0w+/qyZU+KC6o=",
         "CRON_SECRET": "a3f8b2c1d5e7a9b4c8d6f2a1b5e9c3d8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2",
-        "FIREBASE_CREDENTIALS":"./firebase_credentials.json"
+        "FIREBASE_CREDENTIALS": "./firebase_credentials.json"
     }
 }

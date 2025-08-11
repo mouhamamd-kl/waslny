@@ -28,7 +28,10 @@ Route::middleware(['auth:admin-api'])
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/search', 'search')->name('search');
-        Route::post('/{driver}/suspendForever', 'suspendForever')->name('suspend');
-        Route::post('/{driver}/suspendTemporarily', 'suspendTemporarily')->name('suspend');
+        // Correct way to prefix route names
+        Route::name('suspend.')->group(function () {
+            Route::post('/{driver}/suspendForever', 'suspendForever')->name('forever'); // Full name: suspend.forever
+            Route::post('/{driver}/suspendTemporarily', 'suspendTemporarily')->name('temporarily'); // Full name: suspend.temporarily
+        });
         Route::post('/{driver}/reinstate', 'reinstate')->name('reinstate');
     });

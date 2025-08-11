@@ -42,8 +42,8 @@ class TripResource extends JsonResource
             }, null),
             // 'location' => new TripLocationResource($this->whenLoaded('locations')),
             'locations' => $this->when($this->locations()->exists(), function () {
-                return   new TripLocationResource($this->whenLoaded('locations'));
-            }, null),
+                return TripLocationResource::collection($this->whenLoaded('locations'));
+            }, []),
             // 'coupon' => $this->whenLoaded('coupon'),
             'coupon' => $this->when($this->riderCoupon()->exists(), function () {
                 return   new CouponResource($this->whenLoaded('riderCoupon')->coupon());
