@@ -152,7 +152,7 @@ class MyExportPostmanTest extends Command
                 }
 
                 if ($routeGuard && !empty($bearerTokens[$routeGuard])) {
-                    $auth['value'] = $bearerTokens[$routeGuard];
+                    $auth = ['value' => $bearerTokens[$routeGuard]];
                 }
 
                 $request = $this->makeItem($route, $method, $routeHeaders, $auth);
@@ -259,6 +259,21 @@ class MyExportPostmanTest extends Command
                     if (class_exists($controller) && method_exists($controller, $methodName)) {
                         $reflection = new ReflectionMethod($controller, $methodName);
                         $parameters = $reflection->getParameters();
+
+                        $queryParams = $this->extractInputsFromMethodBody($reflection);
+                        if (!empty($queryParams)) {
+                            $requestData['request']['url']['query'] = $queryParams;
+                            // Also update the raw URL
+                            $rawQueryParams = [];
+                            foreach ($queryParams as $param) {
+                                $rawQueryParams[$param['key']] = $param['value'];
+                            }
+                            $queryString = http_build_query($rawQueryParams);
+                            if (!empty($queryString)) {
+                                $requestData['request']['url']['raw'] .= '?' . $queryString;
+                            }
+                        }
+
                         foreach ($parameters as $parameter) {
                             $type = $parameter->getType();
                             if ($type && !$type->isBuiltin()) {
@@ -354,6 +369,94 @@ class MyExportPostmanTest extends Command
         }
 
         return $requestData;
+    }
+
+    function extractInputsFromMethodBody(\ReflectionMethod $reflectionMethod): array
+    {
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
+        $nodeFinder = new NodeFinder();
+
+        try {
+            $ast = $parser->parse(file_get_contents($reflectionMethod->getFileName()));
+            $classNode = $nodeFinder->findFirstInstanceOf($ast, \PhpParser\Node\Stmt\Class_::class);
+            if (!$classNode) return [];
+
+            $methodNode = $nodeFinder->findFirst($classNode->stmts, function ($node) use ($reflectionMethod) {
+                return $node instanceof ClassMethod
+                    && $node->name->toString() === $reflectionMethod->getName();
+            });
+
+            if (!$methodNode || !$methodNode->stmts) return [];
+
+            $inputs = [];
+            $nodeFinder->find($methodNode->stmts, function ($node) use (&$inputs) {
+                if (
+                    $node instanceof \PhpParser\Node\Expr\MethodCall &&
+                    $node->var instanceof \PhpParser\Node\Expr\Variable &&
+                    $node->var->name === 'request' &&
+                    $node->name->toString() === 'input' &&
+                    isset($node->args[0])
+                ) {
+                    $keyNode = $node->args[0]->value;
+                    if ($keyNode instanceof \PhpParser\Node\Scalar\String_) {
+                        $key = $keyNode->value;
+                        $value = '';
+                        $description = 'No default value';
+
+                        if (isset($node->args[1])) {
+                            $value = $this->nodeToValue($node->args[1]->value);
+                            $description = 'Default: ' . (is_array($value) ? json_encode($value) : $value);
+                        }
+
+                        $inputs[] = [
+                            'key' => $key,
+                            'value' => (string)$value,
+                            'description' => $description,
+                        ];
+                    }
+                }
+            });
+
+            return $inputs;
+        } catch (\Throwable $e) {
+            // Log or handle error if parsing fails
+            return [];
+        }
+    }
+
+    private function nodeToValue(\PhpParser\Node\Expr $node)
+    {
+        if ($node instanceof \PhpParser\Node\Scalar\String_) {
+            return $node->value;
+        }
+        if ($node instanceof \PhpParser\Node\Scalar\LNumber) {
+            return $node->value;
+        }
+        if ($node instanceof \PhpParser\Node\Scalar\DNumber) {
+            return $node->value;
+        }
+        if ($node instanceof \PhpParser\Node\Expr\ConstFetch) {
+            $name = $node->name->toLowerString();
+            if ($name === 'true') return true;
+            if ($name === 'false') return false;
+            if ($name === 'null') return null;
+        }
+        if ($node instanceof \PhpParser\Node\Expr\Array_) {
+            $arr = [];
+            foreach ($node->items as $item) {
+                if ($item && $item->value) {
+                    if ($item->key) {
+                        $arr[$this->nodeToValue($item->key)] = $this->nodeToValue($item->value);
+                    } else {
+                        $arr[] = $this->nodeToValue($item->value);
+                    }
+                }
+            }
+            return $arr;
+        }
+        // For other complex expressions, return a placeholder string
+        $printer = new \PhpParser\PrettyPrinter\Standard();
+        return $printer->prettyPrintExpr($node);
     }
 
     function getRulesFunctionReturn(string $className): string
