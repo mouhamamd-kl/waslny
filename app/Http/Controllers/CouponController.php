@@ -27,7 +27,7 @@ class CouponController extends Controller
         try {
             $coupons = $this->couponService->searchCoupons(
                 $request->input('filters', []),
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
             return ApiResponse::sendResponsePaginated(
                 $coupons,

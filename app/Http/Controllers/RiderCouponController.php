@@ -26,7 +26,7 @@ class RiderCouponController extends Controller
         try {
             $favouriteProperties = $this->RiderCouponService->searchRiderCoupons(
                 $request->input('filters', ['rider_id' => auth('sanctum')->user()->id]),
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
 
             return ApiResponse::sendResponsePaginated($favouriteProperties, RiderCouponResource::class, 'Favourites retrieved successfully');

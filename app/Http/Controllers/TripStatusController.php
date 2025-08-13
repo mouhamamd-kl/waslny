@@ -27,7 +27,7 @@ class TripStatusController extends Controller
         try {
             $trip_statuses = $this->tripStatusService->searchTripStatus(
                 $request->input('filters', []),
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
             return ApiResponse::sendResponsePaginated(
                 $trip_statuses,

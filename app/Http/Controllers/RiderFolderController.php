@@ -28,7 +28,7 @@ class RiderFolderController extends Controller
             $filters['rider_id'] = auth('rider-api')->user()->id;
             $rider_folders = $this->riderFolderService->searchRiderFolders(
                 $filters,
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
             return ApiResponse::sendResponsePaginated(
                 $rider_folders,
