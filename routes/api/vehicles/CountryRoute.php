@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:admin-api'])->controller(CountryController::class)
     ->prefix('car-manufacturers-countries')
-    ->name('car-manufacturers-countries.') // Optional name prefix
+    // ->name('car-manufacturers-countries.') // Optional name prefix
+    ->name('admin.car-manufacturers-countries.')
     ->group(function () {
         // Top-level routes
         Route::get('/', 'index')->name('index');

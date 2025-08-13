@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\CarManufacturerRequest;
-use App\Http\Requests\CarManufacturerSearchRequest;
+use App\Http\Requests\CarManufacturer\CarManufacturerRequest;
+use App\Http\Requests\CarManufacturer\CarManufacturerAdminSearchRequest;
+use App\Http\Requests\CarManufacturer\CarManufacturerDriverSearchRequest;
+use App\Http\Requests\CarManufacturer\CarManufacturerSearchRequest;
 use App\Http\Resources\CarManufacturerResource;
 use App\Models\CarManufacturer;
 use App\Services\CarManufactureService;
@@ -46,16 +48,67 @@ class CarManufacturerController extends Controller
         }
     }
 
+    // /**
+    //  * Display a listing of the resource.
+    //  */
+    // public function search(CarManufacturerSearchRequest $request)
+    // {
+    //     try {
+    //         $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+    //         if (!auth('admin-api')) {
+    //             $filters['is_active'] = true;
+    //         }
+    //         $car_manufactures = $this->carManufactureService->searchCarManufacture(
+    //             filters: $filters,
+    //             perPage: $request->input('per_page', 10),
+    //         );
+
+    //         return ApiResponse::sendResponsePaginated(
+    //             $car_manufactures,
+    //             CarManufacturerResource::class, // Add your resource class
+    //             trans_fallback('messages.car_manufacture.list', 'Car Manufacture retrieved successfully'),
+    //         );
+    //     } catch (Exception $e) {
+    //         return ApiResponse::sendResponseError(
+    //             'Search failed: ' . $e->getMessage(),
+    //             500
+    //         );
+    //     }
+    // }
+
     /**
      * Display a listing of the resource.
      */
-    public function search(CarManufacturerSearchRequest $request)
+    public function adminSearch(CarManufacturerAdminSearchRequest $request)
     {
         try {
             $filters = array_filter($request->validated(), fn($value) => !is_null($value));
-            if (!auth('admin-api')) {
-                $filters['is_active'] = true;
-            }
+            $car_manufactures = $this->carManufactureService->searchCarManufacture(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
+
+            return ApiResponse::sendResponsePaginated(
+                $car_manufactures,
+                CarManufacturerResource::class, // Add your resource class
+                trans_fallback('messages.car_manufacture.list', 'Car Manufacture retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function driverSearch(CarManufacturerDriverSearchRequest $request)
+    {
+        try {
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+            $filters['is_active'] = true;
             $car_manufactures = $this->carManufactureService->searchCarManufacture(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),

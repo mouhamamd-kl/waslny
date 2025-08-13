@@ -18,7 +18,8 @@ Route::controller(PaymentMethodController::class)
 // Admin-protected routes
 Route::middleware(['auth:admin-api'])->controller(PaymentMethodController::class)
     ->prefix('payment-methods')
-    ->name('payment-method.')
+    // ->name('payment-method.')
+    ->name('admin.payment-method.')
     ->group(function () {
         Route::post('/', 'store')->name('store');
 

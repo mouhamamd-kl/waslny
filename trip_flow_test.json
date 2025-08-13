@@ -1,0 +1,431 @@
+[
+    {
+        "id": "a1b2c3d4.e5f6g7",
+        "type": "tab",
+        "label": "Trip Flow Test",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "b2c3d4e5.f6g7h8",
+        "type": "http in",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Rider Request Trip",
+        "url": "/rider/request_trip",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "c3d4e5f6.g7h8i9"
+            ]
+        ]
+    },
+    {
+        "id": "c3d4e5f6.g7h8i9",
+        "type": "function",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Prepare Trip Request",
+        "func": "msg.payload = {\n    \"trip_type_id\": \"8\",\n    \"trip_time_type_id\": \"2\",\n    \"coupon_id\": null,\n    \"payment_method_id\": \"1\",\n    \"locations\": [\n        {\n            \"location\": {\n                \"type\": \"Point\",\n                \"coordinates\": [\n                    31.504291,\n                    34.464199\n                ]\n            },\n            \"location_order\": 1,\n            \"location_type\": \"pickup\"\n        },\n        {\n            \"location\": {\n                \"type\": \"Point\",\n                \"coordinates\": [\n                   31.776225, 35.235877\n                ]\n            },\n            \"location_order\": 2,\n            \"location_type\": \"dropoff\"\n        }\n    ]\n\n};\nmsg.headers = {\n    'Authorization': 'Bearer 5|G2iYGjRFFJOitTeRJQGALxZmX4g2CIaKi47v3czX722082f7'\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 350,
+        "y": 100,
+        "wires": [
+            [
+                "d4e5f6g7.h8i9j0"
+            ]
+        ]
+    },
+    {
+        "id": "d4e5f6g7.h8i9j0",
+        "type": "http request",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Send Trip Request",
+        "method": "POST",
+        "ret": "json",
+        "paytoqs": false,
+        "url": "http://localhost/api/trips/rider/request",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "bearer",
+        "x": 550,
+        "y": 100,
+        "wires": [
+            [
+                "e5f6g7h8.i9j0k1"
+            ]
+        ]
+    },
+    {
+        "id": "e5f6g7h8.i9j0k1",
+        "type": "debug",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Trip Request Response",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 770,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "f6g7h8i9.j0k1l2",
+        "type": "pusher in",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Rider Events",
+        "channel": "private-trip.{trip_id}",
+        "event": "",
+        "pusherConfig": "g7h8i9j0.k1l2m3",
+        "x": 150,
+        "y": 200,
+        "wires": [
+            [
+                "h8i9j0k1.l2m3n4"
+            ]
+        ]
+    },
+    {
+        "id": "h8i9j0k1.l2m3n4",
+        "type": "debug",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Rider Event Data",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 350,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "i9j0k1l2.m3n4o5",
+        "type": "pusher in",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Driver Events",
+        "channel": "private-driver.{driver_id}",
+        "event": "TripAvailableForDriver",
+        "pusherConfig": "g7h8i9j0.k1l2m3",
+        "x": 150,
+        "y": 300,
+        "wires": [
+            [
+                "j0k1l2m3.n4o5p6"
+            ]
+        ]
+    },
+    {
+        "id": "j0k1l2m3.n4o5p6",
+        "type": "function",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Extract Trip ID",
+        "func": "msg.trip_id = msg.payload.trip.id;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 350,
+        "y": 300,
+        "wires": [
+            [
+                "k1l2m3n4.o5p6q7"
+            ]
+        ]
+    },
+    {
+        "id": "k1l2m3n4.o5p6q7",
+        "type": "debug",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "TripAvailableForDriver",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 550,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "l2m3n4o5.p6q7r8",
+        "type": "inject",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Accept Trip",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 400,
+        "wires": [
+            [
+                "m3n4o5p6.q7r8s9"
+            ]
+        ]
+    },
+    {
+        "id": "m3n4o5p6.q7r8s9",
+        "type": "http request",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Accept Trip",
+        "method": "POST",
+        "ret": "json",
+        "paytoqs": false,
+        "url": "http://localhost/api/trips/{{trip_id}}/accept",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "bearer",
+        "headers": [
+            {
+                "key": "Authorization",
+                "value": "Bearer 6|ncv7UviJnMP1OViURIlgDNUAyWkc70kJWqibOrTac137c2fd"
+            }
+        ],
+        "x": 350,
+        "y": 400,
+        "wires": [
+            [
+                "n4o5p6q7.r8s9t0"
+            ]
+        ]
+    },
+    {
+        "id": "n4o5p6q7.r8s9t0",
+        "type": "debug",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Accept Trip Response",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 550,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "o5p6q7r8.s9t0u1",
+        "type": "inject",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Arrive at Pickup",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 460,
+        "wires": [
+            [
+                "p6q7r8s9.t0u1v2"
+            ]
+        ]
+    },
+    {
+        "id": "p6q7r8s9.t0u1v2",
+        "type": "http request",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Arrive",
+        "method": "POST",
+        "ret": "json",
+        "paytoqs": false,
+        "url": "http://localhost/api/trips/{{trip_id}}/arrive",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "bearer",
+        "headers": [
+            {
+                "key": "Authorization",
+                "value": "Bearer 6|ncv7UviJnMP1OViURIlgDNUAyWkc70kJWqibOrTac137c2fd"
+            }
+        ],
+        "x": 350,
+        "y": 460,
+        "wires": [
+            [
+                "q7r8s9t0.u1v2w3"
+            ]
+        ]
+    },
+    {
+        "id": "q7r8s9t0.u1v2w3",
+        "type": "debug",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Arrive Response",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 550,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "r8s9t0u1.v2w3x4",
+        "type": "inject",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Start Trip",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 520,
+        "wires": [
+            [
+                "s9t0u1v2.w3x4y5"
+            ]
+        ]
+    },
+    {
+        "id": "s9t0u1v2.w3x4y5",
+        "type": "http request",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Start",
+        "method": "POST",
+        "ret": "json",
+        "paytoqs": false,
+        "url": "http://localhost/api/trips/{{trip_id}}/start",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "bearer",
+        "headers": [
+            {
+                "key": "Authorization",
+                "value": "Bearer 6|ncv7UviJnMP1OViURIlgDNUAyWkc70kJWqibOrTac137c2fd"
+            }
+        ],
+        "x": 350,
+        "y": 520,
+        "wires": [
+            [
+                "t0u1v2w3.x4y5z6"
+            ]
+        ]
+    },
+    {
+        "id": "t0u1v2w3.x4y5z6",
+        "type": "debug",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Start Response",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 550,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "u1v2w3x4.y5z6a7",
+        "type": "inject",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Complete Trip",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 580,
+        "wires": [
+            [
+                "v2w3x4y5.z6a7b8"
+            ]
+        ]
+    },
+    {
+        "id": "v2w3x4y5.z6a7b8",
+        "type": "http request",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Complete",
+        "method": "POST",
+        "ret": "json",
+        "paytoqs": false,
+        "url": "http://localhost/api/trips/{{trip_id}}/complete",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "bearer",
+        "headers": [
+            {
+                "key": "Authorization",
+                "value": "Bearer 6|ncv7UviJnMP1OViURIlgDNUAyWkc70kJWqibOrTac137c2fd"
+            }
+        ],
+        "x": 350,
+        "y": 580,
+        "wires": [
+            [
+                "w3x4y5z6.a7b8c9"
+            ]
+        ]
+    },
+    {
+        "id": "w3x4y5z6.a7b8c9",
+        "type": "debug",
+        "z": "a1b2c3d4.e5f6g7",
+        "name": "Complete Response",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 550,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "g7h8i9j0.k1l2m3",
+        "type": "pusher-config",
+        "name": "Pusher Dev",
+        "appKey": "f521d53f124667c40c3c",
+        "appCluster": "us2"
+    }
+]

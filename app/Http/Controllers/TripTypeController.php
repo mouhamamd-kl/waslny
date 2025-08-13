@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\TripTypeRequest;
-use App\Http\Requests\TripTypeSearchRequest;
+use App\Http\Requests\TripType\StoreTripTypeRequest;
+use App\Http\Requests\TripType\TripTypeAdminSearchRequest;
+use App\Http\Requests\TripType\UpdateTripTypeRequest;
+use App\Http\Requests\TripType\TripTypeRiderSearchRequest;
 use App\Http\Resources\TripTypeResource;
 use App\Models\TripType;
 use App\Services\TripTypeService;
@@ -19,10 +21,11 @@ class TripTypeController extends Controller
     {
         $this->tripTypeService = $tripTypeService;
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function adminIndex(Request $request)
     {
         try {
             $trip_types = $this->tripTypeService->searchTripType(
@@ -41,13 +44,87 @@ class TripTypeController extends Controller
         }
     }
 
+
     /**
      * Display a listing of the resource.
      */
-    public function search(TripTypeSearchRequest $request)
+    public function riderIndex(Request $request)
     {
         try {
-            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
+            $trip_types = $this->tripTypeService->searchTripType(
+                $request->input('filters', ['is_active' => true]),
+                $request->input('perPage', 5)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $trip_types,
+                TripTypeResource::class,
+                trans_fallback('messages.trip_type.list', 'Trip Types retrieved successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
+
+    // /**
+    //  * Display a listing of the resource.
+    //  */
+    // public function search(TripTypeAdminSearchRequest $request)
+    // {
+    //     try {
+    //         $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+    //         $trip_types = $this->tripTypeService->searchTripType(
+    //             filters: $filters,
+    //             perPage: $request->input('per_page', 10),
+    //         );
+
+    //         return ApiResponse::sendResponsePaginated(
+    //             $trip_types,
+    //             TripTypeResource::class, // Add your resource class
+    //             trans_fallback('messages.trip_type.list', 'Trip Types retrieved successfully'),
+    //         );
+    //     } catch (Exception $e) {
+    //         return ApiResponse::sendResponseError(
+    //             'Search failed: ' . $e->getMessage(),
+    //             500
+    //         );
+    //     }
+    // }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function adminSearch(TripTypeAdminSearchRequest $request)
+    {
+        try {
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+            $trip_types = $this->tripTypeService->searchTripType(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
+
+            return ApiResponse::sendResponsePaginated(
+                $trip_types,
+                TripTypeResource::class, // Add your resource class
+                trans_fallback('messages.trip_type.list', 'Trip Types retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function riderSearch(TripTypeRiderSearchRequest $request)
+    {
+        try {
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+            $filters['is_active'] = true;
             $trip_types = $this->tripTypeService->searchTripType(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -69,7 +146,7 @@ class TripTypeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(TripTypeRequest $request)
+    public function store(StoreTripTypeRequest $request)
     {
         try {
             $data = $request->validate();
@@ -105,10 +182,11 @@ class TripTypeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TripTypeRequest $request, string $id)
+    public function update(UpdateTripTypeRequest $request, string $id)
     {
         try {
-            $trip_type = $this->tripTypeService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $trip_type = $this->tripTypeService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new TripTypeResource($trip_type),
                 trans_fallback('messages.trip_type.updated', 'trip_type updated successfully')

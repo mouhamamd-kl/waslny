@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\CouponRequest;
-use App\Http\Requests\CouponSearchRequest;
+use App\Http\Requests\Coupon\CouponRequest;
+use App\Http\Requests\Coupon\CouponSearchRequest;
 use App\Http\Resources\CouponResource;
 use App\Models\Coupon;
 use App\Services\CouponService;

@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:admin-api'])->controller(PricingController::class)
     ->prefix('service-level/pricings')
-    ->name('service-level.pricing.') // Optional name prefix
+    // ->name('service-level.pricing.') // Optional name prefix
+    ->name('admin.service-level.pricing.')
     ->group(function () {
         // Top-level routes
         Route::get('/', 'index')->name('index');

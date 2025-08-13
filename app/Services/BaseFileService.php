@@ -137,6 +137,9 @@ class BaseFileService
         if (!array_key_exists($this->disk, config('filesystems.disks'))) {
             throw new \RuntimeException("Disk [$this->disk] not configured");
         }
+        $filePath = str_replace('\\', '/', $filePath);
+        $filePath = str_replace('//', '/', $filePath);
+
         /** @var storage $storage */
 
         $storage = Storage::disk($this->disk);

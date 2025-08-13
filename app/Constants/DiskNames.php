@@ -51,7 +51,7 @@ enum DiskNames: string
     {
         $result = in_array($name, self::names(), true);
         if ($result == false) {
-            throw new Exception('the disk name' . $name . 'is not valid');
+            throw new Exception('the disk name ' . $name . ' is not valid');
         }
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AdminLoginRequest;
+use App\Http\Requests\Admin\Auth\AdminLoginRequest;
 use App\Models\Admin;
 use App\Notifications\Admin\AdminTwoFactorCode;
 use Exception;

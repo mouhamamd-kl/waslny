@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:admin-api'])->controller(TripStatusController::class)
     ->prefix('trip-statuses')
-    ->name('trip-status.')
+    // ->name('trip-status.')
+    ->name('admin.trip-status.')
     ->group(function () {
         // Top-level routes
         Route::get('/', 'index')->name('index');

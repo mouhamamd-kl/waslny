@@ -16,34 +16,39 @@ use Illuminate\Support\Facades\Route;
 
 Route::controller(TripController::class)
     ->prefix('trips')
-    ->name('trips.')
     ->group(function () {
         //================================================================
         // Rider Trip Routes
         //================================================================
-        Route::middleware(['auth:rider-api'])->group(function () {
-            Route::get('/rider/list', 'riderIndex')->name('rider.index');
-            Route::get('/rider/{trip}', 'show')->name('rider.show');
-            Route::post('/rider/request', 'store')->name('rider.request');
-            Route::post('/rider/cancel', 'cancelTripByRider')->name('rider.cancel');
-        });
+        Route::middleware(['auth:rider-api'])
+            ->prefix('rider')
+            ->name('rider.trip.')
+            ->group(function () {
+                Route::get('/list', 'riderIndex')->name('index');
+                Route::get('/{trip}', 'show')->name('show');
+                Route::post('/request', 'store')->name('request');
+                Route::post('/cancel', 'cancelTripByRider')->name('cancel');
+            });
 
         //================================================================
         // Driver Trip Routes
         //================================================================
-        Route::middleware(['auth:driver-api'])->group(function () {
-            Route::get('/driver/list', 'driverIndex')->name('driver.index');
-            Route::get('/driver/{trip}', 'show')->name('driver.show');
-            Route::post('/driver/cancel', 'cancelTripByDriver')->name('driver.cancel');
-            // Route::post('/driver/{trip}/complete', 'completeTrip')->name('driver.complete');
-        });
+        Route::middleware(['auth:driver-api'])
+            ->prefix('driver')
+            ->name('driver.trip.')
+            ->group(function () {
+                Route::get('/list', 'driverIndex')->name('index');
+                Route::get('/{trip}', 'show')->name('show');
+                Route::post('/cancel', 'cancelTripByDriver')->name('cancel');
+                // Route::post('/driver/{trip}/complete', 'completeTrip')->name('driver.complete');
+            });
 
         //================================================================
         // Admin Trip Routes
         //================================================================
         Route::middleware(['auth:admin-api'])
             ->prefix('admin')
-            ->name('admin.')
+            ->name('admin.trip.')
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::get('/{trip}', 'show')->name('show');

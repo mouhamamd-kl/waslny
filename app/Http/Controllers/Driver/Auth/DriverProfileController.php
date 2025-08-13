@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Driver\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DriverCarCompleteRequest;
-use App\Http\Requests\DriverCompleteProfileRequest;
+use App\Http\Requests\Driver\Auth\DriverCarCompleteRequest;
+use App\Http\Requests\Driver\Auth\DriverCompleteProfileRequest;
 use App\Http\Requests\RiderCompleteProfileRequest;
 use App\Http\Requests\UpdateAgentProfileRequest;
-use App\Http\Requests\UpdateDriverProfileRequest;
+use App\Http\Requests\Driver\UpdateDriverProfileRequest;
 use App\Http\Resources\DriverCarResource;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\RiderResource;

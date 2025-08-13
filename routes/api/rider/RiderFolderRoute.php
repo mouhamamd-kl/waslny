@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:rider-api','rider.profile.completed'])->group(function () {
     Route::controller(RiderFolderController::class)
         ->prefix('rider-folders')
-        ->name('rider-folders.')
+        // ->name('rider-folders.')
+        ->name('rider.rider-folders.')
         ->group(function () {
             // Collection routes
             Route::get('/', 'index')->name('index');

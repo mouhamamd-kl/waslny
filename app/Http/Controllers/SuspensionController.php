@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\SuspensionRequest;
-use App\Http\Requests\SuspensionSearchRequest;
+use App\Http\Requests\Suspension\SuspensionRequest;
+use App\Http\Requests\Suspension\SuspensionSearchRequest;
 use App\Http\Resources\SuspensionResource;
 use App\Models\Suspension;
 use App\Services\SuspensionService;

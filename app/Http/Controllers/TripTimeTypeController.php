@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\TripTimeTypeRequest;
-use App\Http\Requests\TripTimeTypeSearchRequest;
+use App\Http\Requests\TripTimeType\TripTimeTypeRequest;
+use App\Http\Requests\TripTimeType\TripTimeTypeAdminSearchRequest;
+use App\Http\Requests\TripTimeType\TripTimeTypeRiderSearchRequest;
+use App\Http\Requests\TripTimeType\TripTimeTypeSearchRequest;
 use App\Http\Resources\TripTimeTypeResource;
 use App\Models\TripTimeType;
 use App\Services\TripTimeTypeService;
@@ -42,13 +44,64 @@ class TripTimeTypeController extends Controller
         }
     }
 
+    // /**
+    //  * Display a listing of the resource.
+    //  */
+    // public function search(TripTimeTypeSearchRequest $request)
+    // {
+    //     try {
+    //         $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+    //         $trip_time_types = $this->tripTimeTypeService->searchTripTimeType(
+    //             filters: $filters,
+    //             perPage: $request->input('per_page', 10),
+    //         );
+
+    //         return ApiResponse::sendResponsePaginated(
+    //             $trip_time_types,
+    //             TripTimeTypeResource::class, // Add your resource class
+    //             trans_fallback('messages.trip_time_type.list', 'Trip Time Types retrieved successfully'),
+    //         );
+    //     } catch (Exception $e) {
+    //         return ApiResponse::sendResponseError(
+    //             'Search failed: ' . $e->getMessage(),
+    //             500
+    //         );
+    //     }
+    // }
+
     /**
      * Display a listing of the resource.
      */
-    public function search(TripTimeTypeSearchRequest $request)
+    public function adminSearch(TripTimeTypeAdminSearchRequest $request)
     {
         try {
-            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+            $trip_time_types = $this->tripTimeTypeService->searchTripTimeType(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
+
+            return ApiResponse::sendResponsePaginated(
+                $trip_time_types,
+                TripTimeTypeResource::class, // Add your resource class
+                trans_fallback('messages.trip_time_type.list', 'Trip Time Types retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function riderSearch(TripTimeTypeRiderSearchRequest $request)
+    {
+        try {
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+            $filters['is_active'] = true;
             $trip_time_types = $this->tripTimeTypeService->searchTripTimeType(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -109,7 +162,8 @@ class TripTimeTypeController extends Controller
     public function update(TripTimeTypeRequest $request, string $id)
     {
         try {
-            $trip_time_type = $this->tripTimeTypeService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $trip_time_type = $this->tripTimeTypeService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new TripTimeTypeResource($trip_time_type),
                 trans_fallback('messages.trip_time_type.updated', 'trip_time_type updated successfully')

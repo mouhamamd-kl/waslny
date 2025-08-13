@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:rider-api')->group(function () {
     Route::controller(RiderSavedLocationController::class)
         ->prefix('rider-saved-locations')
-        ->name('rider-saved-locations.')
+        // ->name('rider-saved-locations.')
+        ->name('rider.rider-saved-locations.')
         ->group(function () {
             // Collection routes
             Route::get('/', 'index')->name('index');

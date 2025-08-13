@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\PricingRequest;
-use App\Http\Requests\PricingSearchRequest;
+use App\Http\Requests\Pricing\PricingRequest;
+use App\Http\Requests\Pricing\PricingSearchRequest;
 use App\Http\Resources\PricingResource;
 use App\Models\pricing;
 use App\Services\PricingService;

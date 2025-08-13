@@ -6,7 +6,8 @@ use App\Http\Controllers\TripDriverActionsController;
 Route::middleware(['auth:driver-api'])
     ->controller(TripDriverActionsController::class)
     ->prefix('trips/{id}')
-    ->name('trips.driver.')
+    // ->name('trips.driver.')
+    ->name('driver.trips.')
     ->group(function () {
         Route::post('/accept', 'accept')->name('accept');
         Route::post('/location', 'updateLocation')->name('update_location');

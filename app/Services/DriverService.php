@@ -108,4 +108,10 @@ class DriverService extends BaseService
             throw new Exception('error activating for driver' . $e);
         }
     }
+
+    public function updateLastActiveAt(Driver $driver): void
+    {
+        $driver->last_active_at = now();
+        $driver->saveQuietly();
+    }
 }

@@ -73,6 +73,11 @@ return [
             'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
             'visibility' => 'public', // If you want files publicly accessible
+            'cache' => [
+                'store' => 'file',
+                'expire' => 600,
+                'prefix' => 'flysystem-cache',
+            ],
         ],
         DiskNames::ADMINS_PROFILE->name => [
             'driver' => 's3',
@@ -85,6 +90,11 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
             'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::ADMINS_PROFILE->value,
+            'cache' => [
+                'store' => 'file',
+                'expire' => 600,
+                'prefix' => 'flysystem-cache',
+            ],
         ],
         DiskNames::RIDERS->name => [
             'driver' => 's3',
@@ -97,6 +107,11 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
             'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::RIDERS->value,
+            'cache' => [
+                'store' => 'file',
+                'expire' => 600,
+                'prefix' => 'flysystem-cache',
+            ],
         ],
         DiskNames::DRIVERS_PROFILE->name => [
             'driver' => 's3',
@@ -109,6 +124,11 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
             'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::DRIVERS_PROFILE->value,
+            'cache' => [
+                'store' => 'file',
+                'expire' => 600,
+                'prefix' => 'flysystem-cache',
+            ],
         ],
         DiskNames::DRIVERS_LICENSE->name => [
             'driver' => 's3',
@@ -121,6 +141,11 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
             'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::DRIVERS_LICENSE->value,
+            'cache' => [
+                'store' => 'file',
+                'expire' => 600,
+                'prefix' => 'flysystem-cache',
+            ],
         ],
         DiskNames::DRIVERS_CAR_PHOTOS->name => [
             'driver' => 's3',
@@ -133,6 +158,11 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
             'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::DRIVERS_CAR_PHOTOS->value,
+            'cache' => [
+                'store' => 'file',
+                'expire' => 600,
+                'prefix' => 'flysystem-cache',
+            ],
         ],
         DiskNames::SYSTEM->name => [
             'driver' => 's3',
@@ -145,6 +175,11 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
             'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::SYSTEM->value, // Dedicated folder for agents
+            'cache' => [
+                'store' => 'file',
+                'expire' => 600,
+                'prefix' => 'flysystem-cache',
+            ],
 
         ],
         // 'supabase_private' => [

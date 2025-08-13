@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\RiderFolderRequest;
-use App\Http\Requests\RiderFolderSearchRequest;
+use App\Http\Requests\RiderFolder\RiderFolderRequest;
+use App\Http\Requests\RiderFolder\RiderFolderSearchRequest;
 use App\Http\Resources\RiderFolderResource;
 use App\Models\RiderFolder;
 use App\Services\RiderFolderService;

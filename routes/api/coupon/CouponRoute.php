@@ -1,11 +1,13 @@
 <?php
+
 use App\Http\Controllers\CouponController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['auth:admin-api'])->controller(CouponController::class)
     ->prefix('coupons')
-    ->name('coupons.') // Optional name prefix
+    // ->name('coupons.') // Old route name 
+    ->name('admin.coupons.')
     ->group(function () {
         // Top-level routes
         Route::get('/', 'index')->name('index');

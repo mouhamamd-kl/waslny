@@ -42,7 +42,7 @@ class DashboardService
     private function getTripStatsForPeriod(Carbon $startDate, Carbon $endDate)
     {
         $trips = Trip::whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('DATE_FORMAT(created_at, "%H:%i") as time, COUNT(*) as value')
+            ->selectRaw("TO_CHAR(created_at, 'HH24:MI') as time, COUNT(*) as value")
             ->groupBy('time')
             ->orderBy('time', 'asc')
             ->get();
@@ -57,8 +57,8 @@ class DashboardService
     {
         // Assuming 'active' means their status was updated recently.
         // This might need adjustment based on the actual logic for "active".
-        $drivers = Driver::where('status_updated_at', '>=', $startDate)
-            ->selectRaw('DATE_FORMAT(status_updated_at, "%H:%i") as time, COUNT(*) as value')
+        $drivers = Driver::where('last_active_at', '>=', $startDate)
+            ->selectRaw("TO_CHAR(last_active_at, 'HH24:MI') as time, COUNT(*) as value")
             ->groupBy('time')
             ->orderBy('time', 'asc')
             ->get();

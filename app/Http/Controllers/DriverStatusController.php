@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\DriverStatusRequest;
+use App\Http\Requests\DriverStatus\DriverStatusRequest;
 use App\Http\Resources\DriverStatusResource;
 use App\Models\DriverStatus;
 use App\Services\DriverStatusService;

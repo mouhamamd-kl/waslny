@@ -23,7 +23,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Rider;
 use App\Events\TestQueuedNotification;
+use App\Http\Controllers\PusherWebhookController;
 use App\Notifications\TestFirebaseNotification;
+
+
+Route::post('/pusher/webhook', [PusherWebhookController::class, 'handle']);
 
 
 Route::get('/test-queued-job', function () {
@@ -353,6 +357,7 @@ require __DIR__ . '/api/payment/PaymentMethodRoute.php';
 require __DIR__ . '/api/payment/MoneyCodeRoute.php';
 
 require __DIR__ . '/api/rider/RiderRoute.php';
+require __DIR__ . '/api/rider/RiderCouponRoute.php';
 require __DIR__ . '/api/rider/RiderFolderRoute.php';
 require __DIR__ . '/api/rider/RiderSavedLocationRoute.php';
 

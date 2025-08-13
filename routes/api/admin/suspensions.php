@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:admin-api'])->controller(SuspensionController::class)
     ->prefix('suspensions')
-    ->name('suspensions.') // Optional name prefix
+    // ->name('suspensions.') // Optional name prefix
+    ->name('admin.suspensions.')
     ->group(function () {
         // Top-level routes
         Route::get('/', 'index')->name('index');

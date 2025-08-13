@@ -47,6 +47,7 @@ return new class extends Migration
 
             $table->spatialIndex('location'); // Spatial index for location
             $table->index('driver_status_id'); // Index for status
+            $table->timestamp('last_seen_at')->nullable()->after('rememberToken');
             $table->index('rating'); // Index for rating
         });
     }

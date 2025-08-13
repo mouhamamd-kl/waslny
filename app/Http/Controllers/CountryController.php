@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\CountryRequest;
-use App\Http\Requests\CountrySearchRequest;
+use App\Http\Requests\Country\CountryRequest;
+use App\Http\Requests\Country\CountrySearchRequest;
 use App\Http\Resources\CountryResource;
 use App\Models\Country;
 use App\Services\CountryService;

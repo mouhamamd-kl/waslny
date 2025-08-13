@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\RiderSavedLocationRequest;
+use App\Http\Requests\RiderSavedLocation\RiderSavedLocationRequest;
 use App\Http\Resources\RiderSavedLocationResource;
 use App\Models\RiderSavedLocation;
 use App\Services\RiderSavedLocationService;

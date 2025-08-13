@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:admin-api'])->controller(CarServiceLevelController::class)
     ->prefix('service-levels')
-    ->name('service-level.') // Optional name prefix
+    // ->name('service-level.') // Optional name prefix
+    ->name('admin.service-level.')
     ->group(function () {
         // Top-level routes
         Route::get('/', 'index')->name('index');

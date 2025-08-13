@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:rider-api'])
     ->controller(MoneyCodeController::class)
     ->prefix('money-codes')
-    ->name('money-codes.')
+    // ->name('money-codes.')
+    ->name('rider.money-codes.')
     ->group(function () {
         Route::post('/redeem', 'redeem')->name('redeem');
     });

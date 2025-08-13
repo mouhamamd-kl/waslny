@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\UpdateDriverCarRequest;
+use App\Http\Requests\DriverCar\UpdateDriverCarRequest;
 use App\Http\Resources\DriverCarResource;
 use App\Models\CarPhotoType;
 use App\Models\DriverCar;

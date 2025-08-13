@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\MoneyCodeRequest;
+use App\Http\Requests\MoneyCode\MoneyCodeRequest;
 use App\Http\Resources\MoneyCodeResource;
 use App\Models\MoneyCode;
 use App\Models\Rider;

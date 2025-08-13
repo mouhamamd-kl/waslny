@@ -8,10 +8,10 @@ use App\Helpers\ApiResponse;
 use App\Http\Requests\DriverUpdateRequest;
 use App\Http\Requests\SuspendAccountForeverRequest;
 use App\Http\Requests\SuspendAccountRequest;
-use App\Http\Requests\DriverSearchRequest;
-use App\Http\Requests\DriverUpdateLocationRequest;
+use App\Http\Requests\Driver\DriverSearchRequest;
+use App\Http\Requests\Driver\DriverUpdateLocationRequest;
 use App\Http\Requests\SuspendAccountTemporarilyRequest;
-use App\Http\Requests\UpdateDriverProfileRequest;
+use App\Http\Requests\Driver\UpdateDriverProfileRequest;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\UploadedFile;
 use App\Http\Resources\DriverResource;
@@ -47,6 +47,7 @@ class DriverController extends Controller
                 trans_fallback('messages.driver.list', 'Driver  retrieved successfully')
             );
         } catch (Exception $e) {
+            throw $e;
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred')
             );

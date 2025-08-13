@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\TripStatusRequest;
-use App\Http\Requests\TripStatusSearchRequest;
+use App\Http\Requests\TripStatus\TripStatusRequest;
+use App\Http\Requests\TripStatus\TripStatusSearchRequest;
 use App\Http\Resources\TripStatusResource;
 use App\Models\TripStatus;
 use App\Services\TripStatusService;

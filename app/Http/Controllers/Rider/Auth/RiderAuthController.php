@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Rider\Auth;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AgentRegisterRequest;
-use App\Http\Requests\RiderLoginRequest;
+use App\Http\Requests\Rider\Auth\RiderLoginRequest;
 use App\Models\Agent;
 use App\Models\Rider;
 use App\Notifications\Agent\AgentTwoFactorCode;
