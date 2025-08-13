@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ApiAdminEmailVerificationRequest;
+use App\Http\Requests\Admin\Auth\ApiAdminEmailVerificationRequest;
 use App\Models\Admin;
 use App\Models\Agent;
 use Exception;

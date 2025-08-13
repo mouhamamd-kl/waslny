@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Rider\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RiderCompleteProfileRequest;
-use App\Http\Requests\UpdateRiderProfileRequest;
+use App\Http\Requests\Rider\RiderCompleteProfileRequest;
+use App\Http\Requests\Rider\UpdateRiderProfileRequest;
 use App\Http\Resources\RiderResource;
 use App\Models\RiderPhotoType;
 use App\Services\RiderService;

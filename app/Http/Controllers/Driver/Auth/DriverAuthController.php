@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Driver\Auth;
 use App\Enums\DriverStatusEnum;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DriverLoginRequest;
+use App\Http\Requests\Driver\Auth\DriverLoginRequest;
 use App\Models\Driver;
 use App\Notifications\Driver\DriverTwoFactorCode;
 use App\Services\DriverService;

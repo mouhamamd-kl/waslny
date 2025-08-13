@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AdminOtpRequest;
-use App\Http\Requests\AdminResendOtpRequest;
+use App\Http\Requests\Admin\Auth\AdminOtpRequest;
+use App\Http\Requests\Admin\Auth\AdminResendOtpRequest;
 use App\Models\Admin;
 use App\Models\Agent;
 use Exception;

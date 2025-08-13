@@ -5,7 +5,7 @@ namespace App\Http\Controllers\AuthTest;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RiderCompleteProfileRequest;
+use App\Http\Requests\Rider\RiderCompleteProfileRequest;
 use App\Http\Requests\UpdateAgentProfileRequest;
 use App\Models\Agent;
 use App\Services\AssetsService;

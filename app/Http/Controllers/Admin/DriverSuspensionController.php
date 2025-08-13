@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Events\AccountSuspended;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreSuspensionRequest;
+use App\Http\Requests\Suspension\StoreSuspensionRequest;
 use App\Models\Driver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Date;

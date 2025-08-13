@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Rider\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DriverResendOtpRequest;
-use App\Http\Requests\TwoFactorCodeRequest;
+use App\Http\Requests\Auth\TwoFactorCodeRequest;
+use App\Http\Requests\Driver\Auth\DriverResendOtpRequest;
 use App\Http\Resources\RiderResource;
 use App\Models\Agent;
 use App\Models\Rider;

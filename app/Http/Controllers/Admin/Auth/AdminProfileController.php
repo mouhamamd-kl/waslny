@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateAdminProfileRequest;
 use App\Http\Requests\AgentRegisterRequest;
-use App\Http\Requests\UpdateAdminProfileRequest;
 use App\Http\Resources\AdminResource;
 use App\Models\Admin;
 use App\Models\AdminPhotoType;

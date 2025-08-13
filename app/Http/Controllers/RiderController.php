@@ -4,17 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Enums\SuspensionReason;
 use App\Helpers\ApiResponse;
-use App\Http\Requests\RiderSearchRequest;
-use App\Http\Requests\RiderUpdateRequest;
-use App\Http\Requests\SuspendAccountForeverRequest;
-use App\Http\Requests\SuspendAccountRequest;
-use App\Http\Requests\SuspendAccountTemporarilyRequest;
+use App\Http\Requests\Rider\RiderSearchRequest;
+use App\Http\Requests\Suspension\SuspendAccountForeverRequest;
+use App\Http\Requests\Suspension\SuspendAccountTemporarilyRequest;
 use App\Http\Resources\RiderResource;
 use App\Models\Rider;
 use App\Services\RiderService;
 use Exception;
 use Illuminate\Http\Request;
-
 class RiderController extends Controller
 {
     protected $riderService;
