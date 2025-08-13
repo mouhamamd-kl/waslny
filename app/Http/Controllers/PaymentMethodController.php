@@ -159,10 +159,11 @@ class PaymentMethodController extends Controller
     {
         try {
             $payment_method = $this->paymentMethodService->findById($id);
-            if (!$payment_method) {
+        if (!$payment_method) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Payment Method not found'), 404);
             }
-            $payment_method = $this->paymentMethodService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $payment_method = $this->paymentMethodService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new PaymentMethodResource($payment_method),
                 trans_fallback('messages.payment_method.updated', 'Payment Method updated successfully')

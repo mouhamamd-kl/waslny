@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 // Rider routes
 Route::middleware(['auth:rider-api'])
     ->controller(MoneyCodeController::class)
-    ->prefix('money-codes')
+    ->prefix('money-codes/rider')
     // ->name('money-codes.')
     ->name('rider.money-codes.')
     ->group(function () {
@@ -16,7 +16,7 @@ Route::middleware(['auth:rider-api'])
 // Admin management routes
 Route::middleware(['auth:admin-api'])
     ->controller(MoneyCodeController::class)
-    ->prefix('admin/money-codes')
+    ->prefix('money-codes/admin')
     ->name('admin.money-codes.')
     ->group(function () {
         Route::get('/', 'index')->name('index');

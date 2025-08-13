@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\SuspensionReasonEnum;
 use App\Traits\Activatable;
+use App\Traits\BooleanCaster;
 use App\Traits\General\ActiveScope;
 use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

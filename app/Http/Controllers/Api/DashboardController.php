@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\DashboardService;
-use Illuminate\Http\Request;
+use App\Http\Requests\Dashboard\GetChartStatsRequest;
 use App\Helpers\ApiResponse;
 
 class DashboardController extends Controller
@@ -22,9 +22,9 @@ class DashboardController extends Controller
         return ApiResponse::sendResponseSuccess($stats);
     }
 
-    public function getChartStats(Request $request)
+    public function getChartStats(GetChartStatsRequest $request)
     {
-        $period = $request->query('period', 'last_60_minutes');
+        $period = $request->validated('period', 'last_60_minutes');
         $stats = $this->dashboardService->getChartStats($period);
         return ApiResponse::sendResponseSuccess($stats);
     }

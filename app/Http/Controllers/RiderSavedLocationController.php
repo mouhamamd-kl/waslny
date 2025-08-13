@@ -117,7 +117,8 @@ class RiderSavedLocationController extends Controller
             if (!$rider_saved_location) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Rider Saved Location not found'), 404);
             }
-            $rider_saved_location = $this->rider_saved_location_service->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $rider_saved_location = $this->rider_saved_location_service->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new RiderSavedLocationResource($rider_saved_location),
                 trans_fallback('messages.rider_saved_location.updated', 'Rider Saved Location updated successfully')

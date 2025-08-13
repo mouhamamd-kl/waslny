@@ -17,7 +17,7 @@ Route::middleware('auth:rider-api')->group(function () {
             // Resource routes
             Route::prefix('{rider_saved_location}')->group(function () {
                 Route::get('/', 'show')->name('show');
-                Route::put('/', 'update')->name('update');
+                Route::post('/', 'update')->name('update');
                 Route::delete('/', 'destroy')->name('destroy');
             });
         });

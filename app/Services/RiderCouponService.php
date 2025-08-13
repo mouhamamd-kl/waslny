@@ -37,18 +37,17 @@ class RiderCouponService extends BaseService
     }
     public function deleteRiderCoupon($rider, $riderCouponId)
     {
-        return DB::transaction(function () use ($rider, $riderCouponId) {
-            try {
-                // return $model->notifications()->detach($modelNotificationId);
-                return  $rider->coupons()->detach($riderCouponId); // Detach one listing
-                // $deleted =  $this->notifiableModel::findOrFail($modelId)
-                //     ->notifications()
-                //     ->detach();
-                // return $deleted;
-            } catch (\Exception $e) {
-                Log::error(Rider::class  . " notification deletion failed: " . $e->getMessage());
-                throw $e;
-            }
-        });
+
+        try {
+            // return $model->notifications()->detach($modelNotificationId);
+            return  $rider->coupons()->detach($riderCouponId); // Detach one listing
+            // $deleted =  $this->notifiableModel::findOrFail($modelId)
+            //     ->notifications()
+            //     ->detach();
+            // return $deleted;
+        } catch (\Exception $e) {
+            Log::error(Rider::class  . " notification deletion failed: " . $e->getMessage());
+            throw $e;
+        }
     }
 }

@@ -116,7 +116,8 @@ class SuspensionController extends Controller
             if (!$suspension) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Suspension not found'), 404);
             }
-            $suspension = $this->suspensionService->update((int) $id, $request->validated());
+            $data =  array_filter($request->validated(), fn($value) => !is_null($value));
+            $suspension = $this->suspensionService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new SuspensionResource($suspension),
                 trans_fallback('messages.suspension.updated', 'Suspension updated successfully')

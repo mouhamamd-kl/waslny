@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes (accessible by anyone)
 Route::middleware(['auth:driver-api'])->controller(CarManufacturerController::class)
-    ->prefix('car-manufacturers')
+    ->prefix('car-manufacturers/driver')
     // ->name('car-manufacturers.')
     ->name('driver.car-manufacturers.')
     ->group(function () {
@@ -18,14 +18,15 @@ Route::middleware(['auth:driver-api'])->controller(CarManufacturerController::cl
 
 // Admin-protected routes (using middleware group)
 Route::middleware(['auth:admin-api'])->controller(CarManufacturerController::class)
-    ->prefix('car-manufacturers')
+    ->prefix('car-manufacturers/admin')
     // ->name('car-manufacturers.')
     ->name('admin.car-manufacturers.')
     ->group(function () {
         Route::post('/', 'store')->name('store');
         Route::post('/search', 'adminSearch')->name('search');
         Route::prefix('{car_manufacturer}')->group(function () {
-            Route::put('/', 'update')->name('update');
+            Route::get('/', 'show')->name('show');
+            Route::post('/', 'update')->name('update');
             Route::delete('/', 'destroy')->name('destroy');
             Route::post('/activate', 'activate')->name('activate');
             Route::post('/deactivate', 'deActivate')->name('deactivate');

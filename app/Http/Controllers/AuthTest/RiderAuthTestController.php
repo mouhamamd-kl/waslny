@@ -43,12 +43,12 @@ class RiderAuthTestController extends Controller
         $token = $rider->createToken('authToken')->plainTextToken;
         $rider->generateTwoFactorCode();
         // $rider->notifyNow(new RiderTwoFactorCode);
-         try {
-                $rider->notifyNowsdfsdf(new RiderTwoFactorCode);
-                Log::info("Notification sent.");
-            } catch (\Exception $e) {
-               dd($e);
-            }
+        try {
+            $rider->notifyNowsdfsdf(new RiderTwoFactorCode);
+            Log::info("Notification sent.");
+        } catch (\Exception $e) {
+            dd($e);
+        }
 
         return ApiResponse::sendResponseSuccess(
             [
@@ -85,7 +85,6 @@ class RiderAuthTestController extends Controller
         $rider = $request->user('rider-api'); // Authenticated agent
         // return ApiResponse::sendResponseSuccess($agent, 'Agent account deleted successfully');
 
-        DB::beginTransaction();
         try {
             // Delete uploaded files from S3
             $this->riderSerivce->deleteAssets($rider->id);
@@ -95,10 +94,8 @@ class RiderAuthTestController extends Controller
 
             // Delete agent from DB
             $rider->delete();
-            DB::commit();
             return ApiResponse::sendResponseSuccess(null, 'Rider account deleted successfully');
         } catch (\Throwable $e) {
-            DB::rollBack();
 
             return ApiResponse::sendResponseError('Failed to delete account: ' . $e->getMessage(), 500);
         }

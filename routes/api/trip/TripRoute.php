@@ -55,7 +55,7 @@ Route::controller(TripController::class)
                 Route::get('/', 'index')->name('index');
                 Route::get('/{trip}', 'show')->name('show');
                 Route::post('/search', 'searchAdmin')->name('search');
-                Route::put('/{trip}', 'update')->name('update');
+                Route::post('/{trip}', 'update')->name('update');
                 Route::delete('/{trip}', 'destroy')->name('destroy');
             });
     });

@@ -172,7 +172,8 @@ class CarManufacturerController extends Controller
             if (!$car_manufacture) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Manufacture not found'), 404);
             }
-            $car_manufacture = $this->carManufactureService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $car_manufacture = $this->carManufactureService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new CarManufacturerResource($car_manufacture),
                 trans_fallback('messages.car_manufacture.updated', 'Car Manufacture updated successfully')

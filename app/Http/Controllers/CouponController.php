@@ -113,7 +113,8 @@ class CouponController extends Controller
             if (!$coupon) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Coupon not found'), 404);
             }
-            $coupon = $this->couponService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $coupon = $this->couponService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new CouponResource($coupon),
                 trans_fallback('messages.coupon.updated', 'Coupon updated successfully')

@@ -112,7 +112,8 @@ class DriverStatusController extends Controller
             if (!$driver_status) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Driver Status not found'), 404);
             }
-            $driver_status = $this->driverStatusService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $driver_status = $this->driverStatusService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new DriverStatusResource($driver_status),
                 trans_fallback('messages.driver_status.updated', 'Driver Status updated successfully')

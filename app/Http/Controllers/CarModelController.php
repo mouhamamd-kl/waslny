@@ -212,7 +212,8 @@ class CarModelController extends Controller
             if (!$car_model) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Model not found'), 404);
             }
-            $car_model = $this->carModelService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $car_model = $this->carModelService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new CarModelResource($car_model),
                 trans_fallback('messages.car_model.updated', 'Car Model updated successfully')

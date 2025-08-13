@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 //     ->name('rider.')
 //     ->group(function () {
 //         Route::get('/profile', 'show')->name('show');
-//         Route::put('/profile', 'update')->name('update');
+//         Route::post('/profile', 'update')->name('update');
 //     });
 
 // Admin management routes (require admin authentication)

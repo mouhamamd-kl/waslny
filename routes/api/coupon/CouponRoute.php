@@ -4,6 +4,7 @@ use App\Http\Controllers\CouponController;
 use Illuminate\Support\Facades\Route;
 
 
+
 Route::middleware(['auth:admin-api'])->controller(CouponController::class)
     ->prefix('coupons')
     // ->name('coupons.') // Old route name 
@@ -17,7 +18,7 @@ Route::middleware(['auth:admin-api'])->controller(CouponController::class)
         // Routes requiring car_manufacturer parameter
         Route::prefix('{coupon}')->group(function () {
             Route::get('/', 'show')->name('show');
-            Route::put('/', 'update')->name('update');
+            Route::post('/', 'update')->name('update');
             Route::delete('/', 'destroy')->name('destroy');
             Route::post('/activate', 'activate')->name('activate');
             Route::post('/deactivate', 'deActivate')->name('deactivate');

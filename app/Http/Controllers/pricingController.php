@@ -111,7 +111,8 @@ class PricingController extends Controller
             if (!$pricing) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Pricing not found'), 404);
             }
-            $pricing = $this->pricingService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $pricing = $this->pricingService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new PricingResource($pricing),
                 trans_fallback('messages.pricing.updated', 'Pricing updated successfully')

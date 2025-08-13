@@ -18,7 +18,7 @@ class AdminResource extends JsonResource
         $assetService = FileServiceFactory::makeForAdminProfile();
         return [
             'id' => $this->id,
-            'user_name' => $this->first_name,
+            'user_name' => $this->user_name,
             'phone' => $this->phone,
             'email' => $this->email,
             'profile_photo' => $this->when($this->profile_photo, function () use ($assetService) {

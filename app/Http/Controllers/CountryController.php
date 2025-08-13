@@ -111,7 +111,8 @@ class CountryController extends Controller
             if (!$country) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Country not found'), 404);
             }
-            $country = $this->countryService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $country = $this->countryService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new CountryResource($country),
                 trans_fallback('messages.country.updated', 'Country updated successfully')

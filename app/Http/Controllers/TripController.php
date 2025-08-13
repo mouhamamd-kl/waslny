@@ -369,7 +369,8 @@ class TripController extends Controller
             if (!$trip) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
             }
-            $trip = $this->trip_service->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $trip = $this->trip_service->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new TripResource($trip),
                 trans_fallback('messages.trip.updated', 'trip updated successfully')

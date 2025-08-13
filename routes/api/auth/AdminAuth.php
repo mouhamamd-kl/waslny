@@ -34,10 +34,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('password/reset', [AdminPasswordResetController::class, 'resetPassword'])->name('password.reset');
 
     // Verification
-    Route::get('verified-success', fn() => view('admin.auth.verified-success'))->name('verification.success');
-    Route::get('email/verify', fn() => response()->json(['message' => 'Email verification required.']))
-        ->middleware('auth:admin-api')
-        ->name('verification.notice');
+// Route::get('verified-success', fn() => view('admin.auth.verified-success'))->name('verification.success');
+// Route::get('email/verify', fn() => response()->json(['message' => 'Email verification required.']))
+//     ->middleware('auth:admin-api')
+//     ->name('verification.notice');
 
     // Route::get('email/verify/{id}/{hash}', [AdminVerificationController::class, 'verifyEmail'])
     //     ->middleware(['signed'])

@@ -27,22 +27,29 @@ class DashboardService
 
         return [
             'period' => $period,
-            'trips_requests' => $this->getTripStatsForPeriod($startDate, $endDate),
-            'active_riders' => $this->getActiveRiderStatsForPeriod($startDate, $endDate),
-            'active_drivers' => $this->getActiveDriverStatsForPeriod($startDate, $endDate),
+            'trips_requests' => $this->getTripStatsForPeriod($startDate, $endDate, $period),
+            'active_riders' => $this->getActiveRiderStatsForPeriod($startDate, $endDate, $period),
+            'active_drivers' => $this->getActiveDriverStatsForPeriod($startDate, $endDate, $period),
         ];
     }
 
     private function calculateStartDate(string $period, Carbon $endDate): Carbon
     {
-        // For now, only last_60_minutes is supported as per the design
-        return $endDate->copy()->subMinutes(60);
+        return match ($period) {
+            'last_60_minutes' => $endDate->copy()->subMinutes(60),
+            'last_12_hours' => $endDate->copy()->subHours(12),
+            'last_24_hours' => $endDate->copy()->subHours(24),
+            'last_7_days' => $endDate->copy()->subDays(7),
+            default => $endDate->copy()->subMinutes(60),
+        };
     }
 
-    private function getTripStatsForPeriod(Carbon $startDate, Carbon $endDate)
+    private function getTripStatsForPeriod(Carbon $startDate, Carbon $endDate, string $period)
     {
+        $format = $period === 'last_7_days' ? 'YYYY-MM-DD' : 'HH24:MI';
+
         $trips = Trip::whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw("TO_CHAR(created_at, 'HH24:MI') as time, COUNT(*) as value")
+            ->selectRaw("TO_CHAR(created_at, '$format') as time, COUNT(*) as value")
             ->groupBy('time')
             ->orderBy('time', 'asc')
             ->get();
@@ -53,12 +60,16 @@ class DashboardService
         ];
     }
 
-    private function getActiveDriverStatsForPeriod(Carbon $startDate, Carbon $endDate)
+    private function getActiveDriverStatsForPeriod(Carbon $startDate, Carbon $endDate, string $period)
     {
-        // Assuming 'active' means their status was updated recently.
-        // This might need adjustment based on the actual logic for "active".
-        $drivers = Driver::where('last_active_at', '>=', $startDate)
-            ->selectRaw("TO_CHAR(last_active_at, 'HH24:MI') as time, COUNT(*) as value")
+        $format = $period === 'last_7_days' ? 'YYYY-MM-DD' : 'HH24:MI';
+
+        // Assuming 'active' means their status was updated recently or is null (currently online).
+        $drivers = Driver::where(function ($query) use ($startDate) {
+            $query->where('last_seen_at', '>=', $startDate)
+                ->orWhereNull('last_seen_at');
+        })
+            ->selectRaw("TO_CHAR(COALESCE(last_seen_at, NOW()), '$format') as time, COUNT(*) as value")
             ->groupBy('time')
             ->orderBy('time', 'asc')
             ->get();
@@ -69,19 +80,23 @@ class DashboardService
         ];
     }
 
-    private function getActiveRiderStatsForPeriod(Carbon $startDate, Carbon $endDate)
+    private function getActiveRiderStatsForPeriod(Carbon $startDate, Carbon $endDate, string $period)
     {
-        // Assuming 'active' means they created a trip recently.
-        // This is a proxy for activity.
-        $riders = Trip::whereBetween('created_at', [$startDate, $endDate])
-            ->distinct('rider_id')
-            ->count('rider_id');
+        $format = $period === 'last_7_days' ? 'YYYY-MM-DD' : 'HH24:MI';
 
-        // Chart data for active riders is more complex and might require a different approach.
-        // For now, returning a simplified version.
+        // Assuming 'active' means their status was updated recently or is null (currently online).
+        $riders = Rider::where(function ($query) use ($startDate) {
+            $query->where('last_seen_at', '>=', $startDate)
+                ->orWhereNull('last_seen_at');
+        })
+            ->selectRaw("TO_CHAR(COALESCE(last_seen_at, NOW()), '$format') as time, COUNT(*) as value")
+            ->groupBy('time')
+            ->orderBy('time', 'asc')
+            ->get();
+
         return [
-            'total' => $riders,
-            'series' => [], // Placeholder for series data
+            'total' => $riders->sum('value'),
+            'series' => $riders,
         ];
     }
 }

@@ -23,22 +23,28 @@ class SuspensionRequest extends BaseRequest
      */
     public function rules(): array
     {
+        $suspensionId = $this->route('suspension');
+
         return [
             'reason' => [
                 $this->isRequired(),
+                'nullable',
                 'string',
-                'unique:' . Suspension::class
+                'unique:' . Suspension::class . ',reason,' . $suspensionId
             ],
             'admin_msg' => [
                 $this->isRequired(),
+                'nullable',
                 'string',
             ],
             'user_msg' => [
                 $this->isRequired(),
+                'nullable',
                 'string',
             ],
             'is_active' => [
                 $this->isRequired(),
+                'nullable',
                 'boolean',
             ]
         ];

@@ -5,7 +5,7 @@ use App\Http\Controllers\TripDriverActionsController;
 
 Route::middleware(['auth:driver-api'])
     ->controller(TripDriverActionsController::class)
-    ->prefix('trips/{id}')
+    ->prefix('trips/driver/{id}')
     // ->name('trips.driver.')
     ->name('driver.trips.')
     ->group(function () {

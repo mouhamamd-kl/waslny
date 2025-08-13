@@ -114,7 +114,8 @@ class RiderFolderController extends Controller
             if (!$rider_folder) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'rider_location_folder not found'), 404);
             }
-            $rider_folder = $this->riderFolderService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $rider_folder = $this->riderFolderService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new RiderFolderResource($rider_folder),
                 trans_fallback('messages.rider_location_folder.updated', 'rider_location_folder updated successfully')

@@ -111,7 +111,8 @@ class CarServiceLevelController extends Controller
             if (!$car_service_level) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Service Level not found'), 404);
             }
-            $car_service_level = $this->carServiceLevelService->update((int) $id, $request->validated());
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
+            $car_service_level = $this->carServiceLevelService->update((int) $id, $data);
             return ApiResponse::sendResponseSuccess(
                 new CarServiceLevelResource($car_service_level),
                 trans_fallback('messages.car_service_level.updated', 'Car Service Level updated successfully')

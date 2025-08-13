@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AdminResetLinkRequest;
-use App\Http\Requests\AdminResetPasswordRequest;
+use App\Http\Requests\Admin\Auth\AdminResetLinkRequest;
+use App\Http\Requests\Admin\Auth\AdminResetPasswordRequest;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
