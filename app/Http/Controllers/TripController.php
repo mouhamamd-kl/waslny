@@ -13,8 +13,10 @@ use App\Events\TripCreated;
 use App\Helpers\ApiResponse;
 use App\Http\Requests\Trip\SubmitDriverReviewRequest;
 use App\Http\Requests\Trip\SubmitRiderReviewRequest;
+use App\Http\Requests\Trip\TripAdminSearchRequest;
+use App\Http\Requests\Trip\TripDriverSearchRequest;
 use App\Http\Requests\Trip\TripRequest;
-use App\Http\Requests\Trip\TripSearchRequest;
+use App\Http\Requests\Trip\TripRiderSearchRequest;
 use App\Http\Resources\TripResource;
 use App\Models\Trip;
 use App\Models\TripLocation;
@@ -43,7 +45,7 @@ class TripController extends Controller
         try {
             $trips = $this->trip_service->searchTrips(
                 $request->input('filters', []),
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
             return ApiResponse::sendResponsePaginated(
                 $trips,
@@ -65,7 +67,7 @@ class TripController extends Controller
             $filters['driver_id'] = auth('driver-api')->user()->id;
             $trips = $this->trip_service->searchTrips(
                 $filters,
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
             return ApiResponse::sendResponsePaginated(
                 $trips,
@@ -87,7 +89,7 @@ class TripController extends Controller
             $filters['rider_id'] = auth('rider-api')->user()->id;
             $trips = $this->trip_service->searchTrips(
                 $filters,
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
             return ApiResponse::sendResponsePaginated(
                 $trips,
@@ -100,14 +102,56 @@ class TripController extends Controller
             );
         }
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function search(TripSearchRequest $request)
+    public function searchRider(TripRiderSearchRequest $request)
     {
         try {
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+            $filters['rider_id'] = auth('rider-api')->user()->id;
+            $trips = $this->trip_service->searchTrips(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
 
-            $filters = $request->validated();
+            return ApiResponse::sendResponsePaginated(
+                $trips,
+                TripResource::class, // Add your resource class
+                trans_fallback('messages.trip.list', 'Trip retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    public function searchDriver(TripDriverSearchRequest $request)
+    {
+        try {
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+            $filters['driver_id'] = auth('driver-api')->user()->id;
+            $trips = $this->trip_service->searchTrips(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
+
+            return ApiResponse::sendResponsePaginated(
+                $trips,
+                TripResource::class, // Add your resource class
+                trans_fallback('messages.trip.list', 'Trip retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    public function searchAdmin(TripAdminSearchRequest $request)
+    {
+        try {
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $trips = $this->trip_service->searchTrips(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
