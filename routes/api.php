@@ -1,57 +1,47 @@
 <?php
 
-use App\Constants\DiskNames;
-use App\Enums\TripStatusEnum;
 use App\Events\TestEvent;
 use App\Events\TestNotification;
-use App\Events\TripAvailableForDriver;
 use App\Helpers\ApiResponse;
 use App\Services\FileServiceFactory;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\FileController;
-use App\Http\Requests\RiderSavedLocationRequest;
-use App\Http\Requests\TripRequest;
-use App\Models\CarModel;
 use App\Models\Driver;
-use App\Models\Trip;
-use App\Models\TripDriverNotification;
-use App\Services\TripService;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Rider;
 use App\Events\TestQueuedNotification;
 use App\Http\Controllers\PusherWebhookController;
+use App\Http\Requests\RiderSavedLocation\RiderSavedLocationRequest;
+use App\Http\Requests\Trip\TripRequest;
 use App\Notifications\TestFirebaseNotification;
 
 
-Route::post('/pusher/webhook', [PusherWebhookController::class, 'handle']);
+Route::post('/pusher/webhook', [PusherWebhookController::class, 'handle'])->name('no-export.websocket');
 
 
 Route::get('/test-queued-job', function () {
     for ($i = 0; $i < 20; $i++) {
         event(new TestQueuedNotification('This is a test queued job.' . now()));
     }
-})->name('no-export');
+})->name('no-export.test-queue');
 
 Route::get('/test-notfication', function () {
     event(new TestNotification([
         'قائد الطوفان' => 'القائد يحيى السنوار'
     ]));
-})->name('no-export');
+})->name('no-export.test-notification');
 
 
 Route::post('/test', function () {
     return "hello";
-})->name('no-export');
+})->name('no-export.test');
 
 Route::get('/test-worker', function () {
     $command = 'php ' . realpath(__DIR__ . '/../artisan') . ' queue:work';
     passthru($command);
     return "hello";
-})->name('no-export');
+})->name('no-export.test-worker');
 
 Route::get('/test-firebase/{type}/{id}', function ($type, $id) {
     if ($type === 'driver') {
@@ -69,7 +59,7 @@ Route::get('/test-firebase/{type}/{id}', function ($type, $id) {
     $user->notify(new TestFirebaseNotification());
 
     return response()->json(['message' => 'Test notification sent.']);
-})->name('no-export');
+})->name('no-export.test-firebase');
 
 // Route::get('/test', function (Request $request) {
 //     return CarModel::where('name','Civic')->get();
