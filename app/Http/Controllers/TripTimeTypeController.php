@@ -30,7 +30,7 @@ class TripTimeTypeController extends Controller
         try {
             $trip_time_types = $this->tripTimeTypeService->searchTripTimeType(
                 $request->input('filters', []),
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
             return ApiResponse::sendResponsePaginated(
                 $trip_time_types,
