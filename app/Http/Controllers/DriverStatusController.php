@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
+use App\Http\Requests\Country\DriverStatusSearchRequest;
 use App\Http\Requests\DriverStatus\DriverStatusRequest;
 use App\Http\Resources\DriverStatusResource;
 use App\Models\DriverStatus;
@@ -26,7 +27,7 @@ class DriverStatusController extends Controller
         try {
             $driver_statuses = $this->driverStatusService->searchDriverStatus(
                 $request->input('filters', []),
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
             return ApiResponse::sendResponsePaginated(
                 $driver_statuses,
@@ -43,12 +44,10 @@ class DriverStatusController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function search(DriverStatusSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-            ]);
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $driver_statuses = $this->driverStatusService->searchDriverStatus(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
