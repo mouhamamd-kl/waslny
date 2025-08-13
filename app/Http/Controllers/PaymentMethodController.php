@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
+use App\Http\Requests\Country\PaymentMethodAdminSearchRequest;
+use App\Http\Requests\Country\PaymentMethodRiderSearchRequest;
 use App\Http\Requests\PaymentMethod\PaymentMethodRequest;
 use App\Http\Resources\PaymentMethodResource;
 use App\Models\PaymentMethod;
@@ -21,16 +23,36 @@ class PaymentMethodController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function riderIndex(Request $request)
+    {
+        try {
+            $payment_methods = $this->paymentMethodService->searchPaymentMethods(
+                $request->input('filters',  ['is_active' => true]),
+                $request->input('per_page', 5)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $payment_methods,
+                PaymentMethodResource::class,
+                trans_fallback('messages.payment_method.list', 'Payment Methods retrieved successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
+
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function adminIndex(Request $request)
     {
         try {
             $filters = [];
-            if (!auth('admin-api')) {
-                $filters['is_active'] = true;
-            }
             $payment_methods = $this->paymentMethodService->searchPaymentMethods(
                 $request->input('filters', $filters),
-                $request->input('perPage', 5)
+                $request->input('per_page', 5)
             );
             return ApiResponse::sendResponsePaginated(
                 $payment_methods,
@@ -47,13 +69,35 @@ class PaymentMethodController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function search(Request $request)
+    public function riderSearch(PaymentMethodRiderSearchRequest $request)
     {
         try {
-            $filters = $request->only([
-                'name',
-                'is_active',
-            ]);
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
+            $payment_methods = $this->paymentMethodService->searchPaymentMethods(
+                filters: $filters,
+                perPage: $request->input('per_page', 10),
+            );
+
+            return ApiResponse::sendResponsePaginated(
+                $payment_methods,
+                PaymentMethodResource::class, // Add your resource class
+                trans_fallback('messages.payment_method.list', 'Payment Methods retrieved successfully'),
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                'Search failed: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function adminSearch(PaymentMethodAdminSearchRequest $request)
+    {
+        try {
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $payment_methods = $this->paymentMethodService->searchPaymentMethods(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
