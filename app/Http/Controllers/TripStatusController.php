@@ -76,8 +76,7 @@ class TripStatusController extends Controller
             $data = $request->validated();
             $trip_status = $this->tripStatusService->create($data);
             return ApiResponse::sendResponseSuccess(
-                $trip_status,
-                TripStatusResource::class,
+                new TripStatusResource($trip_status),
                 trans_fallback('messages.trip_status.created', 'Trip Statuses retrieved successfully'),
                 201
             );

@@ -19,6 +19,7 @@ class TripTypeResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'is_active' => $this->is_active,
+            'is_system_defined' => $this->is_system_defined,
             'dates' => [
                 'created' => $this->created_at,
                 'updated' => $this->updated_at,

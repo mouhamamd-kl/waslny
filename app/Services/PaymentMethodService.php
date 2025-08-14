@@ -34,4 +34,9 @@ class PaymentMethodService extends BaseService
                 withCount: []
             );
     }
+
+    public function searchByCode(String $code): ?PaymentMethod
+    {
+        return $this->search_first(filters: ['code' => $code]);
+    }
 }

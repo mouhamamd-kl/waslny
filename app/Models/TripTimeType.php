@@ -22,6 +22,7 @@ class TripTimeType extends Model
     protected $guarded = ['id']; // Guard against mass assignment
     protected $casts = [
         'is_active' => 'boolean',
+        'is_system_defined' => 'boolean',
     ];
 
     // Default trip type constants

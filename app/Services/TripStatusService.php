@@ -66,4 +66,9 @@ class TripStatusService extends BaseService
             throw new Exception('error Searching Trip Status' . $e);
         }
     }
+
+    public function searchByCode(String $code): ?TripStatus
+    {
+        return $this->search_first(filters: ['code' => $code]);
+    }
 }

@@ -55,4 +55,9 @@ class TripTimeTypeService extends BaseService
             throw new Exception('error activating TripType' . $e);
         }
     }
+
+    public function searchByCode(String $code): ?TripTimeType
+    {
+        return $this->search_first(filters: ['code' => $code]);
+    }
 }

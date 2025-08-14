@@ -19,7 +19,8 @@ class PaymentMethod extends Model
     protected $table = 'payment_methods';
     protected $guarded = ['id'];
     protected $casts = [
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'is_system_defined' => 'boolean',
     ];
 
     // =================

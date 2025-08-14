@@ -16,6 +16,9 @@ class TripStatus extends Model
     // =================
     protected $table = 'trip_statuses';
     protected $guarded = ['id'];
+    protected $casts = [
+        'is_system_defined' => 'boolean',
+    ];
 
     // =================
     // Relationships
