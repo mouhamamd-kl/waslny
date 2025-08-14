@@ -10,7 +10,7 @@ Route::middleware(['auth:rider-api'])->controller(TripTimeTypeController::class)
     // ->name('trip-time-type.')
     ->name('rider.trip-time-type.')
     ->group(function () {
-        Route::get('/', 'index')->name('index');
+        Route::get('/', 'riderIndex')->name('index');
         // Route::post('/search', 'search')->name('search');
         Route::post('/search', 'riderSearch')->name('search');
         Route::get('/{trip_time_type}', 'show')->name('show');
@@ -22,6 +22,7 @@ Route::middleware(['auth:admin-api'])->controller(TripTimeTypeController::class)
     // ->name('trip-time-type.')
     ->name('admin.trip-time-type.')
     ->group(function () {
+        Route::get('/', 'adminIndex')->name('index');
         Route::post('/search', 'adminSearch')->name('search');
         Route::post('/', 'store')->name('store');
         Route::prefix('{trip_time_type}')->group(function () {

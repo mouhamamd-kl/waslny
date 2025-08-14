@@ -28,7 +28,7 @@ class CarServiceLevelController extends Controller
         try {
             $car_service_levels = $this->carServiceLevelService->searchCarServiceLevel(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $car_service_levels,

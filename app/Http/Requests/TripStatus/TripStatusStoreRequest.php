@@ -40,6 +40,10 @@ class TripStatusStoreRequest extends BaseRequest
                 'string',
                 'unique:' . TripType::class
             ],
+            'is_active' => [
+                'required',
+                'boolean',
+            ],
         ];
     }
 }

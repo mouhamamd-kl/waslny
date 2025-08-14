@@ -23,15 +23,38 @@ class TripTimeTypeController extends Controller
     {
         $this->tripTimeTypeService = $tripTimeTypeService;
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function adminIndex(Request $request)
     {
         try {
             $trip_time_types = $this->tripTimeTypeService->searchTripTimeType(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $trip_time_types,
+                TripTimeTypeResource::class,
+                trans_fallback('messages.trip_time_type.list', 'Trip Time Types retrieved successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function riderIndex(Request $request)
+    {
+        try {
+            $trip_time_types = $this->tripTimeTypeService->searchTripTimeType(
+                $request->input('filters', ['is_active' => true]),
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $trip_time_types,

@@ -32,7 +32,7 @@ class DriverController extends Controller
         try {
             $drivers = $this->driverService->searchDrivers(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $drivers,

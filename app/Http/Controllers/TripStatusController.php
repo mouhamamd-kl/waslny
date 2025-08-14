@@ -28,7 +28,7 @@ class TripStatusController extends Controller
         try {
             $trip_statuses = $this->tripStatusService->searchTripStatus(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $trip_statuses,
@@ -48,7 +48,7 @@ class TripStatusController extends Controller
     public function search(TripStatusSearchRequest $request)
     {
         try {
-            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $trip_statuses = $this->tripStatusService->searchTripStatus(
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
@@ -149,6 +149,55 @@ class TripStatusController extends Controller
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.delete_failed', 'Delete failed: ' . $e->getMessage())
+            );
+        }
+    }
+
+    public function activate($id)
+    {
+        try {
+            /** @var TripStatus $tripStatus */ // Add PHPDoc type hint
+            $tripStatus = $this->tripStatusService->findById($id);
+            if (!$tripStatus) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_status not found'), 404);
+            }
+            if ($tripStatus->is_system_defined) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip_status.error.system_trip_status_activation_failed', ['name' => $tripStatus->name]),
+                    403
+                );
+            }
+            $tripStatus->activate();
+            return ApiResponse::sendResponseSuccess(
+                message: trans_fallback('messages.trip_status.activated', 'Trip Status Activated successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.trip_status.error.activation_failed', 'Activation failed: ' . $e->getMessage())
+            );
+        }
+    }
+    public function deActivate($id)
+    {
+        try {
+            /** @var TripStatus $tripStatus */ // Add PHPDoc type hint
+            $tripStatus = $this->tripStatusService->findById($id);
+            if (!$tripStatus) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_status not found'), 404);
+            }
+            if ($tripStatus->is_system_defined) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip_status.error.system_trip_status_deactivation_failed', ['name' => $tripStatus->name]),
+                    403
+                );
+            }
+            $tripStatus->deactivate();
+            return ApiResponse::sendResponseSuccess(
+                message: trans_fallback('messages.trip_status.deactivated', 'Trip Status DeActivated successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.trip_status.error.deactivation_failed', 'DeActivation failed: ' . $e->getMessage())
             );
         }
     }

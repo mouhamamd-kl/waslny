@@ -27,6 +27,10 @@ class TripType extends Model
         'is_system_defined' => 'boolean',
     ];
 
+    protected $attributes = [
+        'is_system_defined' => false,
+    ];
+
     // Default trip type constants
     public const STANDARD = 'standard';
     public const PREMIUM = 'premium';
@@ -90,5 +94,10 @@ class TripType extends Model
     public function isSUV(): bool
     {
         return $this->name === self::SUV;
+    }
+
+    public function toEnum(): \App\Enums\TripTypeEnum
+    {
+        return \App\Enums\TripTypeEnum::from($this->code);
     }
 }

@@ -307,12 +307,19 @@ return [
         'deleted' => 'تم حذف حالة الرحلة بنجاح',
         'retrieved' => 'تم استرجاع حالة الرحلة بنجاح',
         'list' => 'تم استرجاع قائمة حالات الرحلات بنجاح',
+        'activated' => 'تم تفعيل حالة الرحلة بنجاح',
+        'deactivated' => 'تم إيقاف حالة الرحلة بنجاح',
         // Error Messages
         'error' => [
             'creation_failed' => 'فشل إنشاء حالة الرحلة',
             'update_failed' => 'فشل تحديث حالة الرحلة',
             'delete_failed' => 'فشل حذف حالة الرحلة',
             'not_found' => 'حالة الرحلة غير موجودة',
+            'activation_failed' => 'فشل تفعيل حالة الرحلة',
+            'deactivation_failed' => 'فشل إيقاف حالة الرحلة',
+            'system_trip_status_delete_failed' => "لا يمكن حذف حالة الرحلة ':name' لأنها من حالات النظام.",
+            'system_trip_status_activation_failed' => "لا يمكن تفعيل حالة الرحلة ':name' لأنها من حالات النظام.",
+            'system_trip_status_deactivation_failed' => "لا يمكن تعطيل حالة الرحلة ':name' لأنها من حالات النظام.",
         ]
     ],
     'driver' => [

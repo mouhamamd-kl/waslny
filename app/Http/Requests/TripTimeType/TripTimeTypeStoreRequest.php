@@ -25,7 +25,7 @@ class TripTimeTypeStoreRequest extends BaseRequest
      */
     public function handleAuthorization(): bool
     {
-        return auth('rider-api')->check();
+        return auth('admin-api')->check();
     }
 
     /**

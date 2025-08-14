@@ -13,7 +13,7 @@ class TripTimeTypePolicy
      */
     public function viewAny($user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class TripTimeTypePolicy
      */
     public function view($user, TripTimeType $tripTimeType): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,7 +29,7 @@ class TripTimeTypePolicy
      */
     public function create($user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +37,7 @@ class TripTimeTypePolicy
      */
     public function update($user, TripTimeType $tripTimeType): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -45,7 +45,7 @@ class TripTimeTypePolicy
      */
     public function delete($user, TripTimeType $tripTimeType): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -53,7 +53,7 @@ class TripTimeTypePolicy
      */
     public function restore($user, TripTimeType $tripTimeType): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -61,6 +61,6 @@ class TripTimeTypePolicy
      */
     public function forceDelete($user, TripTimeType $tripTimeType): bool
     {
-        return false;
+        return true;
     }
 }

@@ -16,7 +16,7 @@ Route::middleware(['auth:admin-api'])->controller(CouponController::class)
         Route::post('/search', 'search')->name('search');
 
         // Routes requiring car_manufacturer parameter
-        Route::prefix('{coupon}')->group(function () {
+        Route::group(['prefix' => '{coupon}', 'where' => ['coupon' => '[0-9]+']],function () {
             Route::get('/', 'show')->name('show');
             Route::post('/', 'update')->name('update');
             Route::delete('/', 'destroy')->name('destroy');

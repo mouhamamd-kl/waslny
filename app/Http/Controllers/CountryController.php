@@ -28,7 +28,7 @@ class CountryController extends Controller
         try {
             $countries = $this->countryService->searchCountries(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $countries,

@@ -41,6 +41,10 @@ class TripStatusUpdateRequest extends BaseRequest
                 'string',
                 'unique:' . TripType::class
             ],
+            'is_active' => [
+                'sometimes',
+                'boolean',
+            ],
         ];
     }
 }

@@ -18,10 +18,13 @@ Route::middleware(['auth:admin-api'])
     ->prefix('riders')
     ->name('admin.riders.')   // Namespaced naming
     ->group(function () {
-        Route::post('/search', 'search')->name('search');
-        Route::get('/{rider}', 'showAdmin')->name('show-admin');
         Route::get('/', 'index')->name('index');
-        Route::post('/{rider}/suspendForever', 'suspendForever')->name('suspend');
-        Route::post('/{rider}/suspendTemporarily', 'suspendTemporarily')->name('suspend');
+        Route::post('/search', 'search')->name('search');
+        Route::get('/{rider}', 'showAdmin')->name('show');
+
+           Route::name('suspend.')->group(function () {
+            Route::post('/{rider}/suspendForever', 'suspendForever')->name('forever'); // Full name: suspend.forever
+            Route::post('/{rider}/suspendTemporarily', 'suspendTemporarily')->name('temporarily'); // Full name: suspend.temporarily
+        });
         Route::post('/{rider}/reinstate', 'reinstate')->name('reinstate');
     });

@@ -29,7 +29,7 @@ class RiderSavedLocationController extends Controller
             $filters['rider_id'] = auth('rider-api')->user()->id;
             $rider_saved_locations = $this->rider_saved_location_service->searchRiderSavedLocations(
                 $filters,
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $rider_saved_locations,

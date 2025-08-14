@@ -302,11 +302,18 @@ return [
         'deleted' => 'Trip status deleted successfully',
         'retrieved' => 'Trip status retrieved successfully',
         'list' => 'Trip statuses list retrieved successfully',
+        'activated' => 'Trip status activated successfully',
+        'deactivated' => 'Trip status deactivated successfully',
         'error' => [
             'creation_failed' => 'Failed to create trip status',
             'update_failed' => 'Failed to update trip status',
             'delete_failed' => 'Failed to delete trip status',
             'not_found' => 'Trip status not found',
+            'activation_failed' => 'Failed to activate trip status',
+            'deactivation_failed' => 'Failed to deactivate trip status',
+            'system_trip_status_delete_failed' => "Trip status ':name' is a system status and cannot be deleted.",
+            'system_trip_status_activation_failed' => "Trip status ':name' is a system status and cannot be activated.",
+            'system_trip_status_deactivation_failed' => "Trip status ':name' is a system status and cannot be deactivated.",
         ]
     ],
 

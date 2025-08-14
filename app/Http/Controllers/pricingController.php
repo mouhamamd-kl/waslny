@@ -28,7 +28,7 @@ class PricingController extends Controller
         try {
             $pricings = $this->pricingService->searchPricings(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $pricings,

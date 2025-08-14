@@ -30,7 +30,7 @@ class TripTypeController extends Controller
         try {
             $trip_types = $this->tripTypeService->searchTripType(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $trip_types,
@@ -53,7 +53,7 @@ class TripTypeController extends Controller
         try {
             $trip_types = $this->tripTypeService->searchTripType(
                 $request->input('filters', ['is_active' => true]),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $trip_types,

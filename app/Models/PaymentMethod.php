@@ -23,6 +23,10 @@ class PaymentMethod extends Model
         'is_system_defined' => 'boolean',
     ];
 
+    protected $attributes = [
+        'is_system_defined' => false,
+    ];
+
     // =================
     // Relationships
     // =================
@@ -73,4 +77,8 @@ class PaymentMethod extends Model
     // =================
     // Business Logic
     // =================
+    public function toEnum(): \App\Enums\PaymentMethodEnum
+    {
+        return \App\Enums\PaymentMethodEnum::from($this->code);
+    }
 }

@@ -29,7 +29,7 @@ class PaymentMethodController extends Controller
         try {
             $payment_methods = $this->paymentMethodService->searchPaymentMethods(
                 $request->input('filters',  ['is_active' => true]),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $payment_methods,
@@ -50,10 +50,9 @@ class PaymentMethodController extends Controller
     public function adminIndex(Request $request)
     {
         try {
-            $filters = [];
             $payment_methods = $this->paymentMethodService->searchPaymentMethods(
-                $request->input('filters', $filters),
-                $request->input('per_page', 5)
+                $request->input('filters', []),
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $payment_methods,
@@ -159,7 +158,7 @@ class PaymentMethodController extends Controller
     {
         try {
             $payment_method = $this->paymentMethodService->findById($id);
-        if (!$payment_method) {
+            if (!$payment_method) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Payment Method not found'), 404);
             }
             $data = array_filter($request->validated(), fn($value) => !is_null($value));

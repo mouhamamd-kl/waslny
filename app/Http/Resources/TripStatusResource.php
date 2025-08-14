@@ -18,6 +18,7 @@ class TripStatusResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'is_system_defined' => $this->is_system_defined,
+            'is_active' => $this->is_active,
             'dates' => [
                 'created' => $this->created_at,
                 'updated' => $this->updated_at,

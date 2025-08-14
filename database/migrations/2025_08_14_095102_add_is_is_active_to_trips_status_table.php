@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('trip_statuses', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            
-            $table->timestamps();
+        Schema::table('trip_statuses', function (Blueprint $table) {
+            $table->boolean('is_active')->default(true);
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trip_statuses');
+        Schema::table('trip_statuses', function (Blueprint $table) {
+            $table->boolean('is_active')->default(true);
+        });
     }
 };

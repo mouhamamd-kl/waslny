@@ -25,6 +25,10 @@ class TripTimeType extends Model
         'is_system_defined' => 'boolean',
     ];
 
+    protected $attributes = [
+        'is_system_defined' => false,
+    ];
+
     // Default trip type constants
     public const Instant = 'instant';
     public const Scheduled = 'scheduled';
@@ -86,5 +90,10 @@ class TripTimeType extends Model
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    public function toEnum(): \App\Enums\TripTimeTypeEnum
+    {
+        return \App\Enums\TripTimeTypeEnum::from($this->code);
     }
 }

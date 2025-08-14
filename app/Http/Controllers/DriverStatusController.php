@@ -28,7 +28,7 @@ class DriverStatusController extends Controller
         try {
             $driver_statuses = $this->driverStatusService->searchDriverStatus(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $driver_statuses,

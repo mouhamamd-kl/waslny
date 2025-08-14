@@ -30,7 +30,7 @@ class CarModelController extends Controller
         try {
             $car_models = $this->carModelService->searchCarModel(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $car_models,
@@ -50,7 +50,7 @@ class CarModelController extends Controller
         try {
             $car_models = $this->carModelService->searchCarModel(
                 $request->input('filters', ['is_active' => true]),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $car_models,

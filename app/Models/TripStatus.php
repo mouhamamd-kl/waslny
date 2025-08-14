@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TripStatusEnum;
+use App\Traits\Activatable;
 use App\Traits\General\FilterScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TripStatus extends Model
 {
-    use FilterScope;
+    use FilterScope,Activatable;
     // =================
     // Configuration
     // =================
@@ -18,8 +19,12 @@ class TripStatus extends Model
     protected $guarded = ['id'];
     protected $casts = [
         'is_system_defined' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
+    protected $attributes = [
+        'is_system_defined' => false,
+    ];
     // =================
     // Relationships
     // =================
@@ -33,7 +38,7 @@ class TripStatus extends Model
     // =================
     public function toEnum(): TripStatusEnum
     {
-        return TripStatusEnum::from($this->name);
+        return TripStatusEnum::from($this->code);
     }
     // =================
     // Scopes

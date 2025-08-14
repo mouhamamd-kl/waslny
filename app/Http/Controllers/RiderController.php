@@ -28,7 +28,7 @@ class RiderController extends Controller
         try {
             $riders = $this->riderService->searchRiders(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $riders,

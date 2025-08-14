@@ -47,7 +47,7 @@ class TripController extends Controller
         try {
             $trips = $this->trip_service->searchTrips(
                 $request->input('filters', []),
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $trips,
@@ -69,7 +69,7 @@ class TripController extends Controller
             $filters['driver_id'] = auth('driver-api')->user()->id;
             $trips = $this->trip_service->searchTrips(
                 $filters,
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $trips,
@@ -91,7 +91,7 @@ class TripController extends Controller
             $filters['rider_id'] = auth('rider-api')->user()->id;
             $trips = $this->trip_service->searchTrips(
                 $filters,
-                $request->input('per_page', 5)
+                $request->input('per_page', 10)
             );
             return ApiResponse::sendResponsePaginated(
                 $trips,

@@ -29,16 +29,19 @@ class UpdateTripTypeRequest extends BaseRequest
     {
         return [
             'name' => [
-                $this->isRequired(),
+                'sometimes',
+                'nullable',
                 'string',
                 'unique:' . TripType::class
             ],
             'description' => [
-                $this->isRequired(),
+                'sometimes',
+                'nullable',
                 'string',
             ],
             'is_active' => [
-                $this->isRequired(),
+                'sometimes',
+                'nullable',
                 'boolean'
             ]
         ];
