@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\Country\CountryRequest;
 use App\Http\Requests\Country\CountrySearchRequest;
+use App\Http\Requests\Country\CountryStoreRequest;
+use App\Http\Requests\Country\CountryUpdateRequest;
 use App\Http\Resources\CountryResource;
 use App\Models\Country;
 use App\Services\CountryService;
@@ -69,7 +70,7 @@ class CountryController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(CountryRequest $request)
+    public function store(CountryStoreRequest $request)
     {
         try {
             $data = $request->validated();
@@ -104,7 +105,7 @@ class CountryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CountryRequest $request, string $id)
+    public function update(CountryUpdateRequest $request, string $id)
     {
         try {
             $country = $this->countryService->findById($id);

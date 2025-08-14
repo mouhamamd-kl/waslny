@@ -9,7 +9,7 @@ use App\Models\TripType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class TripStatusRequest extends BaseRequest
+class TripStatusStoreRequest extends BaseRequest
 {
     // /**
     //  * Determine if the user is authorized to make this request.
@@ -36,7 +36,7 @@ class TripStatusRequest extends BaseRequest
     {
         return [
             'name' => [
-                $this->isRequired(),
+                'required',
                 'string',
                 'unique:' . TripType::class
             ],

@@ -29,6 +29,7 @@ Route::controller(TripController::class)
                 Route::get('/{trip}', 'show')->name('show');
                 Route::post('/request', 'store')->name('request');
                 Route::post('/cancel', 'cancelTripByRider')->name('cancel');
+                Route::post('/get-fine', 'getTripFine')->name('get-fine');
             });
 
         //================================================================

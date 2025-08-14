@@ -1,22 +1,25 @@
 <?php
 
-namespace App\Http\Requests\RiderFolder;
+namespace App\Http\Requests\RiderSavedLocation;
 
 use App\Http\Requests\BaseRequest;
+use App\Models\CarManufacturer;
 use App\Models\Country;
-use App\Models\PaymentMethod;
-use App\Models\TripType;
+use Clickbar\Magellan\Data\Geometries\Point;
+use Clickbar\Magellan\Http\Requests\TransformsGeojsonGeometry;
+use Clickbar\Magellan\Rules\GeometryGeojsonRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class RiderFolderRequest extends BaseRequest
+class RiderSavedLocationUpdateRequest extends BaseRequest
 {
+    use TransformsGeojsonGeometry;
     // /**
     //  * Determine if the user is authorized to make this request.
     //  */
     // public function authorize(): bool
     // {
-    //     return auth('rider-api')->check();
+    //     return true;
     // }
 
     /**
@@ -34,17 +37,16 @@ class RiderFolderRequest extends BaseRequest
      */
     public function rules(): array
     {
-        $userId = $this->user()->id;
         return [
-            'name' => [
-                $this->isRequired(),
-                'string',
-                'max:255',
-                Rule::unique('rider_folders')
-                    ->where('rider_id', auth('rider-api')->id())
-                    ->ignore($this->route('rider_folder'))
+            'rider_folder_id' => [
+                'sometimes',
+                'exists:rider_folders,id',
             ],
-
+            'location' => ['sometimes', new GeometryGeojsonRule([Point::class])],
         ];
+    }
+    public function geometries(): array
+    {
+        return ['location'];
     }
 }

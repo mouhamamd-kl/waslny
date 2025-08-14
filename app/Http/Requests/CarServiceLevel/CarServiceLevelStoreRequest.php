@@ -9,7 +9,7 @@ use App\Models\Country;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CarServiceLevelRequest extends BaseRequest
+class CarServiceLevelStoreRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -33,12 +33,12 @@ class CarServiceLevelRequest extends BaseRequest
     {
         return [
             'name' => [
-                $this->isRequired(),
+                'required',
                 'string',
                 'unique:' . CarServiceLevel::class
             ],
             'is_active' => [
-                $this->isRequired(),
+                'required',
                 'boolean'
             ]
         ];

@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Coupon;
+namespace App\Http\Requests\Country;
 
 use App\Http\Requests\BaseRequest;
 use App\Models\Country;
-use App\Models\Coupon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CouponRequest extends BaseRequest
+class CountryStoreRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,32 +30,13 @@ class CouponRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'code' => [
-                $this->isRequired(),
+            'name' => [
+                'required',
                 'string',
-                'unique:' . Coupon::class
-            ],
-            'max_uses' => [
-                $this->isRequired(),
-                'integer',
-                'min:1'
-            ],
-            'percent' => [
-                $this->isRequired(),
-                'decimal:2',
-                'min:0.1',
-                'max:0.9',
-            ],
-            'start_date' => [
-                $this->isRequired(),
-                Rule::date()->afterOrEqual(now()),
-            ],
-            'end_date' => [
-                $this->isRequired(),
-                Rule::date()->after(now()),
+                'unique:' . Country::class
             ],
             'is_active' => [
-                $this->isRequired(),
+                'required',
                 'boolean'
             ]
         ];

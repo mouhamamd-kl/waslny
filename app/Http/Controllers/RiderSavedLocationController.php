@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\RiderSavedLocation\RiderSavedLocationRequest;
+use App\Http\Requests\RiderSavedLocation\RiderSavedLocationStoreRequest;
+use App\Http\Requests\RiderSavedLocation\RiderSavedLocationUpdateRequest;
 use App\Http\Resources\RiderSavedLocationResource;
 use App\Models\RiderSavedLocation;
 use App\Services\RiderSavedLocationService;
@@ -74,7 +75,7 @@ class RiderSavedLocationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(RiderSavedLocationRequest $request)
+    public function store(RiderSavedLocationStoreRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -110,7 +111,7 @@ class RiderSavedLocationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RiderSavedLocationRequest $request, string $id)
+    public function update(RiderSavedLocationUpdateRequest $request, string $id)
     {
         try {
             $rider_saved_location = $this->rider_saved_location_service->findById($id);

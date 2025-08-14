@@ -15,8 +15,10 @@ use App\Http\Requests\Trip\SubmitDriverReviewRequest;
 use App\Http\Requests\Trip\SubmitRiderReviewRequest;
 use App\Http\Requests\Trip\TripAdminSearchRequest;
 use App\Http\Requests\Trip\TripDriverSearchRequest;
-use App\Http\Requests\Trip\TripRequest;
+use App\Http\Requests\Trip\TripStoreRequest;
+use App\Http\Requests\Trip\TripUpdateRequest;
 use App\Http\Requests\Trip\TripRiderSearchRequest;
+use App\Http\Requests\Trip\TripFineRequest;
 use App\Http\Resources\TripResource;
 use App\Models\Trip;
 use App\Models\TripLocation;
@@ -261,7 +263,7 @@ class TripController extends Controller
      * Show the form for creating a new resource.
      */
     // trip_flow
-    public function store(TripRequest $request)
+    public function store(TripStoreRequest $request)
     {
         try {
             /** @var Rider $rider */
@@ -362,7 +364,7 @@ class TripController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TripRequest $request, string $id)
+    public function update(TripUpdateRequest $request, string $id)
     {
         try {
             $trip = $this->trip_service->findById($id);
@@ -417,4 +419,14 @@ class TripController extends Controller
 
     //     return response()->json($result);
     // }
+
+    public function getTripFine(TripFineRequest $request)
+    {
+        try {
+            $fine = $this->trip_service->calculateTripFine($request->validated());
+            return ApiResponse::sendResponseSuccess(['fine' => $fine], 'Trip fine calculated successfully.');
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError($e->getMessage());
+        }
+    }
 }

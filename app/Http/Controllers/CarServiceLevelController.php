@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\CarServiceLevel\CarServiceLevelRequest;
 use App\Http\Requests\CarServiceLevel\CarServiceLevelSearchRequest;
+use App\Http\Requests\CarServiceLevel\CarServiceLevelStoreRequest;
+use App\Http\Requests\CarServiceLevel\CarServiceLevelUpdateRequest;
 use App\Http\Resources\CarServiceLevelResource;
 use App\Models\CarServiceLevel;
 use App\Services\CarServiceLevelService;
@@ -69,7 +70,7 @@ class CarServiceLevelController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(CarServiceLevelRequest $request)
+    public function store(CarServiceLevelStoreRequest $request)
     {
         try {
             $data = $request->validated();
@@ -104,7 +105,7 @@ class CarServiceLevelController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CarServiceLevelRequest $request, string $id)
+    public function update(CarServiceLevelUpdateRequest $request, string $id)
     {
         try {
             $car_service_level = $this->carServiceLevelService->findById($id);

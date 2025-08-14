@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Helpers\ApiResponse;
 use App\Http\Requests\Suspension\SuspensionRequest;
 use App\Http\Requests\Suspension\SuspensionSearchRequest;
+use App\Http\Requests\Suspension\SuspensionStoreRequest;
+use App\Http\Requests\Suspension\SuspensionUpdateRequest;
 use App\Http\Resources\SuspensionResource;
 use App\Models\Suspension;
 use App\Services\SuspensionService;
@@ -74,7 +76,7 @@ class SuspensionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(SuspensionRequest $request)
+    public function store(SuspensionStoreRequest $request)
     {
         try {
             $data = $request->validated();
@@ -109,7 +111,7 @@ class SuspensionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(SuspensionRequest $request, string $id)
+    public function update(SuspensionUpdateRequest $request, string $id)
     {
         try {
             $suspension = $this->suspensionService->findById($id);

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\TripStatus\TripStatusRequest;
 use App\Http\Requests\TripStatus\TripStatusSearchRequest;
+use App\Http\Requests\TripStatus\TripStatusStoreRequest;
+use App\Http\Requests\TripStatus\TripStatusUpdateRequest;
 use App\Http\Resources\TripStatusResource;
 use App\Models\TripStatus;
 use App\Services\TripStatusService;
@@ -69,7 +70,7 @@ class TripStatusController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(TripStatusRequest $request)
+    public function store(TripStatusStoreRequest $request)
     {
         try {
             $data = $request->validate();
@@ -105,7 +106,7 @@ class TripStatusController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TripStatusRequest $request, string $id)
+    public function update(TripStatusUpdateRequest $request, string $id)
     {
         try {
             $trip_status = $this->tripStatusService->findById($id);

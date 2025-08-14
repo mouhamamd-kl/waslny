@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\TripTimeType\TripTimeTypeRequest;
 use App\Http\Requests\TripTimeType\TripTimeTypeAdminSearchRequest;
+use App\Http\Requests\TripTimeType\TripTimeTypeStoreRequest;
+use App\Http\Requests\TripTimeType\TripTimeTypeUpdateRequest;
 use App\Http\Requests\TripTimeType\TripTimeTypeRiderSearchRequest;
 use App\Http\Requests\TripTimeType\TripTimeTypeSearchRequest;
 use App\Http\Resources\TripTimeTypeResource;
@@ -123,7 +124,7 @@ class TripTimeTypeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(TripTimeTypeRequest $request)
+    public function store(TripTimeTypeStoreRequest $request)
     {
         try {
             $data = $request->validate();
@@ -159,7 +160,7 @@ class TripTimeTypeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TripTimeTypeRequest $request, string $id)
+    public function update(TripTimeTypeUpdateRequest $request, string $id)
     {
         try {
             $data = array_filter($request->validated(), fn($value) => !is_null($value));

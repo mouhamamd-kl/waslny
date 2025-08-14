@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\RiderFolder\RiderFolderRequest;
 use App\Http\Requests\RiderFolder\RiderFolderSearchRequest;
+use App\Http\Requests\RiderFolder\RiderFolderStoreRequest;
+use App\Http\Requests\RiderFolder\RiderFolderUpdateRequest;
 use App\Http\Resources\RiderFolderResource;
 use App\Models\RiderFolder;
 use App\Services\RiderFolderService;
@@ -71,7 +72,7 @@ class RiderFolderController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(RiderFolderRequest $request)
+    public function store(RiderFolderStoreRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -107,7 +108,7 @@ class RiderFolderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RiderFolderRequest $request, string $id)
+    public function update(RiderFolderUpdateRequest $request, string $id)
     {
         try {
             $rider_folder = $this->riderFolderService->findById($id);

@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Country;
+namespace App\Http\Requests\CarManufacturer;
 
 use App\Http\Requests\BaseRequest;
+use App\Models\CarManufacturer;
 use App\Models\Country;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CountryRequest extends BaseRequest
+class CarManufacturerStoreRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,13 +32,17 @@ class CountryRequest extends BaseRequest
     {
         return [
             'name' => [
-                $this->isRequired(),
+                'required',
                 'string',
-                'unique:' . Country::class
+                'unique:' . CarManufacturer::class
+            ],
+            'country_id' => [
+                'required',
+                'exists:countries,id',
             ],
             'is_active' => [
-                $this->isRequired(),
-                'boolean'
+                'required',
+                'boolean',
             ]
         ];
     }

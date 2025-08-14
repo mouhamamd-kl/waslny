@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\Pricing\PricingRequest;
 use App\Http\Requests\Pricing\PricingSearchRequest;
+use App\Http\Requests\Pricing\PricingStoreRequest;
+use App\Http\Requests\Pricing\PricingUpdateRequest;
 use App\Http\Resources\PricingResource;
 use App\Models\pricing;
 use App\Services\PricingService;
@@ -69,7 +70,7 @@ class PricingController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(PricingRequest $request)
+    public function store(PricingStoreRequest $request)
     {
         try {
             $data = $request->validated();
@@ -104,7 +105,7 @@ class PricingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PricingRequest $request, string $id)
+    public function update(PricingUpdateRequest $request, string $id)
     {
         try {
             $pricing = $this->pricingService->findById($id);

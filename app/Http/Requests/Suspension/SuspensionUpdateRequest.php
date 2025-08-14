@@ -6,7 +6,7 @@ use App\Http\Requests\BaseRequest;
 use App\Models\Suspension;
 use Illuminate\Foundation\Http\FormRequest;
 
-class SuspensionRequest extends BaseRequest
+class SuspensionUpdateRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,23 +27,23 @@ class SuspensionRequest extends BaseRequest
 
         return [
             'reason' => [
-                $this->isRequired(),
+                'sometimes',
                 'nullable',
                 'string',
                 'unique:' . Suspension::class . ',reason,' . $suspensionId
             ],
             'admin_msg' => [
-                $this->isRequired(),
+                'sometimes',
                 'nullable',
                 'string',
             ],
             'user_msg' => [
-                $this->isRequired(),
+                'sometimes',
                 'nullable',
                 'string',
             ],
             'is_active' => [
-                $this->isRequired(),
+                'sometimes',
                 'nullable',
                 'boolean',
             ]

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\Country\DriverStatusSearchRequest;
-use App\Http\Requests\DriverStatus\DriverStatusRequest;
+use App\Http\Requests\DriverStatus\DriverStatusSearchRequest;
+use App\Http\Requests\DriverStatus\DriverStatusStoreRequest;
+use App\Http\Requests\DriverStatus\DriverStatusUpdateRequest;
 use App\Http\Resources\DriverStatusResource;
 use App\Models\DriverStatus;
 use App\Services\DriverStatusService;
@@ -69,7 +70,7 @@ class DriverStatusController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(DriverStatusRequest $request)
+    public function store(DriverStatusStoreRequest $request)
     {
         try {
             $data = $request->validate();
@@ -105,7 +106,7 @@ class DriverStatusController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(DriverStatusRequest $request, string $id)
+    public function update(DriverStatusUpdateRequest $request, string $id)
     {
         try {
             $driver_status = $this->driverStatusService->findById($id);

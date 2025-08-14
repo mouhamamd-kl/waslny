@@ -15,7 +15,7 @@ use App\Rules\TripLocationTypesRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class TripRequest extends BaseRequest
+class TripUpdateRequest extends BaseRequest
 {
     use TransformsGeojsonGeometry;
     // /**
@@ -42,12 +42,12 @@ class TripRequest extends BaseRequest
     {
         return [
             'trip_type_id' => [
-                $this->isRequired(),
+                'sometimes',
                 'exists:trip_types,id'
             ],
 
             'trip_time_type_id' => [
-                $this->isRequired(),
+                'sometimes',
                 'exists:trip_time_types,id'
             ],
 
@@ -59,17 +59,17 @@ class TripRequest extends BaseRequest
             ],
 
             'payment_method_id' => [
-                $this->isRequired(),
+                'sometimes',
                 'exists:payment_methods,id'
             ],
 
 
             // Old validation rules for locations
-            'locations' => ['array', 'min:2', 'required', 'filled'],
+            'locations' => ['array', 'min:2', 'sometimes', 'filled'],
             'locations' => [new TripLocationTypesRule],
 
             // Combined and corrected validation rules for locations
-            // 'locations' => ['required', 'array', 'min:2', 'filled', new TripLocationTypesRule],
+            // 'locations' => ['sometimes', 'array', 'min:2', 'filled', new TripLocationTypesRule],
 
             'locations.*' => [
                 new JsonValidatorRule(['location', 'location_order', 'location_type']),
@@ -81,7 +81,7 @@ class TripRequest extends BaseRequest
 
 
             // 'locations.*.estimated_arrival_time' => [
-            //     'required',
+            //     'sometimes',
             //     function ($attribute, $value, $fail) {
             //         $datetime = Carbon::createFromFormat('Y-m-d H:i', $value);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Country;
+namespace App\Http\Requests\PaymentMethod;
 
 use App\Http\Requests\BaseRequest;
 use Illuminate\Foundation\Http\FormRequest;

@@ -209,4 +209,21 @@ class TripService extends BaseService
     //         ]);
     //     })->delay(now()->addSeconds(15));
     // }
+
+    public function calculateTripFine($data)
+    {
+        $carServiceLevel = app(CarServiceLevelService::class)->findById($data['car_service_level_id']);
+        $pricing = $carServiceLevel->getCurrentPricing();
+
+        $locations = $data['locations'];
+        $totalDistance = 0;
+
+        for ($i = 0; $i < count($locations) - 1; $i++) {
+            $point1 = $locations[$i]['location'];
+            $point2 = $locations[$i + 1]['location'];
+            $totalDistance += $point1->distance($point2);
+        }
+
+        return $pricing->calculateFare($totalDistance / 1000);
+    }
 }

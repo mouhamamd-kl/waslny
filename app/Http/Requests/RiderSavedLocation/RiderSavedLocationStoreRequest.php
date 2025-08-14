@@ -1,23 +1,25 @@
 <?php
 
-namespace App\Http\Requests\DriverStatus;
+namespace App\Http\Requests\RiderSavedLocation;
 
 use App\Http\Requests\BaseRequest;
-use App\Models\CarModel;
+use App\Models\CarManufacturer;
 use App\Models\Country;
-use App\Models\Coupon;
-use App\Models\DriverStatus;
+use Clickbar\Magellan\Data\Geometries\Point;
+use Clickbar\Magellan\Http\Requests\TransformsGeojsonGeometry;
+use Clickbar\Magellan\Rules\GeometryGeojsonRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class DriverStatusRequest extends BaseRequest
+class RiderSavedLocationStoreRequest extends BaseRequest
 {
+    use TransformsGeojsonGeometry;
     // /**
     //  * Determine if the user is authorized to make this request.
     //  */
     // public function authorize(): bool
     // {
-    //     return auth('admin-api')->check();
+    //     return true;
     // }
 
     /**
@@ -25,7 +27,7 @@ class DriverStatusRequest extends BaseRequest
      */
     public function handleAuthorization(): bool
     {
-        return auth('admin-api')->check();
+        return auth('rider-api')->check();
     }
 
     /**
@@ -36,15 +38,15 @@ class DriverStatusRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'name' => [
-                $this->isRequired(),
-                'string',
-                'unique:' . DriverStatus::class
+            'rider_folder_id' => [
+                'required',
+                'exists:rider_folders,id',
             ],
-            'is_active' => [
-                $this->isRequired(),
-                'boolean'
-            ]
+            'location' => ['required', new GeometryGeojsonRule([Point::class])],
         ];
+    }
+    public function geometries(): array
+    {
+        return ['location'];
     }
 }

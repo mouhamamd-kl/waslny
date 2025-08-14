@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\Coupon\CouponRequest;
 use App\Http\Requests\Coupon\CouponSearchRequest;
+use App\Http\Requests\Coupon\CouponStoreRequest;
+use App\Http\Requests\Coupon\CouponUpdateRequest;
 use App\Http\Resources\CouponResource;
 use App\Models\Coupon;
 use App\Services\CouponService;
@@ -70,7 +71,7 @@ class CouponController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(CouponRequest $request)
+    public function store(CouponStoreRequest $request)
     {
         try {
             $data = $request->validated();
@@ -106,7 +107,7 @@ class CouponController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CouponRequest $request, string $id)
+    public function update(CouponUpdateRequest $request, string $id)
     {
         try {
             $coupon = $this->couponService->findById($id);

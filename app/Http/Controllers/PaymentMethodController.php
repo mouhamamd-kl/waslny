@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Requests\Country\PaymentMethodAdminSearchRequest;
-use App\Http\Requests\Country\PaymentMethodRiderSearchRequest;
-use App\Http\Requests\PaymentMethod\PaymentMethodRequest;
+use App\Http\Requests\PaymentMethod\PaymentMethodAdminSearchRequest;
+use App\Http\Requests\PaymentMethod\PaymentMethodRiderSearchRequest;
+use App\Http\Requests\PaymentMethod\PaymentMethodStoreRequest;
+use App\Http\Requests\PaymentMethod\PaymentMethodUpdateRequest;
 use App\Http\Resources\PaymentMethodResource;
 use App\Models\PaymentMethod;
 use App\Services\PaymentMethodService;
@@ -119,7 +120,7 @@ class PaymentMethodController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function store(PaymentMethodRequest $request)
+    public function store(PaymentMethodStoreRequest $request)
     {
         try {
             $data = $request->validate();
@@ -155,7 +156,7 @@ class PaymentMethodController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PaymentMethodRequest $request, string $id)
+    public function update(PaymentMethodUpdateRequest $request, string $id)
     {
         try {
             $payment_method = $this->paymentMethodService->findById($id);

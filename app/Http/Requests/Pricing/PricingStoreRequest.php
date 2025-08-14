@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Requests\PaymentMethod;
+namespace App\Http\Requests\Pricing;
 
 use App\Http\Requests\BaseRequest;
+use App\Models\CarModel;
 use App\Models\Country;
-use App\Models\PaymentMethod;
+use App\Models\Coupon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class PaymentMethodRequest extends BaseRequest
+class PricingStoreRequest extends BaseRequest
 {
     // /**
     //  * Determine if the user is authorized to make this request.
@@ -34,14 +35,17 @@ class PaymentMethodRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'name' => [
-                $this->isRequired(),
-                'string',
-                'unique:' . PaymentMethod::class
+            'car_service_level_id' => [
+                'required',
+                "exists:car_service_levels,id"
+            ],
+            'price_per_km' => [
+                'required',
+                'integer',
             ],
             'is_active' => [
-                $this->isRequired(),
-                'boolean'
+                'required',
+                "boolean",
             ]
         ];
     }

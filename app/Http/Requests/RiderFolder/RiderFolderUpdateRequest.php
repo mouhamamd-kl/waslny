@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Requests\TripTimeType;
+namespace App\Http\Requests\RiderFolder;
 
 use App\Http\Requests\BaseRequest;
 use App\Models\Country;
 use App\Models\PaymentMethod;
-use App\Models\TripTimeType;
 use App\Models\TripType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class TripTimeTypeRequest extends BaseRequest
+class RiderFolderUpdateRequest extends BaseRequest
 {
     // /**
     //  * Determine if the user is authorized to make this request.
@@ -35,20 +34,17 @@ class TripTimeTypeRequest extends BaseRequest
      */
     public function rules(): array
     {
+        $userId = $this->user()->id;
         return [
             'name' => [
-                $this->isRequired(),
+                'sometimes',
                 'string',
-                'unique:' . TripTimeType::class
+                'max:255',
+                Rule::unique('rider_folders')
+                    ->where('rider_id', auth('rider-api')->id())
+                    ->ignore($this->route('rider_folder'))
             ],
-            'description' => [
-                $this->isRequired(),
-                'string',
-            ],
-            'is_active' => [
-                $this->isRequired(),
-                'boolean'
-            ]
+
         ];
     }
 }
