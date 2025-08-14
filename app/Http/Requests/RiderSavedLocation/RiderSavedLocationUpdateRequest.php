@@ -40,9 +40,10 @@ class RiderSavedLocationUpdateRequest extends BaseRequest
         return [
             'rider_folder_id' => [
                 'sometimes',
+                'nullable',
                 'exists:rider_folders,id',
             ],
-            'location' => ['sometimes', new GeometryGeojsonRule([Point::class])],
+            'location' => ['sometimes', 'nullable', new GeometryGeojsonRule([Point::class])],
         ];
     }
     public function geometries(): array

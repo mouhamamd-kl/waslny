@@ -37,6 +37,7 @@ class TripStatusUpdateRequest extends BaseRequest
         return [
             'name' => [
                 'sometimes',
+                'nullable',
                 'string',
                 'unique:' . TripType::class
             ],

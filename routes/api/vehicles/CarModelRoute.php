@@ -10,7 +10,7 @@ Route::middleware(['auth:driver-api'])->controller(CarModelController::class)
     // ->name('car-models.')  // Corrected name prefix
     ->name('driver.car-models.')
     ->group(function () {
-        Route::get('/', 'index')->name('index');
+        Route::get('/', 'driverIndex')->name('index');
         // Route::post('/search', 'search')->name('search');
         Route::post('/search', 'driverSearch')->name('search');
         Route::get('/{car_model}', 'show')->name('show');
@@ -22,6 +22,7 @@ Route::middleware(['auth:admin-api'])->controller(CarModelController::class)
     // ->name('car-models.')
     ->name('admin.car-models.')
     ->group(function () {
+        Route::get('/', 'adminIndex')->name('index');
         Route::post('/search', 'adminSearch')->name('search');
         Route::post('/', 'store')->name('store');
         Route::prefix('{car_model}')->group(function () {

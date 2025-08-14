@@ -45,7 +45,7 @@ class CarModelController extends Controller
         }
     }
 
-    public function index(Request $request)
+    public function driverIndex(Request $request)
     {
         try {
             $car_models = $this->carModelService->searchCarModel(

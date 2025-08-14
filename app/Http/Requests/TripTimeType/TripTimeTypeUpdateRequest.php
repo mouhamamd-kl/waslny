@@ -38,15 +38,18 @@ class TripTimeTypeUpdateRequest extends BaseRequest
         return [
             'name' => [
                 'sometimes',
+                'nullable',
                 'string',
                 'unique:' . TripTimeType::class
             ],
             'description' => [
                 'sometimes',
+                'nullable',
                 'string',
             ],
             'is_active' => [
                 'sometimes',
+                'nullable',
                 'boolean'
             ]
         ];

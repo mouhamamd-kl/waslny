@@ -20,7 +20,7 @@ class RiderProfileTestController extends Controller
         $rider = auth('rider-api')->user();
         // Handle paperwork file upload
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $rider->update(attributes: $data);
             return ApiResponse::sendResponseSuccess(
                 $rider->fresh(),

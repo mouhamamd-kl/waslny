@@ -43,11 +43,13 @@ class TripUpdateRequest extends BaseRequest
         return [
             'trip_type_id' => [
                 'sometimes',
+                'nullable',
                 'exists:trip_types,id'
             ],
 
             'trip_time_type_id' => [
                 'sometimes',
+                'nullable',
                 'exists:trip_time_types,id'
             ],
 
@@ -60,12 +62,13 @@ class TripUpdateRequest extends BaseRequest
 
             'payment_method_id' => [
                 'sometimes',
+                'nullable',
                 'exists:payment_methods,id'
             ],
 
 
             // Old validation rules for locations
-            'locations' => ['array', 'min:2', 'sometimes', 'filled'],
+            'locations' => ['array', 'min:2', 'sometimes', 'nullable', 'filled'],
             'locations' => [new TripLocationTypesRule],
 
             // Combined and corrected validation rules for locations

@@ -22,11 +22,36 @@ class CarManufacturerController extends Controller
     {
         $this->carManufactureService = $carManufactureService;
     }
+/**
+     * Display a listing of the resource.
+     */
+    public function adminIndex(Request $request)
+    {
+        try {
+            $filters = [];
+            if (!auth('admin-api')) {
+                $filters['is_active'] = true;
+            }
+            $car_manufactures = $this->carManufactureService->searchCarManufacture(
+                filters: $request->input('filters', $filters),
+                perPage: $request->input('per_page', 10)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $car_manufactures,
+                CarManufacturerResource::class,
+                trans_fallback('messages.car_manufacture.list', 'Car Manufacture retrieved successfully')
+            );
+        } catch (Exception $e) {
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
 
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function riderIndex(Request $request)
     {
         try {
             $filters = [];

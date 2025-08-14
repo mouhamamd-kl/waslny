@@ -38,11 +38,13 @@ class DriverStatusUpdateRequest extends BaseRequest
         return [
             'name' => [
                 'sometimes',
+                'nullable',
                 'string',
                 'unique:' . DriverStatus::class
             ],
             'is_active' => [
                 'sometimes',
+                'nullable',
                 'boolean'
             ]
         ];

@@ -28,7 +28,7 @@ class Pricing extends Model
     // =================
     public function serviceLevel(): BelongsTo
     {
-        return $this->belongsTo(CarServiceLevel::class);
+        return $this->belongsTo(CarServiceLevel::class, 'car_service_level_id');
     }
 
     // =================

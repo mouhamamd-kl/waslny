@@ -123,11 +123,10 @@ class PaymentMethodController extends Controller
     public function store(PaymentMethodStoreRequest $request)
     {
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $payment_method = $this->paymentMethodService->create($data);
             return ApiResponse::sendResponseSuccess(
-                $payment_method,
-                PaymentMethodResource::class,
+                new PaymentMethodResource($payment_method),
                 trans_fallback('messages.payment_method.created', 'Payment Methods retrieved successfully'),
                 201
             );
@@ -182,9 +181,16 @@ class PaymentMethodController extends Controller
     public function destroy($id)
     {
         try {
-            $payment_method = $this->paymentMethodService->findById($id);
-            if (!$payment_method) {
+            /** @var PaymentMethod $paymentMethod */ // Add PHPDoc type hint
+            $paymentMethod = $this->paymentMethodService->findById($id);
+            if (!$paymentMethod) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Payment Method not found'), 404);
+            }
+            if ($paymentMethod->is_system_defined) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.payment_method.error.system_payment_method_delete_failed', ['name' => $paymentMethod->name]),
+                    403
+                );
             }
             $this->paymentMethodService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
@@ -200,10 +206,16 @@ class PaymentMethodController extends Controller
     public function deActivate($id)
     {
         try {
-            /** @var Coupon $payment_method */ // Add PHPDoc type hint
+            /** @var PaymentMethod $payment_method */ // Add PHPDoc type hint
             $payment_method = $this->paymentMethodService->findById($id);
             if (!$payment_method) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Payment Method not found'), 404);
+            }
+            if ($payment_method->is_system_defined) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.payment_method.error.system_payment_method_deactivation_failed', ['name' => $payment_method->name]),
+                    403
+                );
             }
             $payment_method->deactivate();
             return ApiResponse::sendResponseSuccess(
@@ -219,10 +231,16 @@ class PaymentMethodController extends Controller
     public function activate($id)
     {
         try {
-            /** @var Coupon $payment_method */ // Add PHPDoc type hint
+            /** @var PaymentMethod $payment_method */ // Add PHPDoc type hint
             $payment_method = $this->paymentMethodService->findById($id);
             if (!$payment_method) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Payment Method not found'), 404);
+            }
+            if ($payment_method->is_system_defined) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.payment_method.error.system_payment_method_activation_failed', ['name' => $payment_method->name]),
+                    403
+                );
             }
             $payment_method->activate();
             return ApiResponse::sendResponseSuccess(

@@ -36,11 +36,13 @@ class PaymentMethodUpdateRequest extends BaseRequest
         return [
             'name' => [
                 'sometimes',
+                'nullable',
                 'string',
                 'unique:' . PaymentMethod::class
             ],
             'is_active' => [
                 'sometimes',
+                'nullable',
                 'boolean'
             ]
         ];

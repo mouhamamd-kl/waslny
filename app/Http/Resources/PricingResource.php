@@ -17,6 +17,7 @@ class PricingResource extends JsonResource
         return [
             'id' => $this->id,
             'price_per_km' => $this->price_per_km,
+            'service_level' => new CarServiceLevelResource($this->whenLoaded('serviceLevel')),
             'is_active' => $this->is_active,
             'dates' => [
                 'created' => $this->created_at,

@@ -32,11 +32,13 @@ class CountryUpdateRequest extends BaseRequest
         return [
             'name' => [
                 'sometimes',
+                'nullable',
                 'string',
                 'unique:' . Country::class
             ],
             'is_active' => [
                 'sometimes',
+                'nullable',
                 'boolean'
             ]
         ];

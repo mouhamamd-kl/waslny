@@ -38,6 +38,7 @@ class RiderFolderUpdateRequest extends BaseRequest
         return [
             'name' => [
                 'sometimes',
+                'nullable',
                 'string',
                 'max:255',
                 Rule::unique('rider_folders')

@@ -103,7 +103,6 @@ class TripTypeController extends Controller
                 filters: $filters,
                 perPage: $request->input('per_page', 10),
             );
-
             return ApiResponse::sendResponsePaginated(
                 $trip_types,
                 TripTypeResource::class, // Add your resource class
@@ -149,11 +148,10 @@ class TripTypeController extends Controller
     public function store(StoreTripTypeRequest $request)
     {
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $trip_type = $this->tripTypeService->create($data);
             return ApiResponse::sendResponseSuccess(
-                $trip_type,
-                TripTypeResource::class,
+                new TripTypeResource($trip_type),
                 trans_fallback('messages.trip_type.created', 'Trip Types retrieved successfully'),
                 201
             );
@@ -204,6 +202,17 @@ class TripTypeController extends Controller
     public function destroy($id)
     {
         try {
+            /** @var TripType $tripType */ // Add PHPDoc type hint
+            $tripType = $this->tripTypeService->findById($id);
+            if (!$tripType) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_type not found'), 404);
+            }
+            if ($tripType->is_system_defined) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip_type.error.system_trip_type_delete_failed', ['name' => $tripType->name]),
+                    403
+                );
+            }
             $this->tripTypeService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_type.deleted', 'trip_type updated successfully')
@@ -223,6 +232,12 @@ class TripTypeController extends Controller
             if (!$triptype) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_type not found'), 404);
             }
+            if ($triptype->is_system_defined) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip_type.error.system_trip_type_activation_failed', ['name' => $triptype->name]),
+                    403
+                );
+            }
             $triptype->activate();
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_type.activated', 'Trip Type Activated successfully')
@@ -240,6 +255,12 @@ class TripTypeController extends Controller
             $triptype = $this->tripTypeService->findById($id);
             if (!$triptype) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'trip_type not found'), 404);
+            }
+            if ($triptype->is_system_defined) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip_type.error.system_trip_type_deactivation_failed', ['name' => $triptype->name]),
+                    403
+                );
             }
             $triptype->deactivate();
             return ApiResponse::sendResponseSuccess(

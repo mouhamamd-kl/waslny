@@ -37,14 +37,17 @@ class PricingUpdateRequest extends BaseRequest
         return [
             'car_service_level_id' => [
                 'sometimes',
+                'nullable',
                 "exists:car_service_levels,id"
             ],
             'price_per_km' => [
                 'sometimes',
+                'nullable',
                 'integer',
             ],
             'is_active' => [
                 'sometimes',
+                'nullable',
                 "boolean",
             ]
         ];

@@ -10,7 +10,7 @@ Route::middleware(['auth:driver-api'])->controller(CarManufacturerController::cl
     // ->name('car-manufacturers.')
     ->name('driver.car-manufacturers.')
     ->group(function () {
-        Route::get('/', 'index')->name('index');
+        Route::get('/', 'riderIndex')->name('index');
         // Route::post('/search', 'search')->name('search');
         Route::post('/search', 'driverSearch')->name('search');
         Route::get('/{car_manufacturer}', 'show')->name('show');
@@ -22,8 +22,9 @@ Route::middleware(['auth:admin-api'])->controller(CarManufacturerController::cla
     // ->name('car-manufacturers.')
     ->name('admin.car-manufacturers.')
     ->group(function () {
-        Route::post('/', 'store')->name('store');
+        Route::get('/', 'adminIndex')->name('index');
         Route::post('/search', 'adminSearch')->name('search');
+        Route::post('/', 'store')->name('store');
         Route::prefix('{car_manufacturer}')->group(function () {
             Route::get('/', 'show')->name('show');
             Route::post('/', 'update')->name('update');

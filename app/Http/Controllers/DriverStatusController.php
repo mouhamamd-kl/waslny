@@ -73,11 +73,10 @@ class DriverStatusController extends Controller
     public function store(DriverStatusStoreRequest $request)
     {
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $driver_status = $this->driverStatusService->create($data);
             return ApiResponse::sendResponseSuccess(
-                $driver_status,
-                DriverStatusResource::class,
+                new DriverStatusResource($driver_status),
                 trans_fallback('messages.driver_status.created', 'Driver Statuses Created successfully'),
                 201
             );

@@ -32,16 +32,19 @@ class CarManufacturerUpdateRequest extends BaseRequest
     {
         return [
             'name' => [
+                'nullable',
                 'sometimes',
                 'string',
                 'unique:' . CarManufacturer::class
             ],
             'country_id' => [
                 'sometimes',
+                'nullable',
                 'exists:countries,id',
             ],
             'is_active' => [
                 'sometimes',
+                'nullable',
                 'boolean',
             ]
         ];

@@ -73,7 +73,7 @@ class TripStatusController extends Controller
     public function store(TripStatusStoreRequest $request)
     {
         try {
-            $data = $request->validate();
+            $data = $request->validated();
             $trip_status = $this->tripStatusService->create($data);
             return ApiResponse::sendResponseSuccess(
                 $trip_status,
@@ -132,9 +132,16 @@ class TripStatusController extends Controller
     public function destroy($id)
     {
         try {
-            $trip_status = $this->tripStatusService->findById($id);
-            if (!$trip_status) {
+            /** @var TripStatus $tripStatus */ // Add PHPDoc type hint
+            $tripStatus = $this->tripStatusService->findById($id);
+            if (!$tripStatus) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip Status not found'), 404);
+            }
+            if ($tripStatus->is_system_defined) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip_status.error.system_trip_status_delete_failed', ['name' => $tripStatus->name]),
+                    403
+                );
             }
             $this->tripStatusService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(

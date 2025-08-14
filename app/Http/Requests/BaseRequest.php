@@ -139,13 +139,14 @@ class BaseRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        if ($this->has('is_active')) {
+        if ($this->has('is_active') && $this->input('is_active') != null) {
             $isActive = filter_var($this->input('is_active'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
             if ($isActive !== null) {
-                $this->merge([
-                    'is_active' => $isActive,
-                ]);
+                $this->merge(['is_active' => $isActive]);
             }
+        } else {
+            $this->request->remove('is_active');
         }
     }
 }

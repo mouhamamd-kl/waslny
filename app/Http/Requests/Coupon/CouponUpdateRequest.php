@@ -33,30 +33,36 @@ class CouponUpdateRequest extends BaseRequest
         return [
             'code' => [
                 'sometimes',
+                'nullable',
                 'string',
                 'unique:' . Coupon::class
             ],
             'max_uses' => [
                 'sometimes',
+                'nullable',
                 'integer',
                 'min:1'
             ],
             'percent' => [
                 'sometimes',
+                'nullable',
                 'decimal:2',
                 'min:0.1',
                 'max:0.9',
             ],
             'start_date' => [
                 'sometimes',
+                'nullable',
                 Rule::date()->afterOrEqual(now()),
             ],
             'end_date' => [
                 'sometimes',
+                'nullable',
                 Rule::date()->after(now()),
             ],
             'is_active' => [
                 'sometimes',
+                'nullable',
                 'boolean'
             ]
         ];

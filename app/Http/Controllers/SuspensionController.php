@@ -125,6 +125,7 @@ class SuspensionController extends Controller
                 trans_fallback('messages.suspension.updated', 'Suspension updated successfully')
             );
         } catch (Exception $e) {
+            throw $e;
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.update_failed', 'Update failed: ' . $e->getMessage())
             );
