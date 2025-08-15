@@ -25,6 +25,15 @@ class CarModel extends Model
         'model_year' => 'integer',
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function (CarModel $carModel) {
+            if ($carModel->driversCars()->exists()) {
+                throw new \Exception('Cannot delete a car model that has driver cars associated with it.');
+            }
+        });
+    }
+
     // =================
     // Relationships
     // =================

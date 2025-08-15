@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
+use App\Http\Requests\RiderFolder\ForceDeleteRiderFolderRequest;
 use App\Http\Requests\RiderFolder\RiderFolderSearchRequest;
 use App\Http\Requests\RiderFolder\RiderFolderStoreRequest;
 use App\Http\Requests\RiderFolder\RiderFolderUpdateRequest;
@@ -49,7 +50,7 @@ class RiderFolderController extends Controller
     public function search(RiderFolderSearchRequest $request)
     {
         try {
-            $filters = array_filter($request->validated(), fn ($value) => !is_null($value));
+            $filters = array_filter($request->validated(), fn($value) => !is_null($value));
             $filters['rider_id'] = auth('rider-api')->user()->id;
             $rider_folders = $this->riderFolderService->searchRiderFolders(
                 filters: $filters,
@@ -131,18 +132,29 @@ class RiderFolderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(ForceDeleteRiderFolderRequest $request, $id)
     {
         try {
             $rider_folder = $this->riderFolderService->findById($id);
             if (!$rider_folder) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'rider_location_folder not found'), 404);
             }
+
+            $locationsCount = $rider_folder->locationsCount();
+
+            if ($locationsCount > 0 && !$request->validated('force')) {
+                return ApiResponse::sendResponseError(
+                    "This folder contains {$locationsCount} saved locations. To delete the folder and all its contents, please confirm by sending the request again with a 'force=true' parameter.",
+                    409 // 409 Conflict
+                );
+            }
+
             $this->riderFolderService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.rider_location_folder.deleted', 'rider_location_folder updated successfully')
             );
         } catch (Exception $e) {
+            throw $e;
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.delete_failed', 'Delete failed: ' . $e->getMessage())
             );

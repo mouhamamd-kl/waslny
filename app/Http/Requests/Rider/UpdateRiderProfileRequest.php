@@ -35,17 +35,18 @@ class UpdateRiderProfileRequest extends BaseRequest
     {
         $rider = auth('rider-api')->user();
         return [
-            'first_name' => ['sometimes', 'string'],
-            'last_name' => ['sometimes', 'string'],
+            'first_name' => ['sometimes',  'nullable', 'string'],
+            'last_name' => ['sometimes',   'nullable', 'string'],
             'phone' => [
-                'string',
                 'sometimes',
+                'nullable',
+                'string',
                 Rule::unique('riders')->ignore($rider->id),
             ],
-            'email' => ['sometimes', 'email', Rule::unique('riders')->ignore($rider->id),],
+            'email' => ['sometimes',  'nullable', 'email', Rule::unique('riders')->ignore($rider->id),],
             'profile_photo' => $this->imageRule(FieldRequirementEnum::SOMETIMES),
-            'payment_method_id' => 'sometimes' . "|exists:payment_methods,id",
-            'location' => ['sometimes', 'string'],
+            'payment_method_id' => ['sometimes',  'nullable', "exists:payment_methods,id"],
+            'location' => ['sometimes',   'nullable', 'string'],
         ];
     }
 }

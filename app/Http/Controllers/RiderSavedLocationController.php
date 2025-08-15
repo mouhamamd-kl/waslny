@@ -7,6 +7,7 @@ use App\Http\Requests\RiderSavedLocation\RiderSavedLocationStoreRequest;
 use App\Http\Requests\RiderSavedLocation\RiderSavedLocationUpdateRequest;
 use App\Http\Resources\RiderSavedLocationResource;
 use App\Models\RiderSavedLocation;
+use App\Services\RiderFolderService;
 use App\Services\RiderSavedLocationService;
 use Exception;
 use Illuminate\Http\Request;
@@ -14,10 +15,11 @@ use Illuminate\Http\Request;
 class RiderSavedLocationController extends Controller
 {
     protected $rider_saved_location_service;
-
-    public function __construct(RiderSavedLocationService $rider_saved_location_service)
+    protected $rider_folder_service;
+    public function __construct(RiderSavedLocationService $rider_saved_location_service, RiderFolderService $rider_folder_service)
     {
         $this->rider_saved_location_service = $rider_saved_location_service;
+        $this->rider_folder_service = $rider_folder_service;
     }
     /**
      * Display a listing of the resource.
@@ -25,7 +27,7 @@ class RiderSavedLocationController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->input('filters');
+            $filters = [];
             $filters['rider_id'] = auth('rider-api')->user()->id;
             $rider_saved_locations = $this->rider_saved_location_service->searchRiderSavedLocations(
                 $filters,
@@ -34,10 +36,39 @@ class RiderSavedLocationController extends Controller
             return ApiResponse::sendResponsePaginated(
                 $rider_saved_locations,
                 RiderSavedLocationResource::class,
-                trans_fallback('messages.rider_saved_location.list', 'Rider Location Folder retrieved successfully')
+                trans_fallback('messages.rider_saved_location.list', 'Rider saved locations retrieved successfully')
             );
         } catch (Exception $e) {
             throw $e;
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
+
+    public function riderFolderIndex(Request $request, $rider_folder_id)
+    {
+        try {
+            $rider_folder = $this->rider_folder_service->findById($rider_folder_id);
+            if (!$rider_folder) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.rider_location_folder.error.not_found', 'Rider folder not found'),
+                    404
+                );
+            }
+            $filters = [];
+            $filters['rider_folder_id'] = $rider_folder_id;
+            $filters['rider_id'] = auth('rider-api')->user()->id;
+            $rider_saved_locations = $this->rider_saved_location_service->searchRiderSavedLocations(
+                $filters,
+                $request->input('per_page', 10)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $rider_saved_locations,
+                RiderSavedLocationResource::class,
+                trans_fallback('messages.rider_saved_location.list', 'Rider saved locations retrieved successfully')
+            );
+        } catch (Exception $e) {
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred')
             );

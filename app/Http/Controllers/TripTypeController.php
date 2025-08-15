@@ -213,6 +213,12 @@ class TripTypeController extends Controller
                     403
                 );
             }
+            if ($tripType->trips()->exists()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip_type.error.has_trips', 'Cannot delete a trip type that is associated with trips.'),
+                    409
+                );
+            }
             $this->tripTypeService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_type.deleted', 'trip_type updated successfully')

@@ -25,6 +25,15 @@ class Coupon extends Model
     protected $guarded = ['id'];
 
     protected $casts = ['is_active' => 'boolean'];
+
+    protected static function booted()
+    {
+        static::deleting(function (Coupon $coupon) {
+            if ($coupon->trips()->exists() || $coupon->riderCoupons()->exists()) {
+                throw new \Exception('Cannot delete a coupon that has been used in trips or assigned to riders.');
+            }
+        });
+    }
     // Add this line to explicitly set the factory class
     // =================
     // Relationships

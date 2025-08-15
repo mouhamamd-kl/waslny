@@ -215,6 +215,12 @@ class TripTimeTypeController extends Controller
                     403
                 );
             }
+            if ($tripTimeType->trips()->exists()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip_time_type.error.has_trips', 'Cannot delete a trip time type that is associated with trips.'),
+                    409
+                );
+            }
             $this->tripTimeTypeService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_time_type.deleted', 'trip_time_type updated successfully')

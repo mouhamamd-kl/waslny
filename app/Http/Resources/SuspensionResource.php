@@ -20,8 +20,8 @@ class SuspensionResource extends JsonResource
             'reason' => $this->reason,
             'admin_msg' => $this->admin_msg,
             'user_msg' => $this->user_msg,
-            'is_active' => $this->is_active,
-            'is_system' => $this->is_system_defined,
+            'is_active' => $this->when(auth('admin-api')->check(), $this->is_active),
+            'is_system_defined' =>  $this->when(auth('admin-api')->check(), $this->is_system_defined),
             'dates' => [
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,

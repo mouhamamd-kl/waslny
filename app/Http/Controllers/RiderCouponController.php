@@ -64,29 +64,40 @@ class RiderCouponController extends Controller
         }
     }
 
-    public function destroy($id): bool
+    public function destroy($id)
     {
         try {
             /** @var Rider $rider */
-            $rider = auth('sanctum')->user();
+            $rider = auth('rider-api')->user();
 
-            // First check if the listing exists
-            $rider_coupon = RiderCoupon::find($id);
-            if (! $rider_coupon) {
-                return true;
+            $riderCoupon = RiderCoupon::find($id);
+
+            if (! $riderCoupon) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.rider_coupon.error.not_found', 'Rider coupon not found.'),
+                    404
+                );
             }
 
-            // Check if the listing is in user's favorites
-            if (! $rider->coupons()->where('listing_id', $id)->exists()) {
-                return true;
+            if ($riderCoupon->rider_id !== $rider->id) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.forbidden', 'You are not authorized to delete this coupon.'),
+                    403
+                );
             }
 
-            // Remove from favorites
-            $rider->coupons()->detach($id);
+            $riderCoupon->delete();
 
-            return true;
+            return ApiResponse::sendResponseSuccess(
+                null,
+                trans_fallback('messages.rider_coupon.deleted', 'Rider coupon deleted successfully.'),
+                200
+            );
         } catch (Exception $e) {
-            return false;
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.rider_coupon.error.delete_failed', 'Failed to delete rider coupon.'),
+                500
+            );
         }
     }
 }

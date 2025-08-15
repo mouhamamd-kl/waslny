@@ -99,8 +99,7 @@ class DriverTwoFactorController extends Controller
     {
         try {
             $data = $request->validated();
-
-            $driver = Driver::where('phone', $data->phone)->first();
+            $driver = Driver::where('phone',  $data['phone'])->first();
             $driver->generateTwoFactorCode();
             // $rider->notify(new \App\Notifications\Agent\AgentTwoFactorCode);
             return ApiResponse::sendResponseSuccess(

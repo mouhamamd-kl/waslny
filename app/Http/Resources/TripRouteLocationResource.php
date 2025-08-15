@@ -2,11 +2,10 @@
 
 namespace App\Http\Resources;
 
-use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RiderSavedLocationResource extends JsonResource
+class TripRouteLocationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,8 +16,6 @@ class RiderSavedLocationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'folder_id' => $this->rider_folder_id,
-            // 'rider_id' => $this->rider_id,
             'location' => $this->when($this->location, function () {
                 return [
                     'type' => 'Point',

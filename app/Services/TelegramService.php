@@ -108,8 +108,10 @@ class TelegramService
     {
         $chatId = $message->getChat()->getId();
         $phoneNumber = $message->getContact()->getPhoneNumber();
-        $phoneNumber =  str_replace("963", "0", $phoneNumber);
-
+        // $phoneNumber =  str_replace("963", "0", $phoneNumber);
+        event(new TestNotification([
+            ' $phoneNumber' =>  $phoneNumber
+        ]));
         // Retrieve the role from cache
         $role = cache('telegram_role_' . $chatId);
 
@@ -170,6 +172,9 @@ class TelegramService
 
     private function getOtpForUser($user): ?string
     {
+        if ($user->getExpirationOfCode() < now()) {
+            return null;
+        }
         return $user->getTwoFactorCode();
     }
 }

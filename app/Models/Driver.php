@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
@@ -46,7 +47,7 @@ enum DriverPhotoType: string
 
 class Driver extends Authenticatable implements Wallet
 {
-    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken, SoftDeletes;
     use Suspendable {
         suspendTemporarily as protected traitSuspendTemp;
         suspendForever as protected traitSuspendForever;
@@ -72,6 +73,17 @@ class Driver extends Authenticatable implements Wallet
         'two_factor_expires_at' => 'datetime',
         'avg_rating' => 'float',
     ];
+
+    protected static function booted()
+    {
+        static::deleting(function (Driver $driver) {
+            if ($driver->isForceDeleting()) {
+                $driver->driverCar()->delete();
+                $driver->tripNotifications()->delete();
+                $driver->suspensions()->delete();
+            }
+        });
+    }
 
     // =================
     // Relationships

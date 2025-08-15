@@ -20,7 +20,7 @@ class CarModelResource extends JsonResource
             'manufacturer' => new CarManufacturerResource($this->whenLoaded('manufacturer')),
             'service_level' => new CarServiceLevelResource($this->whenLoaded('serviceLevel')),
             'model_year' => $this->model_year,
-            'is_active' => $this->is_active,
+            'is_active' => $this->when(auth('admin-api')->check(), $this->is_active),
             'dates' => [
                 'created' => $this->created_at,
                 'updated' => $this->updated_at,

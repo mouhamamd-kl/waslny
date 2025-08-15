@@ -1,10 +1,11 @@
 <?php
 // routes/api.php
 use App\Http\Controllers\RiderFolderController;
+use App\Http\Controllers\RiderSavedLocationController;
 use Illuminate\Support\Facades\Route;
 
 // Rider-specific routes (protected by rider-api guard)
-Route::middleware(['auth:rider-api','rider.profile.completed'])->group(function () {
+Route::middleware(['auth:rider-api', 'rider.profile.completed'])->group(function () {
     Route::controller(RiderFolderController::class)
         ->prefix('rider-folders')
         // ->name('rider-folders.')
@@ -20,6 +21,7 @@ Route::middleware(['auth:rider-api','rider.profile.completed'])->group(function 
                 Route::get('/', 'show')->name('show');
                 Route::post('/', 'update')->name('update');
                 Route::delete('/', 'destroy')->name('destroy');
+                Route::get('/saved-locations', [RiderSavedLocationController::class, 'riderFolderIndex'])->name('saved-locations.index');
             });
         });
 });

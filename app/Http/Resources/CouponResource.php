@@ -22,7 +22,7 @@ class CouponResource extends JsonResource
             'percent' => $this->percent,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
-            'is_active' => $this->is_active,
+            'is_active' => $this->when(auth('admin-api')->check(), $this->is_active),
             'dates' => [
                 'created' => $this->created_at,
                 'updated' => $this->updated_at,

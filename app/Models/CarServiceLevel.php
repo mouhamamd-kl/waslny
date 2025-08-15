@@ -21,6 +21,15 @@ class CarServiceLevel extends Model
     protected $guarded = ['id'];
     protected $casts = ['is_active' => 'boolean'];
 
+    protected static function booted()
+    {
+        static::deleting(function (CarServiceLevel $carServiceLevel) {
+            if ($carServiceLevel->carModels()->exists() || $carServiceLevel->pricings()->exists()) {
+                throw new \Exception('Cannot delete a car service level that has car models or pricings associated with it.');
+            }
+        });
+    }
+
     // =================
     // Relationships
     // =================

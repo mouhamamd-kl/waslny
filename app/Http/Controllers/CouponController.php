@@ -137,9 +137,17 @@ class CouponController extends Controller
             if (!$coupon) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Coupon not found'), 404);
             }
+
+            if ($coupon->trips()->exists() || $coupon->riderCoupons()->exists()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.coupon.error.has_trips_or_riders', 'Cannot delete a coupon that has been used in trips or assigned to riders.'),
+                    409
+                );
+            }
+
             $this->couponService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
-                message: trans_fallback('messages.coupon.deleted', 'Coupon deleted successfully')
+                message: trans_fallback('messages.coupon.deleted', 'Coupon updated successfully')
             );
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(

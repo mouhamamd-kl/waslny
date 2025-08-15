@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CarManufacturerController;
+use App\Http\Controllers\CarModelController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -13,7 +14,10 @@ Route::middleware(['auth:driver-api'])->controller(CarManufacturerController::cl
         Route::get('/', 'riderIndex')->name('index');
         // Route::post('/search', 'search')->name('search');
         Route::post('/search', 'driverSearch')->name('search');
-        Route::get('/{car_manufacturer}', 'show')->name('show');
+        Route::prefix('{car_manufacturer}')->group(function () {
+            Route::get('/', 'show')->name('show');
+            Route::get('/car-models', [CarModelController::class, 'carManufactureIndex'])->name('car-models.index');
+        });
     });
 
 // Admin-protected routes (using middleware group)

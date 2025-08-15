@@ -10,6 +10,7 @@ use App\Http\Requests\CarModel\CarModelDriverSearchRequest;
 use App\Http\Requests\CarModel\CarModelUpdateRequest;
 use App\Http\Resources\CarModelResource;
 use App\Models\CarModel;
+use App\Services\CarManufactureService;
 use App\Services\CarModelService;
 use Exception;
 use Illuminate\Http\Request;
@@ -17,10 +18,11 @@ use Illuminate\Http\Request;
 class CarModelController extends Controller
 {
     protected $carModelService;
-
-    public function __construct(CarModelService $carModelService)
+    protected $car_manufacture_service;
+    public function __construct(CarModelService $carModelService, CarManufactureService $car_manufacture_service)
     {
         $this->carModelService = $carModelService;
+        $this->car_manufacture_service = $car_manufacture_service;
     }
     /**
      * Display a listing of the resource.
@@ -56,6 +58,37 @@ class CarModelController extends Controller
                 $car_models,
                 CarModelResource::class,
                 trans_fallback('messages.car_model.list', 'Car Model retrieved successfully')
+            );
+        } catch (Exception $e) {
+            throw $e;
+            return ApiResponse::sendResponseError(
+                trans_fallback('messages.error.generic', 'An error occurred')
+            );
+        }
+    }
+
+
+    public function carManufactureIndex(Request $request, $car_manufacture_id)
+    {
+        try {
+            $car_manufacture = $this->car_manufacture_service->findById($car_manufacture_id);
+            if (!$car_manufacture) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.car_manufacture.error.not_found', 'Car manufacturer not found'),
+                    404
+                );
+            }
+            $filters = [];
+            $filters['car_manufacturer_id'] = $car_manufacture_id;
+            $filters['is_active'] = true;
+            $car_models = $this->carModelService->searchCarModel(
+                $filters,
+                $request->input('per_page', 10)
+            );
+            return ApiResponse::sendResponsePaginated(
+                $car_models,
+                CarModelResource::class,
+                trans_fallback('messages.car_model.list', 'Car models retrieved successfully')
             );
         } catch (Exception $e) {
             throw $e;
@@ -233,11 +266,19 @@ class CarModelController extends Controller
         try {
             $car_model = $this->carModelService->findById($id);
             if (!$car_model) {
-                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Model not found'), 404);
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'CarModel not found'), 404);
             }
+
+            if ($car_model->driversCars()->exists()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.car_model.error.has_driver_cars', 'Cannot delete a car model that has driver cars associated with it.'),
+                    409
+                );
+            }
+
             $this->carModelService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
-                message: trans_fallback('messages.car_model.deleted', 'Car Model updated successfully')
+                message: trans_fallback('messages.car_model.deleted', 'CarModel updated successfully')
             );
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(

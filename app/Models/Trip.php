@@ -24,6 +24,14 @@ class Trip extends Model
     protected $guarded = ['id']; // Guarded instead of fillable for security
     protected $casts = [];
 
+    protected static function booted()
+    {
+        static::deleting(function (Trip $trip) {
+            $trip->notifications()->delete();
+            $trip->locations()->delete();
+        });
+    }
+
     /**
      * Relationships
      */
@@ -83,6 +91,11 @@ class Trip extends Model
     public function locations(): HasMany
     {
         return $this->hasMany(TripLocation::class);
+    }
+
+    public function routeLocations(): HasMany
+    {
+        return $this->hasMany(\App\Models\domains\trips\trip_route_locations\TripRouteLocation::class);
     }
 
 

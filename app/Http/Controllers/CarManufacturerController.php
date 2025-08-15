@@ -217,13 +217,21 @@ class CarManufacturerController extends Controller
     public function destroy($id)
     {
         try {
-            $car_manufacture = $this->carManufactureService->findById($id);
-            if (!$car_manufacture) {
-                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Manufacture not found'), 404);
+            $car_manufacturer = $this->carManufactureService->findById($id);
+            if (!$car_manufacturer) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'CarManufacturer not found'), 404);
             }
+
+            if ($car_manufacturer->models()->exists()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.car_manufacturer.error.has_models', 'Cannot delete a car manufacturer that has models associated with it.'),
+                    409
+                );
+            }
+
             $this->carManufactureService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
-                message: trans_fallback('messages.car_manufacture.deleted', 'Car Manufacture updated successfully')
+                message: trans_fallback('messages.car_manufacturer.deleted', 'CarManufacturer updated successfully')
             );
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(

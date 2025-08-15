@@ -30,6 +30,10 @@ class TripLocationResource extends JsonResource
             'is_completed' => $this->is_completed,
             'estimated_arrival_time' => $this->estimated_arrival_time,
             'actual_arrival_time' => $this->actual_arrival_time,
+            'dates' => [
+                'created' => $this->created_at,
+                'updated' => $this->updated_at,
+            ],
         ];
     }
 }

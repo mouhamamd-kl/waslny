@@ -17,6 +17,13 @@ class RiderFolder extends Model
     protected $table = 'rider_folders';
     protected $guarded = ['id'];
 
+    protected static function booted()
+    {
+        static::deleting(function (RiderFolder $riderFolder) {
+            $riderFolder->savedLocations()->delete();
+        });
+    }
+
     // =================
     // Relationships
     // =================

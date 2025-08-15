@@ -25,6 +25,7 @@ class TripStatus extends Model
     protected $attributes = [
         'is_system_defined' => false,
     ];
+
     // =================
     // Relationships
     // =================

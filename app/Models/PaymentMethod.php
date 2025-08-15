@@ -27,6 +27,15 @@ class PaymentMethod extends Model
         'is_system_defined' => false,
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function (PaymentMethod $paymentMethod) {
+            if ($paymentMethod->riders()->exists() || $paymentMethod->trips()->exists()) {
+                throw new \Exception('Cannot delete a payment method that is associated with riders or trips.');
+            }
+        });
+    }
+
     // =================
     // Relationships
     // =================

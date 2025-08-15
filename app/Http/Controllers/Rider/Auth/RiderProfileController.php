@@ -68,10 +68,10 @@ class RiderProfileController extends Controller
         try {
             if (!$rider->isProfileComplete()) {
                 $validated = $request->validated();
-                
+
                 $rider->update($validated);
                 return ApiResponse::sendResponseSuccess(
-                    $rider->fresh(),
+                    new RiderResource($rider->fresh()),
                     trans_fallback('messages.rider.completion_success', 'Rider Profile Completion Success')
                 );
             }
@@ -93,7 +93,7 @@ class RiderProfileController extends Controller
         try {
             /** @var Rider $rider */ // Add PHPDoc type hint
             $rider = auth('rider-api')->user();
-            $data = $request->validated();
+            $data = array_filter($request->validated(), fn($value) => !is_null($value));
 
             // Remove fields we don't want to update directly
             unset($data['profile_photo']);

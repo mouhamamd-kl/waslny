@@ -15,6 +15,7 @@ class RiderCouponResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'coupon' => new CouponResource($this->whenLoaded('coupon')),
             'dates' => [
                 'created' => $this->created_at,

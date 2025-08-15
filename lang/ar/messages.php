@@ -111,6 +111,7 @@ return [
         'error' => [
             'activation_failed' => 'فشل تفعيل شركة التصنيع',
             'deactivation_failed' => 'فشل إيقاف شركة التصنيع',
+            'not_found' => 'شركة تصنيع السيارات غير موجودة',
         ],
     ],
     'car_model' => [

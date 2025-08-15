@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Http;
 
 class TripService extends BaseService
 {
-    protected array $relations = ['driver', 'rider', 'status', 'type', 'timeType', 'locations', 'paymentMethod', 'notifications', 'notifiedDrivers', 'riderCoupon'];
+    protected array $relations = ['driver', 'rider', 'status', 'type', 'timeType', 'locations', 'paymentMethod', 'notifications', 'notifiedDrivers', 'riderCoupon', 'routeLocations'];
 
     public function __construct(CacheHelper $cache)
     {

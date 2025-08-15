@@ -142,6 +142,12 @@ class TripStatusController extends Controller
                     403
                 );
             }
+            if ($tripStatus->trips()->exists()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.trip_status.error.has_trips', 'Cannot delete a trip status that is associated with trips.'),
+                    409
+                );
+            }
             $this->tripStatusService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
                 message: trans_fallback('messages.trip_status.deleted', 'Trip Status updated successfully')

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests\TripType;
+namespace App\Http\Requests\RiderFolder;
 
 use App\Http\Requests\BaseRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class TripTypeRiderSearchRequest extends BaseRequest
+class ForceDeleteRiderFolderRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +23,19 @@ class TripTypeRiderSearchRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|nullable|string|max:255',
-            'description' => 'sometimes|nullable|string|max:255',
+            'force' => 'required|boolean',
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'force' => filter_var($this->force, FILTER_VALIDATE_BOOLEAN),
+        ]);
     }
 }

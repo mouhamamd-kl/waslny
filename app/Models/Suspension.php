@@ -24,6 +24,15 @@ class Suspension extends Model
         'is_system_defined' => 'boolean',
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function (Suspension $suspension) {
+            if ($suspension->accountSuspension()->exists()) {
+                throw new \Exception('Cannot delete a suspension reason that is associated with account suspensions.');
+            }
+        });
+    }
+
     // =================
     // Relationships
     // =================

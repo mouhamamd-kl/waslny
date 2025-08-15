@@ -15,6 +15,15 @@ class DriverStatus extends Model
     protected $table = 'driver_statuses';
     protected $guarded = ['id']; // or use `protected $fillable = ['name'];`
 
+    protected static function booted()
+    {
+        static::deleting(function (DriverStatus $driverStatus) {
+            if ($driverStatus->drivers()->exists()) {
+                throw new \Exception('Cannot delete a driver status that is assigned to drivers.');
+            }
+        });
+    }
+
     // =================
     // Relationships
     // =================

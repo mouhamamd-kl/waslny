@@ -133,11 +133,19 @@ class CarServiceLevelController extends Controller
         try {
             $car_service_level = $this->carServiceLevelService->findById($id);
             if (!$car_service_level) {
-                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Car Service Level not found'), 404);
+                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'CarServiceLevel not found'), 404);
             }
+
+            if ($car_service_level->carModels()->exists() || $car_service_level->pricings()->exists()) {
+                return ApiResponse::sendResponseError(
+                    trans_fallback('messages.car_service_level.error.has_models_or_pricings', 'Cannot delete a car service level that has car models or pricings associated with it.'),
+                    409
+                );
+            }
+
             $this->carServiceLevelService->delete((int) $id);
             return ApiResponse::sendResponseSuccess(
-                message: trans_fallback('messages.car_service_level.deleted', 'Car Service Level updated successfully')
+                message: trans_fallback('messages.car_service_level.deleted', 'CarServiceLevel updated successfully')
             );
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(

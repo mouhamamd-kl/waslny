@@ -35,14 +35,14 @@ class DriverCompleteProfileRequest extends BaseRequest
         return [
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
-            'national_number' => ['required', 'string', 'numeric'],
+            'national_number' => ['required', 'string', 'numeric', Rule::unique('drivers')->ignore(auth('driver-api')->id())],
             'profile_photo' => $this->imageRule(FieldRequirementEnum::REQUIRED),
             'driver_license_photo' => $this->imageRule(FieldRequirementEnum::REQUIRED),
-            'gender' => [
-                'required',
-                'string',
-                Rule::in(['male', 'female']), // Dynamic from Enum
-            ],
+            // 'gender' => [
+            //     'required',
+            //     'string',
+            //     Rule::in(['male', 'female']), // Dynamic from Enum
+            // ],
         ];
     }
 }

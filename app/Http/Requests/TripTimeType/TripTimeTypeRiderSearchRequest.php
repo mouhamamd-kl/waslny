@@ -23,7 +23,6 @@ class TripTimeTypeRiderSearchRequest extends BaseRequest
     {
         return [
             'name' => 'sometimes|nullable|string|max:255',
-            'is_active' => 'sometimes|nullable|boolean',
         ];
     }
 }

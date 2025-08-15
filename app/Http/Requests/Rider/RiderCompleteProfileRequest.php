@@ -4,6 +4,7 @@ namespace App\Http\Requests\Rider;
 
 use App\Http\Requests\BaseRequest;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RiderCompleteProfileRequest extends BaseRequest
 {
@@ -33,6 +34,11 @@ class RiderCompleteProfileRequest extends BaseRequest
         return [
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
+            // 'gender' => [
+            //     'required',
+            //     'string',
+            //     Rule::in(['male', 'female']), // Dynamic from Enum
+            // ],
             'location' => ['sometimes', 'string'],
         ];
     }

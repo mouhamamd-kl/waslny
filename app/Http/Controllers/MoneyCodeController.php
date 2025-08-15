@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Requests\MoneyCode\MoneyCodeRequest;
+use App\Http\Requests\RedeemMoneyCodeRequest;
 use App\Http\Resources\MoneyCodeResource;
 use App\Models\MoneyCode;
 use App\Models\Rider;
@@ -54,13 +55,13 @@ class MoneyCodeController extends Controller
         return ApiResponse::sendResponseSuccess(new MoneyCodeResource($moneyCode->load('rider')), trans_fallback('messages.money_code.retrieved', 'Money code retrieved successfully'));
     }
 
-    public function redeem(Request $request)
+    public function redeem(RedeemMoneyCodeRequest $request)
     {
         try {
-            $request->validate(['code' => 'required|string']);
             /** @var Rider $rider */
             $rider = $request->user();
-            $moneyCode = $this->moneyCodeService->redeemMoneyCode($request->input('code'), $rider);
+            $data = $request->validated();
+            $moneyCode = $this->moneyCodeService->redeemMoneyCode($data['code'], $rider);
             return ApiResponse::sendResponseSuccess(new MoneyCodeResource($moneyCode), trans_fallback('messages.money_code.redeemed', 'Money code redeemed successfully'));
         } catch (Exception $e) {
             return ApiResponse::sendResponseError(trans_fallback('messages.money_code.error.invalid', 'Invalid or already used money code'), 422, $e->getMessage());

@@ -41,6 +41,7 @@ class TripResource extends JsonResource
                 return  new TripTimeTypeResource($this->whenLoaded('timeType'));
             }, null),
             'locations'=>  TripLocationResource::collection($this->whenLoaded('locations')),
+            'route_locations' => TripRouteLocationResource::collection($this->whenLoaded('routeLocations')),
             // 'location' => new TripLocationResource($this->whenLoaded('locations')),
             // 'locations' => $this->when($this->locations()->exists(), function () {
             //     return TripLocationResource::collection($this->whenLoaded('locations'));

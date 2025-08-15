@@ -114,6 +114,7 @@ return [
         'error' => [
             'activation_failed' => 'Failed to activate manufacturer',
             'deactivation_failed' => 'Failed to deactivate manufacturer',
+            'not_found' => 'Car manufacturer not found',
         ],
     ],
 

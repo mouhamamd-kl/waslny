@@ -14,6 +14,10 @@ Route::middleware('auth:rider-api')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('/', 'store')->name('store');
 
+            Route::prefix('{rider_folder}')->group(function () {
+                Route::get('/', 'index')->name('index');
+            });
+
             // Resource routes
             Route::prefix('{rider_saved_location}')->group(function () {
                 Route::get('/', 'show')->name('show');

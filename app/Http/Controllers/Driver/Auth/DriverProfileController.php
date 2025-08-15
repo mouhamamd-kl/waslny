@@ -79,7 +79,7 @@ class DriverProfileController extends Controller
                     unset($data[$type->value . '_photo']);
                     if ($request[$type->value . '_photo']) {
                         $file = $request[$type->value . '_photo'];
-                        
+
                         if ($file instanceof UploadedFile) {
                             // $driverCar->updatePhoto($type, $file);
                             $driver->updatePhoto($type, $file);
@@ -98,7 +98,6 @@ class DriverProfileController extends Controller
             );
         } catch (Exception $e) {
             throw $e;
-            DB::rollBack();
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

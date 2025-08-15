@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
@@ -38,7 +39,7 @@ class Rider  extends Authenticatable implements Wallet
     // Traits
     // =================
 
-    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken, SoftDeletes;
 
     // =================
     // Configuration
@@ -54,6 +55,18 @@ class Rider  extends Authenticatable implements Wallet
         'two_factor_expires_at' => 'datetime',
         'avg_rating' => 'float',
     ];
+
+    protected static function booted()
+    {
+        static::deleting(function (Rider $rider) {
+            if ($rider->isForceDeleting()) {
+                $rider->savedLocations()->delete();
+                $rider->folders()->delete();
+                $rider->Ridercoupons()->delete();
+                $rider->suspensions()->delete();
+            }
+        });
+    }
 
     // =================
     // Relationships
@@ -111,7 +124,7 @@ class Rider  extends Authenticatable implements Wallet
     }
     public function coupons()
     {
-        return $this->belongsToMany(Coupon::class, 'rider_coupons', 'rider_id', 'coupon_id');
+        return $this->belongsToMany(Coupon::class, 'rider_coupons', 'rider_id', 'coupon_id')->withTimestamps();;
     }
 
     public function suspensions()

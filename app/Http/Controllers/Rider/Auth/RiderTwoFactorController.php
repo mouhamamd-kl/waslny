@@ -88,7 +88,7 @@ class RiderTwoFactorController extends Controller
     {
         try {
             $data = $request->validated();
-            $rider = Rider::where('phone', $data->phone)->first();
+            $rider = Rider::where('phone', $data['phone'])->first();
             $rider->generateTwoFactorCode();
             // $rider->notify(new \App\Notifications\Agent\AgentTwoFactorCode);
             return ApiResponse::sendResponseSuccess(

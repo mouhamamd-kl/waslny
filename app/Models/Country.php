@@ -21,6 +21,15 @@ class Country extends Model
     protected $guarded = ['id'];
     protected $casts = ['is_active' => 'boolean'];
 
+    protected static function booted()
+    {
+        static::deleting(function (Country $country) {
+            if ($country->manufacturers()->exists()) {
+                throw new \Exception('Cannot delete a country that has car manufacturers associated with it.');
+            }
+        });
+    }
+
     // =================
     // Relationships
     // =================

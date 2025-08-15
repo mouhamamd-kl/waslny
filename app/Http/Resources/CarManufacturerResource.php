@@ -18,7 +18,7 @@ class CarManufacturerResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'country' => new CountryResource($this->whenLoaded('country')),
-            'is_active' => $this->is_active,
+            'is_active' => $this->when(auth('admin-api')->check(), $this->is_active),
             'dates' => [
                 'created' => $this->created_at,
                 'updated' => $this->updated_at,

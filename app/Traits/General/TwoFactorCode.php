@@ -17,6 +17,10 @@ trait TwoFactorCode
     }
     public function getTwoFactorCode(): ?string
     {
-        return $this->two_factore_code;
+        return $this->two_factor_code;
+    }
+    public function getExpirationOfCode()
+    {
+        return $this->two_factor_expires_at;
     }
 }
