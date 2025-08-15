@@ -289,7 +289,8 @@ class TripController extends Controller
                 'payment_method_id' => $request->payment_method_id,
                 'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching)->id,
                 'search_started_at' => now(),
-                'search_expires_at' => now()->addMinutes(5)
+                'search_expires_at' => now()->addMinutes(5),
+                'car_service_level_id' => $request->car_service_level_id
             ];
 
             $trip = $this->trip_service->create($tripData);
@@ -339,6 +340,7 @@ class TripController extends Controller
                 201
             );
         } catch (Exception $e) {
+            throw $e;
             // It's better to log the exception and return a generic error message
             \Illuminate\Support\Facades\Log::error('Trip creation failed: ' . $e->getMessage());
             return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'Trip Creation Failed'));

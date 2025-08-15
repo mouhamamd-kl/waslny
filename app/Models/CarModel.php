@@ -39,12 +39,12 @@ class CarModel extends Model
     // =================
     public function manufacturer(): BelongsTo
     {
-        return $this->belongsTo(CarManufacturer::class);
+        return $this->belongsTo(CarManufacturer::class, 'car_manufacturer_id');
     }
 
     public function serviceLevel(): BelongsTo
     {
-        return $this->belongsTo(CarServiceLevel::class);
+        return $this->belongsTo(CarServiceLevel::class, 'car_service_level_id');
     }
 
     public function driversCars(): HasMany

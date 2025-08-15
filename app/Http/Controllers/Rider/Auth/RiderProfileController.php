@@ -94,7 +94,6 @@ class RiderProfileController extends Controller
             /** @var Rider $rider */ // Add PHPDoc type hint
             $rider = auth('rider-api')->user();
             $data = array_filter($request->validated(), fn($value) => !is_null($value));
-
             // Remove fields we don't want to update directly
             unset($data['profile_photo']);
 
@@ -103,13 +102,14 @@ class RiderProfileController extends Controller
                     $file = $request[$type->value . '_photo'];
                     if ($file instanceof UploadedFile) {
                         // $driverCar->updatePhoto($type, $file);
-                        $rider->updatePhoto($type, $file);
+                        /** @var Rider $rider */ // Add PHPDoc type hint
+                        $rider->updatePhoto(type: $type, file: $file);
                     }
                 }
             }
             $rider->update($data);
             return ApiResponse::sendResponseSuccess(
-                new RiderResource($rider),
+                new RiderResource($rider->fresh()),
                 trans_fallback('messages.auth.profile.updated', 'Profile updated successfully')
             );
         } catch (Exception $e) {

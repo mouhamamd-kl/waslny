@@ -184,7 +184,6 @@ class Rider  extends Authenticatable implements Wallet
     public function updatePhoto(RiderPhotoType $type, UploadedFile $file): bool
     {
         $column = $type->value . '_photo';
-
         try {
             $service = $type->serviceMethod();
 
@@ -192,15 +191,14 @@ class Rider  extends Authenticatable implements Wallet
             if ($this->getRawOriginal($column)) {
                 $service->delete($this->getRawOriginal($column));
             }
-
             // Upload new file
             $path = "{$this->id}/";
-            $url = $service->uploadPublic($file, $path);
-
+            $photo_url = $service->uploadPublic($file, $path);
             // Update model with file path
-            $this->{$column} = $service->getFilePath($url);
-            return $this->save();
-        } catch (\Exception $e) {
+            $this->{$column} = $service->getFilePath($photo_url);
+            $this->save();
+            return true;
+        } catch (Exception $e) {
             report($e);
             return false;
         }

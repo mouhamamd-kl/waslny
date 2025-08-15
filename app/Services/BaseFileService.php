@@ -21,7 +21,7 @@ class BaseFileService
     protected string $disk;
     public function __construct(
         array $validExtensions,
-        string $disk
+        ?string $disk
     ) {
         $this->fileValidator = new FileValidator();
 
@@ -34,10 +34,10 @@ class BaseFileService
     }
 
     protected function validateAndSetDisk(
-        string $disk
+        ?string $disk
     ): void {
-        if ($disk === '') {
-            $disk = \App\Constants\DiskNames::SUBAPASEPUBLIC;
+        if ($disk === '' || $disk === null) {
+            $disk = \App\Constants\DiskNames::SUBAPASEPUBLIC->name;
         }
 
         DiskNames::isValidName($disk);
@@ -53,14 +53,14 @@ class BaseFileService
 
     public function uploadPublic(
         UploadedFile $file,
-        string $pathPrefix = '',
-    ) {
+        string $pathPrefix,
+    ):string {
         if (!$this->fileValidator->validate($this->validExtensions, $file)) {
             throw new Exception("File Type is not Supported");
         }
-        /** @var storage $storage */
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
         $storage = Storage::disk($this->disk);
-        $filepath = Storage::disk($this->disk)->put($pathPrefix, $file);
+        $filepath = $storage->put($pathPrefix, $file);
         $url = $storage->url($filepath);
         return $url;
     }
@@ -93,7 +93,7 @@ class BaseFileService
             /** @var FilesystemAdapter $storage */
             $storage = Storage::disk($this->disk);
 
-            if (! $storage->exists($filePath)) {
+            if (!$storage->exists($filePath)) {
                 Log::warning("File not found for deletion: {$filePath} on disk: {$this->disk}");
 
                 return true; // Consider non-existent files as successfully deleted
@@ -125,6 +125,8 @@ class BaseFileService
             $removed = $removed . "/" . $diskPath;
         }
         $filePath = str_replace($removed, "", $url);
+        $filePath = str_replace('\\', '/', $filePath);
+        $filePath = str_replace('//', '/', $filePath);
         return $filePath;
     }
 
@@ -139,7 +141,6 @@ class BaseFileService
         }
         $filePath = str_replace('\\', '/', $filePath);
         $filePath = str_replace('//', '/', $filePath);
-
         /** @var storage $storage */
 
         $storage = Storage::disk($this->disk);
@@ -157,6 +158,8 @@ class BaseFileService
             if (!filter_var($url, FILTER_VALIDATE_URL)) {
                 throw new \RuntimeException("Generated URL is invalid: $url");
             }
+            $url = str_replace('\\', '/', $url);
+            $url = str_replace('//', '/', $url);
 
             return $url;
         } catch (\Exception $e) {

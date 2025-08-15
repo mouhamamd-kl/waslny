@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Enums\channels\BroadCastChannelEnum;
 use App\Http\Resources\TripResource;
 use App\Models\Trip;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -28,7 +29,14 @@ class TripCreated implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new PrivateChannel(
+        //to make private again
+        // return new PrivateChannel(
+        //     BroadCastChannelEnum::RIDER->bind(
+        //         $this->trip->rider_id
+        //     )
+        // );
+
+        return new Channel(
             BroadCastChannelEnum::RIDER->bind(
                 $this->trip->rider_id
             )

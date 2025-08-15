@@ -2,6 +2,10 @@
 
 namespace App\Events;
 
+use App\Enums\channels\BroadCastChannelEnum;
+use App\Http\Resources\DriverResource;
+use App\Models\Driver;
+use App\Models\Trip;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -18,9 +22,13 @@ class DriverArrived implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct()
+
+    protected Driver $driver;
+    protected Trip $trip;
+    public function __construct(Driver $driver, Trip $trip)
     {
-        //
+        $this->driver = $driver;
+        $this->trip = $trip;
     }
 
     /**
@@ -30,8 +38,27 @@ class DriverArrived implements ShouldBroadcastNow
      */
     public function broadcastOn(): array
     {
+
         return [
-            new PrivateChannel('channel-name'),
+            //to make private again
+            // new PrivateChannel(
+            //     BroadCastChannelEnum::TRIP->bind(
+            //         $this->trip->id
+            //     )
+            // ),
+
+            new Channel(
+                BroadCastChannelEnum::TRIP->bind(
+                    $this->trip->id
+                )
+            ),
+        ];
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'driver' => (new DriverResource($this->driver))->resolve(),
         ];
     }
 }

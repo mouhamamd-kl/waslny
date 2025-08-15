@@ -23,7 +23,7 @@ class RiderResource extends JsonResource
         // 'gender' => $this->gender,
         'phone' => $this->phone,
         'email' => $this->email,
-        'profile_photo' => $this->when($this->profile_photo, function () use ($assetService) {
+        'profile_photo' => $this->when($this->profile_photo!=null||$this->profile_photo!="", function () use ($assetService) {
             return $assetService->getUrl($this->profile_photo);
         }, null),
         'rating' => $this->rating,

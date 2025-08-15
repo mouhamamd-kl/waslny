@@ -102,14 +102,18 @@
 
         "TELEGRAM_BOT_TOKEN": "8404390559:AAEg_kOtrBmj5VnbBYA2GAi875vbtWZrk44",
 
-        "FILESYSTEM_DISK": "supabase",
-        "AWS_ACCESS_KEY_ID": "9cec04e49e90ee5501478e710b383dd6",
-        "AWS_SECRET_ACCESS_KEY": "f7827fd2cb7826a8b0af7290bb44df391b253e26446390edf3cc44b71d9fb6ba",
+        "FILESYSTEM_DISK": "SUBAPASEPUBLIC",
+        "AWS_ACCESS_KEY_ID": "410ae4def58b3b22f7113b3def1f6294",
+        "AWS_SECRET_ACCESS_KEY": "fed8190d3f42f1532fdda7c801a749db84163c3907d39850dcc821ba7a6456fc",
         "AWS_DEFAULT_REGION": "us-east-2",
         "AWS_BUCKET": "waslny",
         "AWS_ENDPOINT": "https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/s3/waslny",
         "AWS_USE_PATH_STYLE_ENDPOINT": "true",
+        "AWS_DISK_PUBLIC": "supabase",
+        "AWS_DISK_PRIVATE": "supabase_private",
 
+        "AWS_BUCKET_PUBLIC": "waslny",
+        "AWS_BUCKET_PRIVATE": "waslny-private",
         "SUPABASE_PROJECT_ID": "cqrlbirnwzidgerehsdq",
         "SUPABASE_STORAGE_BUCKET": "waslny",
 

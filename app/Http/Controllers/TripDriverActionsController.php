@@ -76,6 +76,22 @@ class TripDriverActionsController extends Controller
 
             event(new DriverLocationUpdated($trip->id, $trip->driver_id, $location));
 
+            // trip_flow
+            $pickupLocation = $trip->locations()->pickupPoints()->first();
+            $driverLocation = $trip->driver->location;
+
+            if ($pickupLocation && $driverLocation) {
+                $driverTripLocation = new \App\Models\TripLocation(['location' => $driverLocation]);
+                $distance = $pickupLocation->distanceTo($driverTripLocation);
+
+                // If driver is within 1km and we haven't already notified, fire the event
+                if ($distance <= 1000 && !$trip->approaching_pickup_notified_at) {
+                    $trip->update(['approaching_pickup_notified_at' => now()]);
+                    event(new \App\Events\DriverApproachingPickup($trip, $trip->driver));
+                    return; // Stop checking
+                }
+            }
+
             return ApiResponse::sendResponseSuccess([], 'Location updated successfully.', 200);
         } catch (Exception $e) {
             return ApiResponse::sendResponseError($e->getMessage());
@@ -92,7 +108,7 @@ class TripDriverActionsController extends Controller
 
             $trip->transitionTo(TripStatusEnum::DriverArrived);
 
-            event(new DriverArrived($trip));
+            event(new DriverArrived($request->auth('driver-api'), $trip));
 
             return ApiResponse::sendResponseSuccess([], 'Driver arrived successfully.', 200);
         } catch (Exception $e) {
