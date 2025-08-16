@@ -77,21 +77,21 @@ class TripDriverActionsController extends Controller
 
             event(new TripDriverLocationUpdated($trip->id, $location));
 
-            // trip_flow
-            $pickupLocation = $trip->locations()->pickupPoints()->first();
-            $driverLocation = $trip->driver->location;
+            // // trip_flow
+            // $pickupLocation = $trip->locations()->pickupPoints()->first();
+            // $driverLocation = $trip->driver->location;
 
-            if ($pickupLocation && $driverLocation) {
-                $driverTripLocation = new \App\Models\TripLocation(['location' => $driverLocation]);
-                $distance = $pickupLocation->distanceTo($driverTripLocation);
+            // if ($pickupLocation && $driverLocation) {
+            //     $driverTripLocation = new \App\Models\TripLocation(['location' => $driverLocation]);
+            //     $distance = $pickupLocation->distanceTo($driverTripLocation);
 
-                // If driver is within 1km and we haven't already notified, fire the event
-                if ($distance <= 1000 && !$trip->approaching_pickup_notified_at) {
-                    $trip->update(['approaching_pickup_notified_at' => now()]);
-                    event(new \App\Events\DriverApproachingPickup($trip, $trip->driver));
-                    return; // Stop checking
-                }
-            }
+            //     // If driver is within 1km and we haven't already notified, fire the event
+            //     if ($distance <= 1000 && !$trip->approaching_pickup_notified_at) {
+            //         $trip->update(['approaching_pickup_notified_at' => now()]);
+            //         event(new \App\Events\DriverApproachingPickup($trip, $trip->driver));
+            //         return; // Stop checking
+            //     }
+            // }
 
             return ApiResponse::sendResponseSuccess([], 'Location updated successfully.', 200);
         } catch (Exception $e) {

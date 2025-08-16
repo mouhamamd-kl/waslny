@@ -9,27 +9,31 @@ use App\Enums\TripStatusEnum;
 use App\Enums\TripTimeTypeEnum;
 use App\Events\SearchTimeout;
 use App\Models\Trip;
+use App\Services\DriverSearchService;
 use App\Services\TripService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class FindDriverForTrip implements ShouldQueue
+class FindDriverForTrip implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $trip;
+    public Trip $trip;
+    public int $tries;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Trip $trip)
+    public function __construct(Trip $trip, int $tries = 0)
     {
         $this->trip = $trip;
+        $this->tries = $tries;
     }
 
     /**
@@ -39,7 +43,6 @@ class FindDriverForTrip implements ShouldQueue
      */
     public function handle(TripService $tripService)
     {
-        // trip_flow
         if ($this->trip->driver_id) {
             return;
         }
@@ -59,9 +62,20 @@ class FindDriverForTrip implements ShouldQueue
                 if ($otherDrivers->isNotEmpty()) {
                     event(new TripUnavailable($this->trip, $otherDrivers));
                 }
-            } 
+            }
         } else {
-            self::dispatch($this->trip)->delay(now()->addSeconds(1));
+            $this->tries++;
+            self::dispatch($this->trip, $this->tries)->delay(now()->addSeconds($this->backoff()));
         }
+    }
+
+    public function backoff(): int
+    {
+        return (int) pow(2, $this->tries);
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->trip->id;
     }
 }

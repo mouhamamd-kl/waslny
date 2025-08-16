@@ -9,6 +9,7 @@ use App\Traits\General\ResetOTP;
 use App\Traits\General\Suspendable;
 use App\Traits\General\TwoFactorCode;
 use App\Traits\HasDeviceToken;
+use App\Enums\TripStatusEnum;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Exception;
@@ -287,5 +288,17 @@ class Rider  extends Authenticatable implements Wallet
     public function isAccountSuspended(): bool
     {
         return $this->isSuspended();
+    }
+
+    public function hasActiveTrip(): bool
+    {
+        return $this->trips()
+            ->whereNotIn('trip_status_id', [
+                TripStatusEnum::Completed->value,
+                TripStatusEnum::RiderCancelled->value,
+                TripStatusEnum::DriverCancelled->value,
+                TripStatusEnum::SystemCancelled->value,
+            ])
+            ->exists();
     }
 }

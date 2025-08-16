@@ -198,6 +198,19 @@ class Driver extends Authenticatable implements Wallet
         });
     }
 
+    public function scopeAvailableForTrip(Builder $query, Trip $trip): Builder
+    {
+        $rider = $trip->rider;
+
+        return $query->available()
+            ->when($rider && $rider->rating !== null, function ($query) use ($rider) {
+                $minRating = max(0, $rider->rating - 1);
+                $maxRating = min(5, $rider->rating + 1);
+                return $query->whereBetween('rating', [$minRating, $maxRating]);
+            })
+            ->notNotifiedForTrip($trip);
+    }
+
     // =================
     // Status Helpers
     // =================

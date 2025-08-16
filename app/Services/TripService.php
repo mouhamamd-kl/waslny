@@ -13,8 +13,12 @@ use App\Events\SearchTimeout;
 use App\Events\TripAvailableForDriver;
 use App\Models\Driver;
 use App\Models\TripDriverNotification;
+use App\Models\TripLocation;
 use App\Models\TripTimeType;
 use App\Models\TripType;
+use App\Enums\LocationTypeEnum;
+use App\Enums\TripTypeEnum;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -25,10 +29,12 @@ use Illuminate\Support\Facades\Http;
 class TripService extends BaseService
 {
     protected array $relations = ['driver', 'rider', 'status', 'type', 'timeType', 'locations', 'paymentMethod', 'notifications', 'notifiedDrivers', 'riderCoupon', 'routeLocations'];
+    protected DriverSearchService $driverSearchService;
 
-    public function __construct(CacheHelper $cache)
+    public function __construct(CacheHelper $cache, DriverSearchService $driverSearchService)
     {
         parent::__construct(new Trip, $cache);
+        $this->driverSearchService = $driverSearchService;
     }
 
     public function searchTrips(
@@ -54,7 +60,7 @@ class TripService extends BaseService
     public function findAndAssignDriver(Trip $trip): ?Driver
     {
         // Find available drivers within radius
-        $drivers = $this->findNearbyDrivers($trip);
+        $drivers = $this->driverSearchService->findNearbyDrivers($trip);
 
         // Send notifications to found drivers
         foreach ($drivers as $driver) {
@@ -137,35 +143,6 @@ class TripService extends BaseService
     //     ];
     // }
 
-    private function findNearbyDrivers(Trip $trip): Collection
-    {
-        $pickupLocation = $trip->locations()->pickupPoints()->first();
-
-        if (!$pickupLocation) {
-            return collect();
-        }
-
-        $rider = $trip->rider;
-
-        return Driver::where('driver_status_id', 'available') // Available status
-            ->when($rider && $rider->rating !== null, function ($query) use ($rider) {
-                $minRating = max(0, $rider->rating - 1);
-                $maxRating = min(5, $rider->rating + 1);
-                return $query->whereBetween('rating', [$minRating, $maxRating]);
-            })
-            ->notNotifiedForTrip($trip)
-            ->whereRaw(
-                "ST_DWithin(location, ?, ?)",
-                [
-                    $pickupLocation->location->toWkt(),
-                    $trip->driver_search_radius
-                ]
-            )
-            ->orderByRaw("rating DESC, ST_Distance(location, ?)", [$pickupLocation->location->toWkt()])
-            ->limit(5)
-            ->get();
-    }
-
     private function notifyDriver(Trip $trip, Driver $driver): void
     {
         // Send push notification to driver
@@ -192,6 +169,44 @@ class TripService extends BaseService
                 ->where('trip_id', $trip->id)
                 ->where('driver_id', '!=', $driver->id);
         })->get();
+    }
+
+    public function createTripLocations(Trip $trip, array $locationsData): void
+    {
+        $tripType = TripTypeEnum::tryFrom($trip->trip_type_id);
+        $tripLocations = [];
+        $pickupLocation = null;
+
+        foreach ($locationsData as $locationData) {
+            $locationType = $locationData['location_type'];
+            if ($tripType === TripTypeEnum::ROUND_TRIP && $locationType === LocationTypeEnum::DropOff->value) {
+                $locationType = LocationTypeEnum::Stop->value;
+            }
+
+            $tripLocations[] = [
+                'location' => Point::makeGeodetic($locationData['location']['coordinates'][0], $locationData['location']['coordinates'][1]),
+                'location_order' => $locationData['location_order'],
+                'location_type' => $locationType,
+                'trip_id' => $trip->id,
+            ];
+
+            if ($locationData['location_type'] === LocationTypeEnum::Pickup->value) {
+                $pickupLocation = $tripLocations[count($tripLocations) - 1];
+            }
+        }
+
+        if ($tripType === TripTypeEnum::ROUND_TRIP && $pickupLocation) {
+            $tripLocations[] = [
+                'location' => $pickupLocation['location'],
+                'location_order' => count($locationsData) + 1,
+                'location_type' => LocationTypeEnum::DropOff->value,
+                'trip_id' => $trip->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        TripLocation::insert($tripLocations);
     }
 
 
