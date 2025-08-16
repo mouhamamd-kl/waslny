@@ -96,10 +96,10 @@ return [
             'search_path' => 'public',
             'sslmode' => 'prefer',
             'options' => [
-                // PDO::ATTR_EMULATE_PREPARES,
-                // 'pdotype' => 'unprepared',
-                // PDO::ATTR_PERSISTENT => false,
-                
+                PDO::ATTR_PERSISTENT => false,
+                PDO::ATTR_EMULATE_PREPARES => true,
+                PDO::PGSQL_ATTR_DISABLE_PREPARES => true,
+
             ],
         ],
 
