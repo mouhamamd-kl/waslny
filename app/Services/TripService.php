@@ -158,7 +158,7 @@ class TripService extends BaseService
 
     private function checkForAcceptedDriver(Trip $trip): ?Driver
     {
-        return $trip->driver;
+        return $trip->fresh()->driver;
     }
 
     public function getDriversNotAccepting(Trip $trip, Driver $driver): Collection

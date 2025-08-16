@@ -14,7 +14,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        if (class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+
+            $this->app->register(TelescopeServiceProvider::class);
+        }
     }
 
     /**
@@ -22,10 +27,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Event::listen(
-            TripCreated::class,
-            StartDriverSearch::class,
-        );
+        // Event::listen(
+        //     TripCreated::class,
+        //     StartDriverSearch::class,
+        // );
 
         $mainPath = database_path('migrations');
         $directories = glob($mainPath . '/domains/*/*', GLOB_ONLYDIR);

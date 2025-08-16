@@ -170,6 +170,11 @@ class Trip extends Model
         return $query->where('trip_status_id', $statusId);
     }
 
+    public function scopeNotInStatuses($query, $statusId)
+    {
+        return $query->whereNotIn('trip_status_id', $statusId);
+    }
+
     public function scopeRecent($query, $days = 7)
     {
         return $query->where('created_at', '>=', now()->subDays($days));

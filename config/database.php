@@ -96,9 +96,10 @@ return [
             'search_path' => 'public',
             'sslmode' => 'prefer',
             'options' => [
-                PDO::ATTR_PERSISTENT => false,
-                PDO::ATTR_EMULATE_PREPARES => false,
-                'pdotype' => 'unprepared',
+                // PDO::ATTR_EMULATE_PREPARES,
+                // 'pdotype' => 'unprepared',
+                // PDO::ATTR_PERSISTENT => false,
+                
             ],
         ],
 
@@ -152,7 +153,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 

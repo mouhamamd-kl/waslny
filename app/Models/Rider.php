@@ -10,6 +10,7 @@ use App\Traits\General\Suspendable;
 use App\Traits\General\TwoFactorCode;
 use App\Traits\HasDeviceToken;
 use App\Enums\TripStatusEnum;
+use App\Models\TripStatus;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Exception;
@@ -292,13 +293,13 @@ class Rider  extends Authenticatable implements Wallet
 
     public function hasActiveTrip(): bool
     {
-        return $this->trips()
-            ->whereNotIn('trip_status_id', [
-                TripStatusEnum::Completed->value,
-                TripStatusEnum::RiderCancelled->value,
-                TripStatusEnum::DriverCancelled->value,
-                TripStatusEnum::SystemCancelled->value,
-            ])
-            ->exists();
+        $terminalStatuses = TripStatus::whereIn('name', [
+            TripStatusEnum::Completed->value,
+            TripStatusEnum::RiderCancelled->value,
+            TripStatusEnum::DriverCancelled->value,
+            TripStatusEnum::SystemCancelled->value,
+        ])->pluck('id');
+
+        return $this->trips()->notInStatuses($terminalStatuses)->exists();
     }
 }

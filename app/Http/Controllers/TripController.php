@@ -275,26 +275,23 @@ class TripController extends Controller
                 );
             }
 
-            $trip = DB::transaction(function () use ($request, $rider) {
-                $tripData = [
-                    'rider_id' => $rider->id,
-                    'trip_type_id' => $request->trip_type_id,
-                    'trip_time_type_id' => $request->trip_time_type_id,
-                    'coupon_id' => $request->coupon_id,
-                    'requested_time' => now(),
-                    'payment_method_id' => $request->payment_method_id,
-                    'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching)->id,
-                    'search_started_at' => now(),
-                    'search_expires_at' => now()->addMinutes(5),
-                    'car_service_level_id' => $request->car_service_level_id
-                ];
 
-                $trip = $this->trip_service->create($tripData);
+            $tripData = [
+                'rider_id' => $rider->id,
+                'trip_type_id' => $request->trip_type_id,
+                'trip_time_type_id' => $request->trip_time_type_id,
+                'coupon_id' => $request->coupon_id,
+                'requested_time' => now(),
+                'payment_method_id' => $request->payment_method_id,
+                'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching)->id,
+                'search_started_at' => now(),
+                'search_expires_at' => now()->addMinutes(5),
+                'car_service_level_id' => $request->car_service_level_id
+            ];
 
-                $this->trip_service->createTripLocations($trip, $request->locations);
+            $trip = $this->trip_service->create($tripData);
 
-                return $trip;
-            });
+            $this->trip_service->createTripLocations($trip, $request->locations);
 
             $trip = $this->trip_service->findTripById($trip->id);
             if ($trip) {
@@ -306,6 +303,7 @@ class TripController extends Controller
                 201
             );
         } catch (Exception $e) {
+            throw $e;
             \Illuminate\Support\Facades\Log::error('Trip creation failed: ' . $e->getMessage());
             return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'Trip Creation Failed'));
         }

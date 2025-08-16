@@ -10,6 +10,7 @@ use App\Console\Commands\GenerateResources;
 use App\Console\Commands\MyExportPostman;
 use App\Console\Commands\MyExportPostmanTest;
 use App\Helpers\ApiResponse;
+use App\Http\Middleware\EnsureCleanDatabaseConnection;
 use App\Http\Middleware\EnsureDriverIsNotSuspended;
 use App\Http\Middleware\EnsureDriverProfileComplete;
 use App\Http\Middleware\EnsureRiderIsNotSuspended;
@@ -33,12 +34,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->validateCsrfTokens(except: [
+            'telescope/*',
+        ]);
         // $middleware->api(prepend: [
         //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         // ]);
         $middleware->alias([
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
+        ]);
+        $middleware->alias([
+            'clean.connection' => EnsureCleanDatabaseConnection::class,
         ]);
         $middleware->alias([
             'rider.profile.completed' => EnsureRiderProfileComplete::class,

@@ -47,10 +47,12 @@ class TripType extends Model
     /**
      * Accessors & Mutators
      */
-    protected function displayName(): Attribute
-    {
-        return $this->name;
-    }
+    // protected function displayName(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn () => $this->name,
+    //     );
+    // }
 
     /**
      * Scopes
