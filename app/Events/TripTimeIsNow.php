@@ -37,4 +37,16 @@ class TripTimeIsNow implements ShouldBroadcast
     {
         return new PrivateChannel(BroadCastChannelEnum::RIDER->value . '.' . $this->trip->rider_id);
     }
+
+    public function broadcastAs()
+    {
+        return 'trip.time.is.now';
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'trip' => $this->trip,
+        ];
+    }
 }

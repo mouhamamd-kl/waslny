@@ -21,8 +21,13 @@ class Trip extends Model
      * Configuration
      */
     protected $table = 'trips';
-    protected $guarded = ['id']; // Guarded instead of fillable for security
-    protected $casts = [];
+    protected $guarded = ['id'];
+    protected $casts = [
+        'approaching_pickup_notified_at' => 'datetime',
+        'status_timeline' => 'array',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+    ];
 
     protected static function booted()
     {

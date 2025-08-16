@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Events\DriverAssigned;
+use App\Events\TripUnavailable;
 use App\Events\DriverPreAssigned;
 use App\Enums\TripStatusEnum;
 use App\Enums\TripTimeTypeEnum;
@@ -54,11 +55,13 @@ class FindDriverForTrip implements ShouldQueue
         if ($driver) {
             if ($this->trip->trip_time_type_id === TripTimeTypeEnum::INSTANT->value) {
                 event(new DriverAssigned($this->trip, $driver));
-            } else {
-                event(new DriverPreAssigned($this->trip, $driver));
-            }
+                $otherDrivers = $tripService->getDriversNotAccepting($this->trip, $driver);
+                if ($otherDrivers->isNotEmpty()) {
+                    event(new TripUnavailable($this->trip, $otherDrivers));
+                }
+            } 
         } else {
-            self::dispatch($this->trip)->delay(now()->addSeconds(15));
+            self::dispatch($this->trip)->delay(now()->addSeconds(1));
         }
     }
 }

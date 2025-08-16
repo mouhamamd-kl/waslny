@@ -52,4 +52,12 @@ class DriverPreAssigned implements ShouldBroadcast
     {
         return 'driver.pre_assigned';
     }
+
+    public function broadcastWith()
+    {
+        return [
+            'trip' => $this->trip,
+            'driver' => $this->driver,
+        ];
+    }
 }

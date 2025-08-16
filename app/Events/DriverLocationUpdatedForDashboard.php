@@ -36,4 +36,17 @@ class DriverLocationUpdatedForDashboard implements ShouldBroadcastNow
             new PresenceChannel(BroadCastChannelEnum::DRIVERS_ONLINE->value),
         ];
     }
+
+    public function broadcastAs()
+    {
+        return 'driver.location.updated';
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'driver_id' => $this->driverId,
+            'location' => $this->location,
+        ];
+    }
 }

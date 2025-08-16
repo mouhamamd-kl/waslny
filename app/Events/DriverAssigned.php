@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\channels\BroadCastChannelEnum;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -42,7 +43,12 @@ class DriverAssigned implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('riders.' . $this->trip->rider_id);
+        //to make private again
+        return new Channel(
+            BroadCastChannelEnum::RIDER->bind(
+                $this->trip->rider_id
+            )
+        );
     }
 
     /**

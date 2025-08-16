@@ -36,4 +36,16 @@ class TripDriverLocationUpdated implements ShouldBroadcastNow
             new PrivateChannel(BroadCastChannelEnum::TRIP->bind($this->tripId)),
         ];
     }
+
+    public function broadcastAs()
+    {
+        return 'trip.driver.location.updated';
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'location' => $this->location,
+        ];
+    }
 }

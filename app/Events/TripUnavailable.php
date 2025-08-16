@@ -2,29 +2,31 @@
 
 namespace App\Events;
 
+use App\Enums\channels\BroadCastChannelEnum;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use App\Models\Trip;
+use Illuminate\Database\Eloquent\Collection;
 
-class TripLocationCompleted implements ShouldBroadcastNow
+class TripUnavailable implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
-    public $tripLocation;
+    public Trip $trip;
+    public Collection $drivers;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(\App\Models\Trip $trip, \App\Models\TripLocation $tripLocation)
+    public function __construct(Trip $trip, Collection $drivers)
     {
         $this->trip = $trip;
-        $this->tripLocation = $tripLocation;
+        $this->drivers = $drivers;
     }
 
     /**
@@ -34,20 +36,18 @@ class TripLocationCompleted implements ShouldBroadcastNow
      */
     public function broadcastOn(): array
     {
-        return [
-            new PrivateChannel(\App\Enums\channels\BroadCastChannelEnum::TRIP->bind($this->trip->id)),
-        ];
+        return array_map(function ($driver) {
+            return BroadCastChannelEnum::DRIVER->bind($driver->id);
+        }, $this->drivers->all());
     }
 
     public function broadcastAs()
     {
-        return 'trip.location.completed';
+        return 'trip.unavailable';
     }
 
     public function broadcastWith()
     {
-        return [
-            'trip_location' => $this->tripLocation,
-        ];
+        return ['trip_id' => $this->trip->id];
     }
 }

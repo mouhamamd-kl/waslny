@@ -7,6 +7,7 @@ use App\Http\Resources\AccountSuspensionResource;
 use App\Models\AccountSuspension;
 use App\Models\Driver;
 use App\Models\Rider;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -27,7 +28,7 @@ class AccountSuspended implements ShouldBroadcastNow
         $this->user = $user;
     }
 
-    public function broadcastOn(): PrivateChannel
+    public function broadcastOn()
     {
         $channel = $this->user instanceof Driver
             ? BroadCastChannelEnum::DRIVER
@@ -35,9 +36,16 @@ class AccountSuspended implements ShouldBroadcastNow
 
         $key = $this->user instanceof Driver ? 'driverId' : 'riderId';
 
-        return new PrivateChannel(
+        //to make private again
+        // return new PrivateChannel(
+        //     $channel->bind(
+        //          $this->user->id
+        //     )
+        // );
+
+        return new Channel(
             $channel->bind(
-                 $this->user->id
+                $this->user->id
             )
         );
     }

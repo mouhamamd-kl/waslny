@@ -49,4 +49,11 @@ class TripActivation implements ShouldBroadcast
     {
         return 'trip.activation';
     }
+
+    public function broadcastWith()
+    {
+        return [
+            'trip' => $this->trip,
+        ];
+    }
 }

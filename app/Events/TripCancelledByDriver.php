@@ -18,11 +18,10 @@ class TripCancelledByDriver implements ShouldBroadcastNow
 
 
     public $trip;
-    public $riderId;
 
-    public function __construct(int $riderId)
+    public function __construct(\App\Models\Trip $trip)
     {
-        $this->riderId = $riderId;
+        $this->trip = $trip;
     }
 
     public function broadcastOn()
@@ -41,6 +40,8 @@ class TripCancelledByDriver implements ShouldBroadcastNow
 
     public function broadcastWith()
     {
-        return [];
+        return [
+            'trip' => $this->trip,
+        ];
     }
 }

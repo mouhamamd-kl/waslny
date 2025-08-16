@@ -18,6 +18,7 @@ use App\Models\TripType;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Http;
 
@@ -62,7 +63,7 @@ class TripService extends BaseService
 
         // Check for accepted drivers
         if ($acceptedDriver = $this->checkForAcceptedDriver($trip)) {
-            $trip->update(['driver_id' => $acceptedDriver->id]);
+            // $trip->update(['driver_id' => $acceptedDriver->id]);
             return $acceptedDriver;
         }
 
@@ -180,10 +181,17 @@ class TripService extends BaseService
 
     private function checkForAcceptedDriver(Trip $trip): ?Driver
     {
-        return TripDriverNotification::where('trip_id', $trip->id)
-            ->where('status', 'accepted')
-            ->first()
-            ?->driver;
+        return $trip->driver;
+    }
+
+    public function getDriversNotAccepting(Trip $trip, Driver $driver): Collection
+    {
+        return Driver::whereIn('id', function ($query) use ($trip, $driver) {
+            $query->select('driver_id')
+                ->from('trip_driver_notifications')
+                ->where('trip_id', $trip->id)
+                ->where('driver_id', '!=', $driver->id);
+        })->get();
     }
 
 
@@ -193,7 +201,7 @@ class TripService extends BaseService
             [
                 'rider_id' => $data->rider_id,
                 'driver_id' => $data->driver_id,
-                
+
             ]
         );
     }

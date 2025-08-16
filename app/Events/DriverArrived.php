@@ -55,6 +55,11 @@ class DriverArrived implements ShouldBroadcastNow
         ];
     }
 
+    public function broadcastAs()
+    {
+        return 'driver.arrived';
+    }
+
     public function broadcastWith()
     {
         return [

@@ -18,18 +18,17 @@ class TripCancelledByRider implements ShouldBroadcastNow
 
 
     public $trip;
-    public $driverId;
 
-    public function __construct(int $driverId)
+    public function __construct(\App\Models\Trip $trip)
     {
-        $this->driverId = $driverId;
+        $this->trip = $trip;
     }
 
     public function broadcastOn()
     {
         return new PrivateChannel(
             BroadCastChannelEnum::DRIVER->bind(
-                'driver', $this->driverId
+                'driver', $this->trip->driver_id
             )
         );
     }
@@ -41,6 +40,8 @@ class TripCancelledByRider implements ShouldBroadcastNow
 
     public function broadcastWith()
     {
-        return [];
+        return [
+            'trip' => $this->trip,
+        ];
     }
 }

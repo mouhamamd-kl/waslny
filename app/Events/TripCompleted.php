@@ -41,7 +41,7 @@ class TripCompleted implements ShouldBroadcastNow
 
     public function broadcastAs()
     {
-        return 'trip.created';
+        return 'trip.completed';
     }
 
     public function broadcastWith()

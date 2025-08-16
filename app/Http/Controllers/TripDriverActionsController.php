@@ -12,6 +12,7 @@ use App\Events\TripStarted;
 use App\Events\TripLocationCompleted;
 use App\Events\TripCompleted;
 use App\Enums\TripStatusEnum;
+use App\Events\TripDriverLocationUpdated;
 use App\Models\Trip;
 use App\Models\TripLocation;
 use App\Services\TripLocationService;
@@ -74,7 +75,7 @@ class TripDriverActionsController extends Controller
                 'location' => 'required',
             ]);
 
-            event(new DriverLocationUpdated($trip->id, $trip->driver_id, $location));
+            event(new TripDriverLocationUpdated($trip->id, $location));
 
             // trip_flow
             $pickupLocation = $trip->locations()->pickupPoints()->first();

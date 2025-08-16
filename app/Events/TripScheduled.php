@@ -46,4 +46,11 @@ class TripScheduled implements ShouldBroadcast
     {
         return 'trip.scheduled';
     }
+
+    public function broadcastWith()
+    {
+        return [
+            'trip' => $this->trip,
+        ];
+    }
 }

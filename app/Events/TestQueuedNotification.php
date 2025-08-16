@@ -35,4 +35,16 @@ class TestQueuedNotification implements ShouldBroadcast
     {
         return new PrivateChannel('test');
     }
+
+    public function broadcastAs()
+    {
+        return 'test.queued.notification';
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'message' => $this->message,
+        ];
+    }
 }
