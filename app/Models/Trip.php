@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\DriverStatusEnum;
+use App\Enums\PaymentMethodEnum;
 use App\Enums\TripStatusEnum;
 use App\Exceptions\InvalidTransitionException;
 use App\Traits\General\FilterScope;
 use Bavix\Wallet\Models\Transaction;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -23,10 +26,14 @@ class Trip extends Model
     protected $table = 'trips';
     protected $guarded = ['id'];
     protected $casts = [
+        'current_location' => Point::class,
         'approaching_pickup_notified_at' => 'datetime',
-        'status_timeline' => 'array',
         'start_time' => 'datetime',
         'end_time' => 'datetime',
+        'requested_time' => 'datetime',
+        'search_started_at' => 'datetime',
+        'search_expires_at' => 'datetime',
+        'status_timeline' => 'array',
     ];
 
     protected static function booted()
@@ -61,8 +68,6 @@ class Trip extends Model
             'driver_id'
         );
     }
-
-
 
     public function rider(): BelongsTo
     {
@@ -108,6 +113,20 @@ class Trip extends Model
     /**
      * Accessors & Mutators
      */
+    public function getPickupLocationAttribute()
+    {
+        return $this->locations()->pickupPoints()->first();
+    }
+
+    public function getDropoffLocationAttribute()
+    {
+        return $this->locations()->DropoffPoints()->first();
+    }
+
+    public function getStopsAttribute()
+    {
+        return $this->locations()->StopsPoints()->get();
+    }
     // protected function fare(): Attribute
     // {
     //     // return Attribute::make(
@@ -187,7 +206,9 @@ class Trip extends Model
     public function transitionTo(TripStatusEnum $newStatus): void
     {
         $currentStatus = TripStatusEnum::tryFrom($this->status->name);
-
+        if ($currentStatus === $newStatus->value) {
+            return;
+        }
         if (!$currentStatus->canTransitionTo($newStatus)) {
             throw new InvalidTransitionException(
                 "Cannot transition from {$currentStatus->value} to {$newStatus->value}"
@@ -232,9 +253,7 @@ class Trip extends Model
 
 
         // Update driver status
-        $driver->update([
-            'driver_status_id' => DriverStatus::where('name', 'in_trip')->first()->id
-        ]);
+        $driver->setStatus(DriverStatusEnum::STATUS_ON_TRIP);
     }
 
     public function recordNotification(Driver $driver): void
@@ -270,6 +289,16 @@ class Trip extends Model
         return $this->getStatusTime(TripStatusEnum::Completed);
     }
 
+    public function isCompleted(): bool
+    {
+        return $this->hasStatus(TripStatusEnum::Completed);
+    }
+
+    public function hasStatus(TripStatusEnum $status): bool
+    {
+        return $this->status->name === $status->value;
+    }
+
     public function startTrip(): void
     {
         $this->transitionTo(TripStatusEnum::OnGoing);
@@ -281,12 +310,12 @@ class Trip extends Model
     {
         $this->transitionTo(TripStatusEnum::Completed);
         $this->end_time = now();
-        $this->save();
 
         $this->driver->update([
             'driver_status_id' => DriverStatus::where('name', 'available')->first()->id
         ]);
 
+        $this->save();
         $this->processPayment();
     }
 
@@ -337,6 +366,12 @@ class Trip extends Model
 
         // System pays the driver their share (80%)
         $systemWallet->pay($this->driver->wallet, $this->fare * 0.8, ['trip_id' => $this->id]);
+
+        $paymentMethod = PaymentMethodEnum::tryFrom($this->paymentMethod->name);
+        if ($paymentMethod == PaymentMethodEnum::WALLET) {
+            
+        } else {
+        }
     }
 
     public function addLocation(array $locations): TripLocation

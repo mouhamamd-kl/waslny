@@ -1,5 +1,7 @@
 <?php
 
+use Clickbar\Magellan\Database\PostgisFunctions\ST;
+
 use App\Events\TestEvent;
 use App\Events\TestNotification;
 use App\Helpers\ApiResponse;
@@ -14,11 +16,23 @@ use App\Events\TestQueuedNotification;
 use App\Http\Controllers\PusherWebhookController;
 use App\Http\Requests\RiderSavedLocation\RiderSavedLocationRequest;
 use App\Http\Requests\Trip\TripRequest;
+use App\Models\Trip;
 use App\Notifications\TestFirebaseNotification;
-
+use Illuminate\Support\Facades\Redis;
 
 Route::post('/pusher/webhook', [PusherWebhookController::class, 'handle'])->name('no-export.websocket');
 
+Route::get('/test-location', function () {
+    $trip = Trip::where('id', 102)->first();
+    $driver = Driver::where('id', 2)->first();
+
+    $query = Driver::query()
+        ->availableForTrip($trip)
+        ->where(ST::distanceSphere($trip->pickup_location->location, 'location'), '<=', $trip->driver_search_radius)
+        ->orderBy('rating', 'desc')
+        ->limit(5);
+    dd($query->get());
+});
 
 Route::get('/test-queued-job', function () {
     for ($i = 0; $i < 20; $i++) {
@@ -66,14 +80,14 @@ Route::get('/test-firebase/{type}/{id}', function ($type, $id) {
 // });
 
 
-// Route::get('/test', function (Request $request) {
-//     // Storing a value in Redis
-//     Redis::set('القائد', 'يحيى السنوار');
+Route::get('/test-redis', function (Request $request) {
+    // Storing a value in Redis
+    Redis::set('القائد', 'يحيى السنوار');
 
-//     // Retrieving a value from Redis
-//     $value = Redis::get('القائد');
-//     return response()->json(['القائد' => $value]);
-// });
+    // Retrieving a value from Redis
+    $value = Redis::get('القائد');
+    return response()->json(['القائد' => $value]);
+});
 
 
 Route::get('/trigger-event', function () {
@@ -213,31 +227,31 @@ Route::delete('/testFile', function (Request $request) {
     return $status;
 })->name('no-export.test.test_file_delete');
 
-Route::post('/testdriversaved', function (RiderSavedLocationRequest $request) {
+// Route::post('/testdriversaved', function (RiderSavedLocationRequest $request) {
 
-    $point = $request->input('location');
+//     $point = $request->input('location');
 
-    return response()->json([
-        'success' => true,
-        'coordinates' => [
-            'longitude' => $point->getLongitude(), // or getLongitude() if using geodetic
-            'latitude' => $point->getLatitude(),    // or getLatitude() if using geodetic
-        ]
-    ]);
-})->name('no-export.test.driver_saved_location');
+//     return response()->json([
+//         'success' => true,
+//         'coordinates' => [
+//             'longitude' => $point->getLongitude(), // or getLongitude() if using geodetic
+//             'latitude' => $point->getLatitude(),    // or getLatitude() if using geodetic
+//         ]
+//     ]);
+// })->name('no-export.test.driver_saved_location');
 
 Route::get('/testo', function (Request $request) {
     return response()->json(['message' => 'hello']);
 })->name('no-export.test.simple_test');
-Route::post('/test', function (TripRequest $request) {
+// Route::post('/test', function (TripRequest $request) {
 
-    $data = $request->validate();
+//     $data = $request->validate();
 
-    return response()->json([
-        'success' => true,
-        'data' => $data
-    ]);
-})->name('no-export.test.trip_request');
+//     return response()->json([
+//         'success' => true,
+//         'data' => $data
+//     ]);
+// })->name('no-export.test.trip_request');
 
 
 
@@ -332,11 +346,11 @@ Route::post('/test-htpp', function (Request $request) {
     ]);
 })->name('no-export.test.http_long_polling');
 
-Route::post('/add_website_photo', function (Request $request) {
-    $assetService = FileServiceFactory::makeForSystemFiles();
-    $url =  $assetService->uploadPublic($request->file('file'));
-    return ApiResponse::sendResponseSuccess($url);
-})->name('no-export.test.add_website_photo');
+// Route::post('/add_website_photo', function (Request $request) {
+//     $assetService = FileServiceFactory::makeForSystemFiles();
+//     $url =  $assetService->uploadPublic($request->file('file'));
+//     return ApiResponse::sendResponseSuccess($url);
+// })->name('no-export.test.add_website_photo');
 
 require __DIR__ . '/api/auth/AdminAuth.php';
 require __DIR__ . '/api/auth/DriverAuth.php';

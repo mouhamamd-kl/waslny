@@ -29,7 +29,7 @@ class TripStarted implements ShouldBroadcastNow
     {
         return new PrivateChannel(
             BroadCastChannelEnum::TRIP->bind(
-                'trip', $this->trip->id
+                $this->trip->id
             )
         );
     }

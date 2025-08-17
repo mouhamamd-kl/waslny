@@ -239,6 +239,10 @@ return [
         'payment_processed' => 'تمت معالجة الدفع بنجاح',
         'rated' => 'تم تقييم الرحلة بنجاح',
         'scheduled' => 'تم جدولة الرحلة بنجاح',
+        'accepted' => 'تم قبول الرحلة بنجاح.',
+        'started' => 'تم بدء الرحلة بنجاح.',
+        'location_completed' => 'تم إكمال الموقع بنجاح.',
+        'completed' => 'تم إكمال الرحلة بنجاح.',
 
         // Error Messages
         'error' => [
@@ -252,6 +256,7 @@ return [
             'invalid_status' => 'حالة الرحلة غير صالحة',
             'driver_unavailable' => 'لا يوجد سائق متاح',
             'driver_assignment_failed' => 'فشل تعيين سائق',
+            'already_arrived' => 'السائق قد وصل بالفعل.',
             'rider_not_ready' => 'الراكب غير جاهز للركوب',
             'pickup_failed' => 'فشل عملية الالتقاط',
             'route_calculation_failed' => 'فشل حساب المسار',
@@ -340,6 +345,8 @@ return [
             'profile_incomplete' => 'يرجى إكمال ملفك الشخصي قبل الوصول إلى هذه الميزة',
             'location_update_failed' => 'فشل تحديث الموقع',
             'status_update_failed' => 'فشل تحديث الحالة',
+            'already_accepted' => 'تم قبول الرحلة بالفعل.',
+            'no_longer_available' => 'الرحلة لم تعد متاحة.',
         ],
         'location_updated' => 'تم تحديث الموقع بنجاح.',
         'status_online' => 'تم تحديث الحالة إلى متصل.',

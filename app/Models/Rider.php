@@ -298,6 +298,7 @@ class Rider  extends Authenticatable implements Wallet
             TripStatusEnum::RiderCancelled->value,
             TripStatusEnum::DriverCancelled->value,
             TripStatusEnum::SystemCancelled->value,
+            TripStatusEnum::SearchTimeout->value,
         ])->pluck('id');
 
         return $this->trips()->notInStatuses($terminalStatuses)->exists();

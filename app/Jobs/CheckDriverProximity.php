@@ -9,6 +9,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
+use Clickbar\Magellan\Database\PostgisFunctions\ST;
 
 class CheckDriverProximity implements ShouldQueue
 {
@@ -39,12 +41,14 @@ class CheckDriverProximity implements ShouldQueue
             return;
         }
 
-        $pickupLocation = $this->trip->locations()->pickupPoints()->first();
+        $pickupLocation = $this->trip->pickup_location;
         $driverLocation = $this->trip->driver->location;
 
         if ($pickupLocation && $driverLocation) {
-            $driverTripLocation = new \App\Models\TripLocation(['location' => $driverLocation]);
-            $distance = $pickupLocation->distanceTo($driverTripLocation);
+            $distance = DB::query()
+                ->select(ST::distanceSphere($pickupLocation->location, $driverLocation)->as('distance'))
+                ->first()
+                ->distance;
 
             if ($distance <= 1000) {
                 $this->trip->update(['approaching_pickup_notified_at' => now()]);

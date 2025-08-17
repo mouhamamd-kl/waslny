@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Enums\channels\BroadCastChannelEnum;
+use App\Http\Resources\TripResource;
 use App\Models\Trip;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -35,18 +36,18 @@ class TripTimeIsNow implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel(BroadCastChannelEnum::RIDER->value . '.' . $this->trip->rider_id);
+        return new PrivateChannel(BroadCastChannelEnum::RIDER->bind($this->trip->rider_id));
     }
 
     public function broadcastAs()
     {
-        return 'trip.time.is.now';
+        return 'trip.time.now';
     }
 
     public function broadcastWith()
     {
         return [
-            'trip' => $this->trip,
+            'trip' => (new TripResource($this->trip))->resolve(),
         ];
     }
 }

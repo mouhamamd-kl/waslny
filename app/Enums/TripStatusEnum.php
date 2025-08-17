@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Enums;
+
 enum TripStatusEnum: string
 {
     // Initial states
@@ -27,7 +29,7 @@ enum TripStatusEnum: string
         // Special cases
     case EmergencyStopped = 'emergency_stopped';
     case Disputed = 'disputed';          // Post-trip issues
-
+    case SearchTimeout = 'search_timeout';
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
@@ -45,7 +47,8 @@ enum TripStatusEnum: string
             self::Searching => in_array($newStatus, [
                 self::DriverAssigned,    // Driver accepts
                 self::SystemCancelled,    // No drivers found/timeout
-                self::RiderCancelled     // Rider cancels 
+                self::RiderCancelled,
+                self::SearchTimeout     // Rider cancels 
             ]),
 
             // Driver assignment
@@ -101,7 +104,8 @@ enum TripStatusEnum: string
             self::DriverCancelled,
             self::SystemCancelled,
             self::EmergencyStopped,
-            self::Disputed => false,
+            self::Disputed,
+            self::SearchTimeout => false,
 
             // Default case
             default => throw new \InvalidArgumentException("Unhandled status: {$this->value}")

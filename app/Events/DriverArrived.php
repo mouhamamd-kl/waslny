@@ -4,6 +4,7 @@ namespace App\Events;
 
 use App\Enums\channels\BroadCastChannelEnum;
 use App\Http\Resources\DriverResource;
+use App\Http\Resources\TripResource;
 use App\Models\Driver;
 use App\Models\Trip;
 use Illuminate\Broadcasting\Channel;
@@ -63,7 +64,8 @@ class DriverArrived implements ShouldBroadcastNow
     public function broadcastWith()
     {
         return [
-            'driver' => (new DriverResource($this->driver))->resolve(),
+            'trip' => new TripResource($this->trip),
+            'driver' => new DriverResource($this->driver),
         ];
     }
 }

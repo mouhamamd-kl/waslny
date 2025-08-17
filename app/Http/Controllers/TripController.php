@@ -234,12 +234,15 @@ class TripController extends Controller
     public function cancelTripByRider(Request $request)
     {
         try {
-            $trip = Trip::findOrFail($request->trip_id);
+            $trip = $this->trip_service->findById($request->trip_id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans('messages.error.not_found', 'Trip not found'), 404);
+            }
             $trip->cancelByRider();
 
             event(new TripCancelledByRider($trip));
 
-            return ApiResponse::sendResponseSuccess([], 'Trip cancelled by rider successfully.', 200);
+            return ApiResponse::sendResponseSuccess([], trans_fallback('messages.trip.canceled', 'Trip canceled successfully.'), 200);
         } catch (Exception $e) {
             return ApiResponse::sendResponseError($e->getMessage());
         }
@@ -249,12 +252,15 @@ class TripController extends Controller
     public function cancelTripByDriver(Request $request)
     {
         try {
-            $trip = Trip::findOrFail($request->trip_id);
+            $trip = $this->trip_service->findById($request->trip_id);
+            if (!$trip) {
+                return ApiResponse::sendResponseError(trans('messages.error.not_found', 'Trip not found'), 404);
+            }
             $trip->cancelByDriver();
 
             event(new TripCancelledByDriver($trip));
 
-            return ApiResponse::sendResponseSuccess([], 'Trip cancelled by driver successfully.', 200);
+            return ApiResponse::sendResponseSuccess([], trans_fallback('messages.trip.canceled', 'Trip canceled successfully.'), 200);
         } catch (Exception $e) {
             return ApiResponse::sendResponseError($e->getMessage());
         }
@@ -303,7 +309,6 @@ class TripController extends Controller
                 201
             );
         } catch (Exception $e) {
-            throw $e;
             \Illuminate\Support\Facades\Log::error('Trip creation failed: ' . $e->getMessage());
             return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'Trip Creation Failed'));
         }

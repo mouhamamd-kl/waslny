@@ -8,10 +8,7 @@ class TripRouteLocation extends Model
 {
     protected $table = 'trip_route_locations';
 
-    protected $fillable = [
-        'trip_id',
-        'location',
-    ];
+    protected $guarded = ['id'];
 
     public function trip()
     {

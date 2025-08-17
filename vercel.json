@@ -1,35 +1,24 @@
 {
     "version": 2,
     "framework": null,
-    "builds": [
-        {
-            "src": "api/index.php",
-            "use": "vercel-php@0.7.3",
-            "config": {
-                "build": [
-                    "php artisan key:generate --force",
-                    "php artisan config:cache",
-                    "php artisan route:cache",
-                    "php artisan event:cache"
-                ]
-            }
+    "functions": {
+        "api/worker.php": {
+            "runtime": "vercel-php@0.7.3",
+            "memory": 1024,
+            "maxDuration": 300
         },
-        {
-            "src": "api/worker.php",
-            "use": "vercel-php@0.7.3",
-            "config": { "memory": 1024, "maxDuration": 300 }
+        "api/schedule.php": {
+            "runtime": "vercel-php@0.7.3",
+            "memory": 1024,
+            "maxDuration": 300
         },
-        {
-            "src": "api/schedule.php",
-            "use": "vercel-php@0.7.3",
-            "config": { "memory": 1024, "maxDuration": 300 }
+        "api/index2.php": {
+            "runtime": "vercel-php@0.7.3",
+            "memory": 1024,
+            "maxDuration": 300
         },
-        {
-            "src": "api/index2.php",
-            "use": "vercel-php@0.7.3",
-            "config": { "memory": 1024, "maxDuration": 300 }
-        }
-    ],
+        "api/index.php": { "runtime": "vercel-php@0.7.3" }
+    },
     "routes": [
         {
             "src": "/api/driver-search",

@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class TripService extends BaseService
 {
@@ -57,28 +58,22 @@ class TripService extends BaseService
     }
 
     // trip_flow
-    public function findAndAssignDriver(Trip $trip): ?Driver
+    public function findAndNotifyDrivers(Trip $trip): Collection
     {
+        Log::info("TripService: Starting findAndNotifyDrivers for trip ID: {$trip->id}");
+
         // Find available drivers within radius
         $drivers = $this->driverSearchService->findNearbyDrivers($trip);
+        Log::info("TripService: Found " . count($drivers) . " nearby drivers for trip ID: {$trip->id}");
+
 
         // Send notifications to found drivers
         foreach ($drivers as $driver) {
+            Log::info("TripService: Notifying driver ID: {$driver->id} for trip ID: {$trip->id}");
             $this->notifyDriver($trip, $driver);
         }
 
-        // Check for accepted drivers
-        if ($acceptedDriver = $this->checkForAcceptedDriver($trip)) {
-            // $trip->update(['driver_id' => $acceptedDriver->id]);
-            return $acceptedDriver;
-        }
-
-        // Expand search radius if no drivers found
-        if ($drivers->isEmpty()) {
-            $trip->increment('driver_search_radius', 1000); // Expand by 1km
-        }
-
-        return null;
+        return $drivers;
     }
 
     // public function findDriverForTrip(Trip $trip): array
@@ -146,7 +141,7 @@ class TripService extends BaseService
     private function notifyDriver(Trip $trip, Driver $driver): void
     {
         // Send push notification to driver
-        $driver->notify(new TripAvailableForDriver($trip, $driver->id));
+        event(new TripAvailableForDriver($trip, $driver->id));
 
         // Record notification
         TripDriverNotification::create([
@@ -216,7 +211,6 @@ class TripService extends BaseService
             [
                 'rider_id' => $data->rider_id,
                 'driver_id' => $data->driver_id,
-
             ]
         );
     }

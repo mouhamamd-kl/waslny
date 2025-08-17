@@ -26,7 +26,7 @@ class TripCompleted implements ShouldBroadcastNow
     {
         $this->trip = $trip;
         $this->tripChannel = BroadCastChannelEnum::TRIP->bind(
-            'trip', $trip->id
+            $trip->id
         );
     }
 
@@ -34,7 +34,7 @@ class TripCompleted implements ShouldBroadcastNow
     {
         return new PrivateChannel(
             BroadCastChannelEnum::TRIP->bind(
-                'trip', $this->trip->id
+                $this->trip->id
             )
         );
     }

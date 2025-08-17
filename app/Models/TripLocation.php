@@ -73,7 +73,7 @@ class TripLocation extends Model
         return $query->where('location_type', 'dropoff');
     }
 
-    public function scopeStops($query)
+    public function scopeStopsPoints($query)
     {
         return $query->where('location_type', 'stop');
     }

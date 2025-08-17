@@ -45,7 +45,7 @@ class TripTimeNear implements ShouldBroadcastNow
 
     public function broadcastAs()
     {
-        return 'trip.near';
+        return 'trip.time.near';
     }
 
     public function broadcastWith()

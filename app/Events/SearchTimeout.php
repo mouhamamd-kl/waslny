@@ -42,20 +42,20 @@ class SearchTimeout implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('riders.' . $this->trip->rider_id),
-            new PrivateChannel($this->getChannelName()),
+            new PrivateChannel(BroadCastChannelEnum::RIDER->bind($this->trip->rider_id)),
+            new PrivateChannel(BroadCastChannelEnum::TRIP->bind($this->trip->id)),
         ];
     }
 
-    /**
-     * Get the broadcast channel name for the event.
-     *
-     * @return string
-     */
-    public function getChannelName(): string
-    {
-        return BroadCastChannelEnum::TRIP->bind(['tripId' => $this->trip->id]);
-    }
+    // /**
+    //  * Get the broadcast channel name for the event.
+    //  *
+    //  * @return string
+    //  */
+    // public function getChannelName(): string
+    // {
+    //     return BroadCastChannelEnum::TRIP->bind($this->trip->id);
+    // }
 
     /**
      * The event's broadcast name.

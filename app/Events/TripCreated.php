@@ -29,18 +29,18 @@ class TripCreated implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        //to make private again
-        // return new PrivateChannel(
-        //     BroadCastChannelEnum::RIDER->bind(
-        //         $this->trip->rider_id
-        //     )
-        // );
-
-        return new Channel(
+        // to make private again
+        return new PrivateChannel(
             BroadCastChannelEnum::RIDER->bind(
                 $this->trip->rider_id
             )
         );
+
+        // return new Channel(
+        //     BroadCastChannelEnum::RIDER->bind(
+        //         $this->trip->rider_id
+        //     )
+        // );
     }
 
     public function broadcastAs()

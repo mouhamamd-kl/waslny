@@ -2,6 +2,8 @@
 
 namespace App\Events;
 
+use App\Enums\channels\BroadCastChannelEnum;
+use App\Http\Resources\TripResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -35,7 +37,7 @@ class TripLocationCompleted implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel(\App\Enums\channels\BroadCastChannelEnum::TRIP->bind($this->trip->id)),
+            new PrivateChannel(BroadCastChannelEnum::TRIP->bind($this->trip->id)),
         ];
     }
 
@@ -47,7 +49,7 @@ class TripLocationCompleted implements ShouldBroadcastNow
     public function broadcastWith()
     {
         return [
-            'trip_location' => $this->tripLocation,
+            'trip' => (new TripResource($this->trip))->resolve(),
         ];
     }
 }

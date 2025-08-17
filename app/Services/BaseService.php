@@ -15,13 +15,14 @@ abstract class BaseService
 
     protected CacheHelper $cache;
 
-    protected bool $cacheEnabled = true;
+    protected bool $cacheEnabled = false;
 
     protected int $defaultCacheTtl = 3600; // 10 minutes
 
     public function __construct(
         Model $model,
-        CacheHelper $cache
+        CacheHelper $cache,
+
     ) {
         $this->model = $model;
         $this->cache = $cache;
@@ -193,5 +194,10 @@ abstract class BaseService
         $this->cacheEnabled = $status;
 
         return $this;
+    }
+
+    public function getRelations(): array
+    {
+        return $this->relations ?? [];
     }
 }
