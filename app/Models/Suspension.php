@@ -46,7 +46,7 @@ class Suspension extends Model
     // =================
     public function toEnum(): SuspensionReasonEnum
     {
-        return SuspensionReasonEnum::from($this->code);
+        return SuspensionReasonEnum::from($this->system_value);
     }
     public function reason(): string
     {

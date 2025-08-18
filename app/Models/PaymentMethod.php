@@ -88,6 +88,6 @@ class PaymentMethod extends Model
     // =================
     public function toEnum(): \App\Enums\PaymentMethodEnum
     {
-        return \App\Enums\PaymentMethodEnum::from($this->code);
+        return \App\Enums\PaymentMethodEnum::from($this->system_value);
     }
 }

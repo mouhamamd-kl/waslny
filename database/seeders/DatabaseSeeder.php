@@ -41,9 +41,11 @@ class DatabaseSeeder extends Seeder
 
             // SuspensionSeeder::class,
 
-            TripStatusSeeder::class,
-            TripTimeTypeSeeder::class,
-            TripTypeSeeder::class,
+            // TripStatusSeeder::class,
+            // TripTimeTypeSeeder::class,
+            // TripTypeSeeder::class,
+
+            SystemValueSeeder::class,
         ]);
     }
 }

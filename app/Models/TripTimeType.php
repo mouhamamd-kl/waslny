@@ -94,6 +94,6 @@ class TripTimeType extends Model
 
     public function toEnum(): \App\Enums\TripTimeTypeEnum
     {
-        return \App\Enums\TripTimeTypeEnum::from($this->code);
+        return \App\Enums\TripTimeTypeEnum::from($this->system_value);
     }
 }

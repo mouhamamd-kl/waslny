@@ -111,18 +111,11 @@ class Coupon extends Model
      */
     public function applyDiscount(float $fare): float
     {
-        return $this->isPercentage()
-            ? $fare * (1 - $this->amount / 100)
-            : max(0, $fare - $this->amount);
+        return
+            $fare * (1 - $this->percent / 100);
     }
 
-    /**
-     * Check if coupon is percentage-based
-     */
-    public function isPercentage(): bool
-    {
-        return $this->type === 'percentage';
-    }
+
 
     /**
      * Check if coupon is expired

@@ -127,6 +127,11 @@ class Trip extends Model
     {
         return $this->locations()->StopsPoints()->get();
     }
+
+    public function paymentMethodAsEnum(): PaymentMethodEnum
+    {
+        return PaymentMethodEnum::from($this->paymentMethod->system_value);
+    }
     // protected function fare(): Attribute
     // {
     //     // return Attribute::make(
@@ -369,7 +374,6 @@ class Trip extends Model
 
         $paymentMethod = PaymentMethodEnum::tryFrom($this->paymentMethod->name);
         if ($paymentMethod == PaymentMethodEnum::WALLET) {
-            
         } else {
         }
     }

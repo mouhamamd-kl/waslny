@@ -33,8 +33,8 @@ class SuspenssionService extends BaseService
         return $this->search_first(filters: ['reason' => $reason]);
     }
 
-    public function searchByCode(String $code): ?Suspension
+    public function searchBySystemValue(String $system_value): ?Suspension
     {
-        return $this->search_first(filters: ['code' => $code]);
+        return $this->search_first(filters: ['system_value' => $system_value]);
     }
 }

@@ -100,6 +100,6 @@ class TripType extends Model
 
     public function toEnum(): \App\Enums\TripTypeEnum
     {
-        return \App\Enums\TripTypeEnum::from($this->code);
+        return \App\Enums\TripTypeEnum::from($this->system_value);
     }
 }

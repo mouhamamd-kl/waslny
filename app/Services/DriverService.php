@@ -75,7 +75,7 @@ class DriverService extends BaseService
             if (!$driver) {
                 throw new Exception('Driver not found.');
             }
-            $suspention = $this->suspenssion_service->searchByCode(SuspensionReasonEnum::NEED_REVIEW->value);
+            $suspention = $this->suspenssion_service->searchBySystemValue(SuspensionReasonEnum::NEED_REVIEW->value);
             $driver->suspendForever($suspention->id);
         } catch (Exception $e) {
             throw new Exception('error suspending for driver' . $e);
@@ -104,7 +104,7 @@ class DriverService extends BaseService
             }
             $driver->reinstate();
         } catch (Exception $e) {
-            
+
             throw new Exception('error activating for driver' . $e);
         }
     }

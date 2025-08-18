@@ -55,8 +55,8 @@ class TripTypeService extends BaseService
         }
     }
 
-    public function searchByCode(String $code): ?TripType
+    public function searchBySystemValue(String $system_value): ?TripType
     {
-        return $this->search_first(filters: ['code' => $code]);
+        return $this->search_first(filters: ['system_value' => $system_value]);
     }
 }

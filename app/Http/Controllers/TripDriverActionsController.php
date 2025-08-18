@@ -18,6 +18,8 @@ use App\Models\Trip;
 use App\Models\TripLocation;
 use App\Services\TripLocationService;
 use App\Services\TripService;
+use App\Services\FareCalculationService;
+use App\Services\PaymentService;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Rules\GeometryGeojsonRule;
 use Exception;
@@ -26,11 +28,19 @@ class TripDriverActionsController extends Controller
 {
     protected $tripService;
     protected $tripLocationService;
-    
-    public function __construct(TripService $tripService, TripLocationService $tripLocationService)
-    {
+    protected $fareCalculationService;
+    protected $paymentService;
+
+    public function __construct(
+        TripService $tripService,
+        TripLocationService $tripLocationService,
+        FareCalculationService $fareCalculationService,
+        PaymentService $paymentService
+    ) {
         $this->tripService = $tripService;
         $this->tripLocationService = $tripLocationService;
+        $this->fareCalculationService = $fareCalculationService;
+        $this->paymentService = $paymentService;
     }
 
     public function accept(Request $request, $id)
@@ -187,13 +197,30 @@ class TripDriverActionsController extends Controller
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
             }
             if ($trip->hasStatus(TripStatusEnum::Completed)) {
-                return ApiResponse::sendResponseError(trans_fallback('messages.trip.error.already_arrived', 'Driver has already arrived.'), 422);
+                return ApiResponse::sendResponseError(trans_fallback('messages.trip.error.already_completed', 'Trip has already been completed.'), 422);
+            }
+
+            // // old code
+            // $trip->dropoff_location->completeTripLocation();
+            // $trip->completeTrip();
+            // $trip->load($this->tripService->getRelations());
+            // event(new TripCompleted($trip));
+
+            $fare = $this->fareCalculationService->calculateFare($trip);
+            $commission = $fare * config('company.commission_rate');
+
+            $paymentProcessed = $this->paymentService->processPayment($trip, $fare, $commission);
+
+            if (!$paymentProcessed) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.payment.error.failed', 'Payment failed.'), 422);
             }
 
             $trip->dropoff_location->completeTripLocation();
             $trip->completeTrip();
+            $trip->update(['fare' => $fare]);
             $trip->load($this->tripService->getRelations());
             event(new TripCompleted($trip));
+
 
             return ApiResponse::sendResponseSuccess([], trans_fallback('messages.trip.completed', 'Trip completed successfully.'), 200);
         } catch (Exception $e) {

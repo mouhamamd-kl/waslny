@@ -67,8 +67,8 @@ class TripStatusService extends BaseService
         }
     }
 
-    public function searchByCode(String $code): ?TripStatus
+    public function searchBySystemValue(String $system_value): ?TripStatus
     {
-        return $this->search_first(filters: ['code' => $code]);
+        return $this->search_first(filters: ['system_value' => $system_value]);
     }
 }

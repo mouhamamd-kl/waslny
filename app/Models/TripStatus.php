@@ -39,7 +39,7 @@ class TripStatus extends Model
     // =================
     public function toEnum(): TripStatusEnum
     {
-        return TripStatusEnum::from($this->code);
+        return TripStatusEnum::from($this->system_value);
     }
     // =================
     // Scopes
