@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\domains\trips\trip_route_locations;
+namespace App\Models;
 
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Model;

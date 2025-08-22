@@ -19,15 +19,17 @@ class AccountSuspensionResource  extends JsonResource
     {
         return [
             'id' => $this->id,
-            'suspendable' => $this->whenLoaded('suspendable', function () {
-                return $this->resolvePolymorphicResource($this->suspendable);
-            }),
+            // 'suspendable' => $this->whenLoaded('suspendable', function () {
+            //     return $this->resolvePolymorphicResource($this->suspendable);
+            // }),
             'suspension' => new SuspensionResource($this->whenLoaded('suspension')),
             'lifted_at' => $this->lifted_at,
             'is_permanent' => $this->is_permanent,
             'suspended_until' => $this->suspended_until,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'dates' => [
+                'created_at' => $this->created_at,
+                'updated_at' => $this->updated_at,
+            ]
         ];
     }
 }

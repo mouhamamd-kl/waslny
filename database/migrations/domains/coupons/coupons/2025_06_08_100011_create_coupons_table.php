@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('code', length: 20);
             $table->bigInteger('max_uses'); // Maximum allowed uses
-            $table->bigInteger('used_count')->nullable()->default(0); // How many times the coupon has been used
-            $table->double('percent');
+            $table->bigInteger('used_count')->default(0); // How many times the coupon has been used
+            $table->double('percent')->default(0.00);
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->boolean('is_active')->default(true);

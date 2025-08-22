@@ -65,6 +65,7 @@ trait Suspendable
     public function activeSuspension(): ?AccountSuspension
     {
         return $this->suspensions()
+            ->with('suspension')
             ->where(function ($query) {
                 $query->where('is_permanent', true)
                     ->orWhere('suspended_until', '>', now());
@@ -89,12 +90,12 @@ trait Suspendable
      */
     public function suspensionReason()
     {
-        return $this->activeSuspension()->suspenssion()->reason();
+        return $this->activeSuspension()->suspension()->reason();
     }
 
     public function userSuspensionMessage()
     {
-        return $this->activeSuspension()->suspenssion()->userSuspenssionMessage();
+        return $this->activeSuspension()->suspension()->userSuspenssionMessage();
     }
 
     public function suspensionStatus(): ?string

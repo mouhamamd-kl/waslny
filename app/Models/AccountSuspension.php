@@ -22,7 +22,7 @@ class AccountSuspension extends Model
         return $this->morphTo();
     }
 
-    public function suspenssion(): BelongsTo
+    public function suspension(): BelongsTo
     {
         return $this->belongsTo(Suspension::class);
     }

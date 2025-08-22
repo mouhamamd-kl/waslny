@@ -12,7 +12,7 @@ class TripDriverSearchRequest extends BaseRequest
      */
     public function handleAuthorization(): bool
     {
-         return auth('driver-api')->check();
+        return auth('driver-api')->check();
     }
 
     /**
@@ -25,10 +25,11 @@ class TripDriverSearchRequest extends BaseRequest
         return [
             'trip_status_id' => 'sometimes|nullable|integer|exists:trip_statuses,id',
             'trip_type_id' => 'sometimes|nullable|integer|exists:trip_types,id',
-            'trip_time_type_id' => 'sometimes\nullable|integer|exists:trip_time_types,id',
+            'trip_time_type_id' => 'sometimes|nullable|integer|exists:trip_time_types,id',
             'start_time' => 'sometimes|nullable|date',
             'end_time' => 'sometimes|nullable|date|after_or_equal:start_time',
-            'fare' => 'sometimes|nullable|numeric',
+            'min_fare' => 'sometimes|nullable|numeric',
+            'max_fare' => 'sometimes|nullable|numeric',
         ];
     }
 }

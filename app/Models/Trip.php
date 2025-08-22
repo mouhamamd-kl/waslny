@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
+use App\Models\TripRouteLocation;
 
 class Trip extends Model
 {
@@ -105,7 +106,7 @@ class Trip extends Model
 
     public function routeLocations(): HasMany
     {
-        return $this->hasMany(\App\Models\domains\trips\trip_route_locations\TripRouteLocation::class);
+        return $this->hasMany(TripRouteLocation::class);
     }
 
 

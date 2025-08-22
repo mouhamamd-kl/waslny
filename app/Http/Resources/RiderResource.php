@@ -16,24 +16,28 @@ class RiderResource extends JsonResource
     public function toArray(Request $request): array
     {
         $assetService = FileServiceFactory::makeForRiderProfile();
-    return [
-        'id' => $this->id,
-        'first_name' => $this->first_name,
-        'last_name' => $this->last_name,
-        // 'gender' => $this->gender,
-        'phone' => $this->phone,
-        'email' => $this->email,
-        'profile_photo' => $this->when($this->profile_photo!=null||$this->profile_photo!="", function () use ($assetService) {
-            return $assetService->getUrl($this->profile_photo);
-        }, null),
-        'rating' => $this->rating,
-        'wallet' => [
-            'balance' => $this->balance,
-        ],
-        'dates' => [
-            'created' => $this->created_at,
-            'updated' => $this->updated_at,
-        ],
-    ];
+        return [
+            'id' => $this->id,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            // 'gender' => $this->gender,
+            'phone' => $this->phone,
+            'email' => $this->email,
+            'profile_photo' => $this->when($this->profile_photo != null || $this->profile_photo != "", function () use ($assetService) {
+                return $assetService->getUrl($this->profile_photo);
+            }, null),
+            'rating' => $this->rating,
+            'active_suspension' =>
+            $this->when($this->activeSuspension() && auth('admin-api')->check(), function () {
+                return new AccountSuspensionResource($this->activeSuspension());
+            }, null),
+            'wallet' => [
+                'balance' => $this->balance,
+            ],
+            'dates' => [
+                'created' => $this->created_at,
+                'updated' => $this->updated_at,
+            ],
+        ];
     }
 }

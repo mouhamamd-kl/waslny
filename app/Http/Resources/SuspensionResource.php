@@ -18,7 +18,7 @@ class SuspensionResource extends JsonResource
         return [
             'id' => $this->id,
             'reason' => $this->reason,
-            'admin_msg' => $this->admin_msg,
+            'admin_msg' => $this->when(auth('admin-api')->check(), $this->admin_msg),
             'user_msg' => $this->user_msg,
             'is_active' => $this->when(auth('admin-api')->check(), $this->is_active),
             'is_system_defined' =>  $this->when(auth('admin-api')->check(), $this->is_system_defined),
