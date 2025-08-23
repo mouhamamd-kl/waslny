@@ -72,7 +72,7 @@ return [
             'url' => env('AWS_URL_PUBLIC'),
             'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
-            'visibility' => 'public', // If you want files publicly accessible
+            // 'visibility' => 'public', // If you want files publicly accessible
             'cache' => [
                 'store' => 'file',
                 'expire' => 600,
@@ -88,7 +88,7 @@ return [
             'url' => env('AWS_URL_PUBLIC'),
             'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
-            'visibility' => 'public', // If you want files publicly accessible
+            // 'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::ADMINS_PROFILE->value,
             'cache' => [
                 'store' => 'file',
@@ -105,7 +105,7 @@ return [
             'url' => env('AWS_URL_PUBLIC'),
             'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
-            'visibility' => 'public', // If you want files publicly accessible
+            // 'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::RIDERS->value,
             'cache' => [
                 'store' => 'file',
@@ -122,7 +122,7 @@ return [
             'url' => env('AWS_URL_PUBLIC'),
             'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
-            'visibility' => 'public', // If you want files publicly accessible
+            // 'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::DRIVERS_PROFILE->value,
             'cache' => [
                 'store' => 'file',
@@ -139,7 +139,7 @@ return [
             'url' => env('AWS_URL_PUBLIC'),
             'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
-            'visibility' => 'public', // If you want files publicly accessible
+            // 'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::DRIVERS_LICENSE->value,
             'cache' => [
                 'store' => 'file',
@@ -156,7 +156,7 @@ return [
             'url' => env('AWS_URL_PUBLIC'),
             'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
-            'visibility' => 'public', // If you want files publicly accessible
+            // 'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::DRIVERS_CAR_PHOTOS->value,
             'cache' => [
                 'store' => 'file',
@@ -173,7 +173,7 @@ return [
             'url' => env('AWS_URL_PUBLIC'),
             'endpoint' => env('AWS_ENDPOINT_PUBLIC'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true), // Important change
-            'visibility' => 'public', // If you want files publicly accessible
+            // 'visibility' => 'public', // If you want files publicly accessible
             'root' => DiskNames::SYSTEM->value, // Dedicated folder for agents
             'cache' => [
                 'store' => 'file',

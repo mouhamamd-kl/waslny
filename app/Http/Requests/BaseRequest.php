@@ -137,10 +137,21 @@ class BaseRequest extends FormRequest
      *
      * @return void
      */
-    protected function prepareForValidation()
+    final protected function prepareForValidation()
     {
         $this->prepareBooleanInput('suspended');
         $this->prepareBooleanInput('is_active');
+        $this->handleRequestPreparation();
+    }
+
+    /**
+     * Handle any additional request preparation for child classes.
+     *
+     * @return void
+     */
+    protected function handleRequestPreparation(): void
+    {
+        // This method can be overridden by child classes.
     }
 
     /**

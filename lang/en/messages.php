@@ -83,6 +83,9 @@ return [
         'invalid' => 'Invalid coupon',
         'activated' => 'Coupon activated successfully',
         'deactivated' => 'Coupon deactivated successfully',
+        'not_exist' => 'The selected coupon does not exist.',
+        'not_yours' => 'This coupon does not belong to you.',
+        'not_active' => 'The selected coupon is not active.',
         'error' => [
             'activation_failed' => 'Failed to activate coupon',
             'deactivation_failed' => 'Failed to deactivate coupon',

@@ -54,7 +54,7 @@ class BaseFileService
     public function uploadPublic(
         UploadedFile $file,
         string $pathPrefix,
-    ):string {
+    ): string {
         if (!$this->fileValidator->validate($this->validExtensions, $file)) {
             throw new Exception("File Type is not Supported");
         }
@@ -144,7 +144,7 @@ class BaseFileService
         /** @var storage $storage */
 
         $storage = Storage::disk($this->disk);
-
+        // dd($filePath . ' ' . $this->disk);
         try {
             // 4. Check file existence (optional - adds overhead)
             if (!$storage->exists($filePath)) {

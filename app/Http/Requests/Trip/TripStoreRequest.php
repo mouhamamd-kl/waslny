@@ -5,6 +5,7 @@ namespace App\Http\Requests\Trip;
 use App\Enums\LocationTypeEnum;
 use App\Http\Requests\BaseRequest;
 use App\Rules\ActiveCoupon;
+use App\Rules\ValidRiderCoupon;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Http\Requests\TransformsGeojsonGeometry;
@@ -52,11 +53,10 @@ class TripStoreRequest extends BaseRequest
             ],
             'car_service_level_id' => ['required', 'exists:car_service_levels,id',],
             
-            'coupon_id' => [
+            'rider_coupon_id' => [
                 'nullable',
                 'sometimes',
-                'exists:coupons,id',
-                new ActiveCoupon,
+                new ValidRiderCoupon,
             ],
 
             'payment_method_id' => [
@@ -100,5 +100,16 @@ class TripStoreRequest extends BaseRequest
     public function geometries(): array
     {
         return ['locations.*.location'];
+    }
+
+    protected function handleRequestPreparation(): void
+    {
+        if ($this->has('rider_coupon_id')) {
+            $riderCoupon = \App\Models\RiderCoupon::find($this->input('rider_coupon_id'));
+            if ($riderCoupon) {
+                $this->merge(['coupon_id' => $riderCoupon->coupon_id]);
+                $this->request->remove('rider_coupon_id');
+            }
+        }
     }
 }

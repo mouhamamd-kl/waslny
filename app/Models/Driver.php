@@ -47,7 +47,7 @@ enum DriverPhotoType: string
 
 class Driver extends Authenticatable implements Wallet
 {
-    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken, SoftDeletes;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken;
     use Suspendable {
         suspendTemporarily as protected traitSuspendTemp;
         suspendForever as protected traitSuspendForever;

@@ -80,6 +80,9 @@ return [
         'invalid' => 'كوبون غير صالح',
         'activated' => 'تم تفعيل الكوبون بنجاح',
         'deactivated' => 'تم إيقاف الكوبون بنجاح',
+        'not_exist' => 'الكوبون المحدد غير موجود.',
+        'not_yours' => 'هذا الكوبون لا يخصك.',
+        'not_active' => 'الكوبون المحدد غير فعال.',
         'error' => [
             'activation_failed' => 'فشل تفعيل الكوبون',
             'deactivation_failed' => 'فشل إيقاف الكوبون',

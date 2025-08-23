@@ -41,7 +41,7 @@ class Rider  extends Authenticatable implements Wallet
     // Traits
     // =================
 
-    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken, SoftDeletes;
+    use HasFactory, Notifiable, HasApiTokens, TwoFactorCode, FilterScope, ResetOTP, Suspendable, HasWallet, HasDeviceToken;
 
     // =================
     // Configuration
