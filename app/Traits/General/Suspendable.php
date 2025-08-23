@@ -115,6 +115,16 @@ trait Suspendable
             ? ($this->activeSuspension->is_permanent ? 'banned' : 'suspended')
             : 'active';
     }
+
+    public function scopeActiveSuspension($query)
+    {
+        return $query->whereHas('suspensions', function ($q) {
+            $q->where(function ($query) {
+                $query->where('is_permanent', true)
+                    ->orWhere('suspended_until', '>', now());
+            })->whereNull('lifted_at');
+        });
+    }
     /**
      * Validate that the model has required properties and methods.
      *

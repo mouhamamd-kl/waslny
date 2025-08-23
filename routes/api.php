@@ -357,6 +357,7 @@ require __DIR__ . '/api/auth/DriverAuth.php';
 require __DIR__ . '/api/auth/RiderAuth.php';
 require __DIR__ . '/api/coupon/CouponRoute.php';
 require __DIR__ . '/api/driver/DriverRoute.php';
+require __DIR__ . '/api/driver/DriverStatusRoute.php';
 require __DIR__ . '/api/payment/PaymentMethodRoute.php';
 require __DIR__ . '/api/payment/MoneyCodeRoute.php';
 
@@ -389,3 +390,5 @@ Route::get('/test-log', function () {
 
 // Telegram Bot Integration
 Route::post('/telegram/webhook', [App\Http\Controllers\Api\TelegramController::class, 'webhook'])->name('no-export.test.add_website_photo');
+
+require __DIR__ . '/api/telescope.php';

@@ -55,7 +55,7 @@ Route::prefix('rider')->name('rider.')->group(function () {
             });
 
 
-            Route::prefix('account')->name('account.')->middleware('rider-profile-completed')->group(function () {
+            Route::prefix('account')->name('account.')->middleware('rider.profile.completed')->group(function () {
                 Route::delete('/', [RiderAuthController::class, 'deleteAccount'])
                     ->name('delete');
             });

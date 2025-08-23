@@ -204,4 +204,7 @@ return [
         Watchers\ScheduleWatcher::class => env('TELESCOPE_SCHEDULE_WATCHER', true),
         Watchers\ViewWatcher::class => env('TELESCOPE_VIEW_WATCHER', true),
     ],
+
+    'telescope_clear_secret' => env('TELESCOPE_CLEAR_SECRET'),
+
 ];

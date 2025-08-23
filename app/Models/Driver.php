@@ -71,7 +71,7 @@ class Driver extends Authenticatable implements Wallet
         'location' => Point::class,
         'birth_date' => 'date',
         'two_factor_expires_at' => 'datetime',
-        'avg_rating' => 'float',
+        'rating' => 'float',
     ];
 
     protected static function booted()

@@ -29,6 +29,10 @@ class DriverService extends BaseService
         array $filters = [],
         int $perPage = 10
     ): LengthAwarePaginator {
+        if (isset($filters['suspended']) && $filters['suspended']) {
+            $filters['driver.activeSuspension'] = true;
+            unset($filters['suspended']);
+        }
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
                 filters: $filters,

@@ -139,14 +139,26 @@ class BaseRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        if ($this->has('is_active') && $this->input('is_active') != null) {
-            $isActive = filter_var($this->input('is_active'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $this->prepareBooleanInput('suspended');
+        $this->prepareBooleanInput('is_active');
+    }
 
-            if ($isActive !== null) {
-                $this->merge(['is_active' => $isActive]);
+    /**
+     * Prepares a boolean input field for validation by converting it to a boolean or removing it.
+     *
+     * @param string $key The name of the request parameter.
+     * @return void
+     */
+    private function prepareBooleanInput(string $key): void
+    {
+        if ($this->has($key) && $this->input($key) !== null) {
+            $value = filter_var($this->input($key), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+            if ($value !== null) {
+                $this->merge([$key => $value]);
             }
         } else {
-            $this->request->remove('is_active');
+            $this->request->remove($key);
         }
     }
 }

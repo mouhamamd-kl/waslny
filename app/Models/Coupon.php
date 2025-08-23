@@ -88,7 +88,7 @@ class Coupon extends Model
         $now = now()->toDateString();
         return $query->where('start_date', '<=', $now)
             ->where('end_date', '>=', $now)
-            ->whereColumn('used_count', '<', 'max_uses');
+            ->whereColumn('used_count', '!=', 'max_uses');
     }
 
     public function scopeExpired(Builder $query): Builder

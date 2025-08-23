@@ -52,7 +52,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'driver.profile.completed' => EnsureDriverProfileComplete::class,
 
             'driver.suspended' => EnsureDriverIsNotSuspended::class,
-            'rider.suspended' => EnsureRiderIsNotSuspended::class
+            'rider.suspended' => EnsureRiderIsNotSuspended::class,
+            'telescope.clear.auth' => \App\Http\Middleware\TelescopeClearAuthMiddleware::class,
         ]);
     })
 

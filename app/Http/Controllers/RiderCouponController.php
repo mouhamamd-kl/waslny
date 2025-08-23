@@ -35,6 +35,23 @@ class RiderCouponController extends Controller
         }
     }
 
+
+
+    public function activeIndex(Request $request)
+    {
+        try {
+            $favouriteProperties = $this->RiderCouponService->searchRiderActiveCoupons(
+                $request->input('filters', ['rider_id' => auth('sanctum')->user()->id]),
+                $request->input('per_page', 10)
+            );
+
+            return ApiResponse::sendResponsePaginated($favouriteProperties, RiderCouponResource::class, 'Favourites retrieved successfully');
+        } catch (Exception $e) {
+            throw $e;
+            return ApiResponse::sendResponseError($e->getMessage());
+        }
+    }
+
     public function store($code)
     {
         /** @var Coupon $coupon */

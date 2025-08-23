@@ -36,10 +36,14 @@ class DriverResource extends JsonResource
                 'balance' => $this->balance,
             ],
             'driver_status' => new DriverStatusResource($this->whenLoaded('status')),
-            'active_suspension' =>
-            $this->when($this->activeSuspension() && auth('admin-api')->check(), function () {
-                return new AccountSuspensionResource($this->activeSuspension());
-            }, null),
+
+            $this->mergeWhen(auth('admin-api')->check(), [
+                'active_suspension' =>
+                $this->when($this->activeSuspension() != null && auth('admin-api')->check() == true, function () {
+                    return new AccountSuspensionResource($this->activeSuspension());
+                }, null),
+            ]),
+
             'dates' => [
                 'created' => $this->created_at,
                 'updated' => $this->updated_at,

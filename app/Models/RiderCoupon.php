@@ -34,7 +34,11 @@ class RiderCoupon extends Model
     {
         return $this->belongsTo(Coupon::class, 'coupon_id');
     }
-    
+
+    public function activeCoupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class, 'coupon_id')->active();
+    }
     // =================
     // Scopes
     // =================

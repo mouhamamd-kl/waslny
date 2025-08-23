@@ -18,11 +18,15 @@ use Illuminate\Support\Facades\Validator;
 class DriverAuthController extends Controller
 {
     protected DriverService $driverService;
+    public function __construct(DriverService $driverService)
+    {
+        $this->driverService = $driverService;
+    }
     public function login(DriverLoginRequest $request): JsonResponse
     {
 
         try {
-         $data = $request->validated();
+            $data = $request->validated();
             // $rider = Rider::where('phone', $request->phone)->first();
             $driver = Driver::firstOrCreate(
                 [

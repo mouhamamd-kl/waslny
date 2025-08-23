@@ -23,6 +23,10 @@ class RiderService extends BaseService
         array $filters = [],
         int $perPage = 10
     ): LengthAwarePaginator {
+        if (isset($filters['suspended']) && $filters['suspended']) {
+            $filters['driver.activeSuspension'] = true;
+            unset($filters['suspended']);
+        }
         return $this->toggleCache(config('app.enable_caching'))
             ->paginatedList(
                 filters: $filters,
@@ -33,11 +37,9 @@ class RiderService extends BaseService
             );
     }
 
-    public function deleteAssets($riderId)
+    public function deleteAssets(Rider $rider)
     {
         try {
-            /** @var Rider $rider */ // Add PHPDoc type hint
-            $rider = $this->findById($riderId);
             $assetService = FileServiceFactory::makeForRiderProfile();
             $assetService->delete($rider->profile_photo);
         } catch (Exception $e) {

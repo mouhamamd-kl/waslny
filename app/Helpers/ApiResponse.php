@@ -77,7 +77,7 @@ class ApiResponse
                         'first' => $paginator->url(1),
                         'last' => $paginator->url($paginator->lastPage()),
                         'next' => $paginator->nextPageUrl(),
-                        'pervious' => $paginator->previousPageUrl(),
+                        'previous' => $paginator->previousPageUrl(),
                     ],
                 ],
             ],

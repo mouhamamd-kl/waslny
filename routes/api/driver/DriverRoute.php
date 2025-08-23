@@ -33,3 +33,5 @@ Route::middleware(['auth:admin-api'])
         Route::get('/{driver}', 'show')->name('show');
         Route::post('/{driver}/reinstate', 'reinstate')->name('reinstate');
     });
+
+    

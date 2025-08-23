@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 class RiderCouponService extends BaseService
 {
     protected array $relations = ['rider', 'coupon'];
+
     public function __construct(CacheHelper $cache)
     {
         parent::__construct(new RiderCoupon, $cache);
@@ -35,9 +36,23 @@ class RiderCouponService extends BaseService
                 withCount: []
             );
     }
+
+    public function searchRiderActiveCoupons(
+        array $filters = [],
+        int $perPage = 10
+    ): LengthAwarePaginator {
+        $filters['coupon.active'] = [true];
+        return $this->toggleCache(config('app.enable_caching'))
+            ->paginatedList(
+                filters: $filters,
+                relations: ['rider', 'coupon'],
+                perPage: $perPage,
+                columns: ['*'],
+                withCount: []
+            );
+    }
     public function deleteRiderCoupon($rider, $riderCouponId)
     {
-
         try {
             // return $model->notifications()->detach($modelNotificationId);
             return  $rider->coupons()->detach($riderCouponId); // Detach one listing

@@ -51,6 +51,7 @@ class TripStoreRequest extends BaseRequest
                 'exists:trip_time_types,id'
             ],
             'car_service_level_id' => ['required', 'exists:car_service_levels,id',],
+            
             'coupon_id' => [
                 'nullable',
                 'sometimes',

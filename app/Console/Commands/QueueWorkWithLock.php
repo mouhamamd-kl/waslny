@@ -35,31 +35,31 @@ class QueueWorkWithLock extends Command
 
         if (file_exists($lockFile)) {
             Log::info('Queue worker is already running.');
-            event(new TestNotification('Queue worker is already running.'));
+            event(new TestNotification(['Queue worker is already running.']));
             return 0;
         }
 
         Log::info('Starting queue worker.');
-        event(new TestNotification('Starting queue worker.'));
+        event(new TestNotification(['Starting queue worker.']));
         touch($lockFile);
 
         try {
             Log::info('Running queue:work');
-            event(new TestNotification('Running queue:work'));
+            event(new TestNotification(['Running queue:work']));
             Artisan::call('queue:work', ['--stop-when-empty' => true]);
-            
+
             Log::info('Finished queue:work');
-            event(new TestNotification('Finished queue:work'));
+            event(new TestNotification(['Finished queue:work']));
         } catch (Exception $e) {
             Log::info($e);
         } finally {
             Log::info('Removing lock file.');
-            event(new TestNotification('Removing lock file.'));
+            event(new TestNotification(['Removing lock file.']));
             unlink($lockFile);
         }
 
         Log::info('Queue worker finished.');
-        event(new TestNotification('Queue worker finished.'));
+        event(new TestNotification(['Queue worker finished.']));
         return 0;
     }
 }

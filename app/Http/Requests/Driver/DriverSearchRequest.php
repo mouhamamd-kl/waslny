@@ -29,6 +29,7 @@ class DriverSearchRequest extends BaseRequest
             'max_rating' => 'sometimes|nullable|numeric|min:1|max:5',
             'min_rating' => 'sometimes|nullable|numeric|min:1|max:5|lt:max_rating',
             'created_at' => 'sometimes|nullable|date',
+            'suspended' => 'sometimes|nullable|boolean',
         ];
     }
 }

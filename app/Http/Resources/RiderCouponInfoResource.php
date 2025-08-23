@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RiderCouponResource extends JsonResource
+class RiderCouponInfoResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,12 +15,10 @@ class RiderCouponResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            $this->merge(new RiderCouponInfoResource($this->whenLoaded('coupon'))),
-            'dates' => [
-                'created' => $this->created_at,
-                'updated' => $this->updated_at,
-            ],
+            'code' => $this->code,
+            'percent' => $this->percent,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
         ];
     }
 }

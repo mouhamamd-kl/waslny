@@ -27,10 +27,14 @@ class RiderResource extends JsonResource
                 return $assetService->getUrl($this->profile_photo);
             }, null),
             'rating' => $this->rating,
-            'active_suspension' =>
-            $this->when($this->activeSuspension() && auth('admin-api')->check(), function () {
-                return new AccountSuspensionResource($this->activeSuspension());
-            }, null),
+
+            $this->mergeWhen(auth('admin-api')->check(), [
+                'active_suspension' =>
+                $this->when($this->activeSuspension() != null && auth('admin-api')->check() == true, function () {
+                    return new AccountSuspensionResource($this->activeSuspension());
+                }, null),
+            ]),
+
             'wallet' => [
                 'balance' => $this->balance,
             ],

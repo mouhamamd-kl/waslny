@@ -8,6 +8,7 @@ Route::middleware(['auth:rider-api'])->controller(RiderCouponController::class)
     ->name('rider.coupons.')
     ->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('/active', 'activeIndex')->name('active');
         Route::post('/{code}', 'store')->name('store');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });

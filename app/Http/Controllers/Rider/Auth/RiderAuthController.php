@@ -24,6 +24,12 @@ use Illuminate\Support\Facades\Validator;
 class RiderAuthController extends Controller
 {
     protected RiderService $riderSerivce;
+
+    public function __construct(RiderService $riderService)
+    {
+        $this->riderSerivce = $riderService;
+    }
+
     public function login(RiderLoginRequest $request)
     {
         try {
@@ -95,7 +101,7 @@ class RiderAuthController extends Controller
 
         try {
             // Delete uploaded files from S3
-            $this->riderSerivce->deleteAssets($rider->id);
+            $this->riderSerivce->deleteAssets($rider);
 
             // Revoke tokens
             $rider->tokens()->delete();

@@ -24,6 +24,8 @@ class CarManufacturerAdminSearchRequest extends BaseRequest
     {
         return [
             'name' => 'sometimes|nullable|string|max:255',
+            'country_id' => 'sometimes|nullable|integer|exists:countries,id',
+            'is_active' => 'sometimes|nullable|boolean',
         ];
     }
 }
