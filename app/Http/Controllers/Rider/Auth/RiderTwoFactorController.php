@@ -76,6 +76,7 @@ class RiderTwoFactorController extends Controller
                     statusCode: 201
                 );
         } catch (Exception $e) {
+            throw $e;
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

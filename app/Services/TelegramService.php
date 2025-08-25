@@ -108,7 +108,7 @@ class TelegramService
     {
         $chatId = $message->getChat()->getId();
         $phoneNumber = $message->getContact()->getPhoneNumber();
-        // $phoneNumber =  str_replace("963", "0", $phoneNumber);
+        $phoneNumber =  str_replace("+", "", $phoneNumber);
         event(new TestNotification([
             ' $phoneNumber' =>  $phoneNumber
         ]));
@@ -136,7 +136,11 @@ class TelegramService
             } else {
                 Telegram::sendMessage([
                     'chat_id' => $chatId,
-                    'text' => trans('telegram.otp_message', ['otp' => $otp])
+                    'text' => trans('telegram.otp_message')
+                ]);
+                Telegram::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => $otp
                 ]);
             }
         } else {

@@ -18,7 +18,7 @@ class TripStarted implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
+    public Trip $trip;
 
     public function __construct(Trip $trip)
     {

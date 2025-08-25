@@ -12,9 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('trips', function (Blueprint $table) {
-            $table->foreignIdFor(CarServiceLevel::class)->onDelete('cascade');
-        });
+        // Schema::table('trips', function (Blueprint $table) {
+        //     $table->foreignIdFor(CarServiceLevel::class)->onDelete('cascade');
+        // });
     }
 
     /**
@@ -22,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('trips', function (Blueprint $table) {
-            $table->dropColumn('last_seen_at');
-        });
+        // Schema::table('trips', function (Blueprint $table) {
+        //     $table->dropColumn('last_seen_at');
+        // });
     }
 };

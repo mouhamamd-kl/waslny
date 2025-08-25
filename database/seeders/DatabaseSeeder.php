@@ -45,7 +45,8 @@ class DatabaseSeeder extends Seeder
             // TripTimeTypeSeeder::class,
             // TripTypeSeeder::class,
 
-            SystemValueSeeder::class,
+            // SystemValueSeeder::class,
+            SystemConfigSeeder::class,
         ]);
     }
 }

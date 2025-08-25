@@ -347,7 +347,13 @@ return [
         'status_online' => 'Status updated to online.',
         'status_offline' => 'Status updated to offline.',
         'car' => [
-            'created' => 'Vehicle created successfully'
+            'created' => 'Vehicle created successfully',
+            'updated' => 'Car data updated successfully',
+            'retrieved' => 'Car data retrieved successfully',
+            'error' => [
+                'update_failed' => 'Failed to update car data',
+                'retrieval_failed' => 'Failed to retrieve car data',
+            ]
         ]
     ],
 

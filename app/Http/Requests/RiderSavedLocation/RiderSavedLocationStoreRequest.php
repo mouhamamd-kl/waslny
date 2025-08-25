@@ -39,7 +39,8 @@ class RiderSavedLocationStoreRequest extends BaseRequest
     {
         return [
             'rider_folder_id' => [
-                'required',
+                'sometimes',
+                'nullable',
                 'exists:rider_folders,id',
             ],
             'location' => ['required', new GeometryGeojsonRule([Point::class])],

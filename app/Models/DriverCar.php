@@ -148,7 +148,7 @@ class DriverCar extends Model
             }
 
             // Upload new file
-            $path = "{$this->driver_id}/{$this->car_id}";
+            $path = "{$this->driver_id}";
             $url = $service->uploadPublic($file, $path);
 
             // Update model with file path

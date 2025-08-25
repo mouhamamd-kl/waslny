@@ -16,7 +16,7 @@ class TripTimeNear implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
+    public Trip $trip;
 
     public function __construct(Trip $trip)
     {
@@ -26,20 +26,20 @@ class TripTimeNear implements ShouldBroadcastNow
     public function broadcastOn()
     {
         return [
-            //to make private again
-            // new PrivateChannel(BroadCastChannelEnum::DRIVER->bind(
-            //     $this->trip->driver_id,
-            // )),
-            // new PrivateChannel(BroadCastChannelEnum::RIDER->bind(
-            //     $this->trip->rider_id,
-            // )),
-
-            new Channel(BroadCastChannelEnum::DRIVER->bind(
+            // to make private again
+            new PrivateChannel(BroadCastChannelEnum::DRIVER->bind(
                 $this->trip->driver_id,
             )),
-            new Channel(BroadCastChannelEnum::RIDER->bind(
-                $this->trip->rider_id,
+            new PrivateChannel(BroadCastChannelEnum::RIDER->bind(
+            $this->trip->rider_id,
             )),
+
+            // new Channel(BroadCastChannelEnum::DRIVER->bind(
+            //     $this->trip->driver_id,
+            // )),
+            // new Channel(BroadCastChannelEnum::RIDER->bind(
+            //     $this->trip->rider_id,
+            // )),
         ];
     }
 

@@ -9,5 +9,5 @@ Route::middleware(['auth:admin-api'])
     ->name('admin.dashboard.')
     ->group(function () {
         Route::get('/header-stats', [DashboardController::class, 'getHeaderStats'])->name('header-stats');
-        Route::get('/chart-stats', [DashboardController::class, 'getChartStats'])->name('chart-stats');
+        Route::post('/chart-stats', [DashboardController::class, 'getChartStats'])->name('chart-stats');
     });

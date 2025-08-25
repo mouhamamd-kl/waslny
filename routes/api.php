@@ -383,6 +383,9 @@ require __DIR__ . '/api/trip/TripDriverActionsRoute.php';
 
 require __DIR__ . '/api/dashboard.php';
 
+require __DIR__ . '/api/system.php';
+require __DIR__ . '/api/config.php';
+
 Route::get('/test-log', function () {
     Log::info('This is a test log message from Laravel.');
     return 'Log message sent!';
@@ -392,3 +395,6 @@ Route::get('/test-log', function () {
 Route::post('/telegram/webhook', [App\Http\Controllers\Api\TelegramController::class, 'webhook'])->name('no-export.test.add_website_photo');
 
 require __DIR__ . '/api/telescope.php';
+
+require __DIR__ . '/api/sync.php';
+require __DIR__ . '/api/system_configs.php';

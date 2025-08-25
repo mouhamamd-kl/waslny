@@ -3,6 +3,8 @@
 namespace App\Events;
 
 use App\Enums\channels\BroadCastChannelEnum;
+use App\Http\Resources\TripResource;
+use App\Models\Trip;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -17,31 +19,38 @@ class TripCancelledByDriver implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
 
-    public $trip;
+    public Trip $trip;
 
-    public function __construct(\App\Models\Trip $trip)
+    public function __construct(Trip $trip)
     {
         $this->trip = $trip;
     }
 
     public function broadcastOn()
     {
-        return new PrivateChannel(
-            BroadCastChannelEnum::RIDER->bind(
-                $this->trip->rider_id
-            )
-        );
+        return [
+            // new PrivateChannel(
+            //     BroadCastChannelEnum::RIDER->bind(
+            //         $this->trip->rider_id
+            //     )
+            // ),
+            new PrivateChannel(
+                BroadCastChannelEnum::TRIP->bind(
+                    $this->trip->id
+                )
+            ),
+        ];
     }
 
     public function broadcastAs()
     {
-        return 'trip.cancelled';
+        return 'trip.cancelled.by.driver';
     }
 
     public function broadcastWith()
     {
         return [
-            'trip' => $this->trip,
+            'trip' => (new TripResource($this->trip->fresh()))->resolve()
         ];
     }
 }

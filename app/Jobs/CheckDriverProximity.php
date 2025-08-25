@@ -58,7 +58,7 @@ class CheckDriverProximity implements ShouldQueue
         }
 
         $this->tries++;
-        self::dispatch($this->trip, $this->tries)->delay(now()->addSeconds($this->backoff()));
+        $this->release(now()->addSeconds($this->backoff()));
     }
 
     private function shouldStop(): bool

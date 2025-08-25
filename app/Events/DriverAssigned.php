@@ -21,8 +21,8 @@ class DriverAssigned implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
-    public $driver;
+    public Trip $trip;
+    public Driver $driver;
 
     /**
      * Create a new event instance.
@@ -69,8 +69,8 @@ class DriverAssigned implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'trip' => new TripResource($this->trip),
-            'driver' => new DriverResource($this->driver),
+            'trip' => (new TripResource($this->trip->fresh()))->resolve(),
+            'driver' => (new DriverResource($this->driver->fresh()))->resolve(),
             'sent_at' => now()->toISOString()
         ];
     }

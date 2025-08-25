@@ -19,15 +19,11 @@ class TripCompleted implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
 
-    public $trip;
-    public $tripChannel;
+    public Trip $trip;
 
     public function __construct(Trip $trip)
     {
         $this->trip = $trip;
-        $this->tripChannel = BroadCastChannelEnum::TRIP->bind(
-            $trip->id
-        );
     }
 
     public function broadcastOn()

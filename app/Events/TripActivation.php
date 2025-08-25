@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\channels\BroadCastChannelEnum;
 use App\Models\Trip;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -15,7 +16,7 @@ class TripActivation implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
+    public Trip $trip;
 
     /**
      * Create a new event instance.
@@ -35,8 +36,13 @@ class TripActivation implements ShouldBroadcast
     public function broadcastOn()
     {
         return [
-            new PrivateChannel('riders.' . $this->trip->rider_id),
-            new PrivateChannel('drivers.' . $this->trip->driver_id),
+            // new PrivateChannel('riders.' . $this->trip->rider_id),
+            // new PrivateChannel('drivers.' . $this->trip->driver_id),
+            new  PrivateChannel(
+                BroadCastChannelEnum::TRIP->bind(
+                    $this->trip->id
+                )
+            )
         ];
     }
 

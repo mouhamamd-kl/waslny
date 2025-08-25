@@ -109,7 +109,7 @@ class RiderAuthController extends Controller
             // Delete agent from DB
             $rider->delete();
             return ApiResponse::sendResponseSuccess(null, 'Rider account deleted successfully');
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             return ApiResponse::sendResponseError(
                 trans_fallback('messages.error.generic', 'An error occurred'),
                 500,

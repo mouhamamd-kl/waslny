@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('riders', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        // Schema::table('riders', function (Blueprint $table) {
+        //     $table->softDeletes();
+        // });
 
-        Schema::table('drivers', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        // Schema::table('drivers', function (Blueprint $table) {
+        //     $table->softDeletes();
+        // });
     }
 
     /**
@@ -25,12 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('riders', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        // Schema::table('riders', function (Blueprint $table) {
+        //     $table->dropSoftDeletes();
+        // });
 
-        Schema::table('drivers', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        // Schema::table('drivers', function (Blueprint $table) {
+        //     $table->dropSoftDeletes();
+        // });
     }
 };

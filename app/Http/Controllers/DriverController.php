@@ -159,7 +159,7 @@ class DriverController extends Controller
             }
             $driver->setLocation($location);
 
-            event(new DriverLocationUpdatedForDashboard($driver->id, $location));
+            event(new DriverLocationUpdatedForDashboard($driver, $location));
 
 
             return ApiResponse::sendResponseSuccess(

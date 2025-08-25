@@ -41,7 +41,7 @@
     "env": {
         "APP_ENV": "local",
         "APP_DEBUG": "true",
-        "APP_URL": "https://waslny-self.vercel.app/",
+        "APP_URL": "https://waslny-project.vercel.app/",
         "ASSET_URL": "/",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
@@ -56,7 +56,7 @@
         "APP_NAME": "waslny",
         "APP_KEY": "base64:A+m6qeo+ZUuB0umZYlbysicjn1iswH0w+/qyZU+KC6o=",
         "APP_TIMEZONE": "UTC",
-        "FRONTEND_URL": "https://waslny-self.vercel.app/",
+        "FRONTEND_URL": "https://waslny-project.vercel.app/",
 
         "APP_LOCALE": "en",
         "APP_FALLBACK_LOCALE": "en",
@@ -101,22 +101,22 @@
         "MAIL_FROM_NAME": "test",
 
         "TELEGRAM_BOT_TOKEN": "8404390559:AAEg_kOtrBmj5VnbBYA2GAi875vbtWZrk44",
-
         "FILESYSTEM_DISK": "SUBAPASEPUBLIC",
-        "AWS_ACCESS_KEY_ID": "410ae4def58b3b22f7113b3def1f6294",
-        "AWS_SECRET_ACCESS_KEY": "fed8190d3f42f1532fdda7c801a749db84163c3907d39850dcc821ba7a6456fc",
+        "AWS_ACCESS_KEY_ID": "ca9075b2d96949d31dcd42a8933fbcbf",
+        "AWS_SECRET_ACCESS_KEY": "263b4149f8016bc78249419b4b19deaac82300c6e935405abeae3c4c76c880e1",
         "AWS_DEFAULT_REGION": "us-east-2",
-        "AWS_BUCKET": "waslny",
-        "AWS_ENDPOINT": "https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/s3/waslny",
         "AWS_USE_PATH_STYLE_ENDPOINT": "true",
         "AWS_DISK_PUBLIC": "supabase",
         "AWS_DISK_PRIVATE": "supabase_private",
-
         "AWS_BUCKET_PUBLIC": "waslny",
         "AWS_BUCKET_PRIVATE": "waslny-private",
+        "AWS_ENDPOINT_PUBLIC": "https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/s3/waslny",
+        "AWS_ENDPOINT_PRIVATE": "https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/s3/waslny-private",
+        "AWS_URL_PUBLIC": "https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/object/public/waslny/storage/v1/s3/waslny/waslny/",
+        "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcmxiaXJud3ppZGdlcmVoc2RxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODA3NzA1OCwiZXhwIjoyMDYzNjUzMDU4fQ.3736XsRyFf2HcmXR259xJKzWHhhuEJNIXJZ7O-sOedU",
         "SUPABASE_PROJECT_ID": "cqrlbirnwzidgerehsdq",
-        "SUPABASE_STORAGE_BUCKET": "waslny",
-
+        "SUPABASE_STORAGE_BUCKET_Public": "waslny",
+        "SUPABASE_STORAGE_BUCKET_Private": "waslny_private",
         "VITE_APP_NAME": "${APP_NAME}",
 
         "PUSHER_APP_ID": "1975841",

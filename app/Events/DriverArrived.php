@@ -42,17 +42,17 @@ class DriverArrived implements ShouldBroadcastNow
 
         return [
             //to make private again
-            // new PrivateChannel(
-            //     BroadCastChannelEnum::TRIP->bind(
-            //         $this->trip->id
-            //     )
-            // ),
-
-            new Channel(
+            new PrivateChannel(
                 BroadCastChannelEnum::TRIP->bind(
                     $this->trip->id
                 )
             ),
+
+            // new Channel(
+            //     BroadCastChannelEnum::TRIP->bind(
+            //         $this->trip->id
+            //     )
+            // ),
         ];
     }
 
@@ -64,8 +64,8 @@ class DriverArrived implements ShouldBroadcastNow
     public function broadcastWith()
     {
         return [
-            'trip' => new TripResource($this->trip),
-            'driver' => new DriverResource($this->driver),
+            'trip' => (new TripResource($this->trip->fresh()))->resolve(),
+            'driver' => (new DriverResource($this->driver->fresh()))->resolve(),
         ];
     }
 }

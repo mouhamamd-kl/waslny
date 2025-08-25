@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\TripStatusEnum;
-use App\Events\TripCreated;
+use App\Enums\TripTimeTypeEnum;
+use App\Events\TripTimeIsNow;
+use App\Events\TripTimeNear;
 use App\Models\Trip;
 use Illuminate\Console\Command;
+use Carbon\Carbon;
 
 class ProcessScheduledTrips extends Command
 {
@@ -32,20 +34,36 @@ class ProcessScheduledTrips extends Command
     {
         $this->info('Processing scheduled trips...');
 
-        $trips = Trip::whereHas('status', function ($query) {
-            $query->where('name', TripStatusEnum::Pending->value);
-        })
-            ->where('requested_time', '<=', now()->addMinutes(15))
-            ->get();
-
-        foreach ($trips as $trip) {
-            $this->info("Processing trip #{$trip->id}");
-            $trip->update(['trip_status_id' => TripStatusEnum::Searching->value]);
-            event(new TripCreated($trip));
-        }
+        $this->handleTripsNear();
+        $this->handleTripsNow();
 
         $this->info('Done.');
 
         return 0;
+    }
+
+    protected function handleTripsNear()
+    {
+        $trips = Trip::query()
+            ->whereHas('status', fn($q) => $q->where('system_value', \App\Enums\TripStatusEnum::Scheduled->value))
+            ->whereBetween('requested_time', [now(), now()->addMinutes(5)])
+            ->get();
+
+        $trips->each(fn(Trip $trip) => event(new TripTimeNear($trip)));
+
+        $this->info("{$trips->count()} scheduled trips are near.");
+    }
+
+    protected function handleTripsNow()
+    {
+        $trips = Trip::query()
+            ->whereHas('timeType', fn($q) => $q->where('system_value', TripTimeTypeEnum::SCHEDULED->value))
+            ->whereHas('status', fn($q) => $q->where('system_value', \App\Enums\TripStatusEnum::Scheduled->value))
+            ->where('requested_time', '<=', now())
+            ->get();
+
+        $trips->each(fn(Trip $trip) => event(new TripTimeIsNow($trip)));
+
+        $this->info("{$trips->count()} scheduled trips are now.");
     }
 }

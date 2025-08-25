@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('trips', function (Blueprint $table) {
-            $table->timestamp('approaching_pickup_notified_at')->nullable();
-        });
+        // Schema::table('trips', function (Blueprint $table) {
+        //     $table->timestamp('approaching_pickup_notified_at')->nullable();
+        // });
     }
 
     /**
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('trips', function (Blueprint $table) {
-            $table->dropColumn('approaching_pickup_notified_at');
-        });
+        // Schema::table('trips', function (Blueprint $table) {
+        //     $table->dropColumn('approaching_pickup_notified_at');
+        // });
     }
 };

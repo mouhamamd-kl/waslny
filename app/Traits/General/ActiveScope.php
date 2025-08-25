@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait ActiveScope
 {
-    public function activeScope(Builder $query): Builder
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }

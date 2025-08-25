@@ -20,8 +20,8 @@ class DriverApproachingPickup implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
-    public $driver;
+    public Trip $trip;
+    public Driver $driver;
 
     /**
      * Create a new event instance.
@@ -45,17 +45,17 @@ class DriverApproachingPickup implements ShouldBroadcastNow
         // return new PrivateChannel('driver.' . $this->driverId);
 
         //to make private again
-        // return new PrivateChannel(
-        //     BroadCastChannelEnum::TRIP->bind(
-        //          $this->trip->id
-        //     )
-        // );
-
-        return new Channel(
+        return new PrivateChannel(
             BroadCastChannelEnum::TRIP->bind(
-                $this->trip->id
+                 $this->trip->id
             )
         );
+
+        // return new Channel(
+        //     BroadCastChannelEnum::TRIP->bind(
+        //         $this->trip->id
+        //     )
+        // );
     }
 
     /**
@@ -76,8 +76,8 @@ class DriverApproachingPickup implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'trip' => (new TripResource($this->trip))->resolve(),
-            'driver' => (new DriverResource($this->driver))->resolve(),
+            'trip' => (new TripResource($this->trip->fresh()))->resolve(),
+            'driver' => (new DriverResource($this->driver->fresh()))->resolve(),
             'sent_at' => now()->toISOString()
         ];
     }

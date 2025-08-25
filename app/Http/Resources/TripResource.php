@@ -40,7 +40,7 @@ class TripResource extends JsonResource
             'time_type' => $this->when($this->timeType()->exists(), function () {
                 return  new TripTimeTypeResource($this->whenLoaded('timeType'));
             }, null),
-            'locations'=>  TripLocationResource::collection($this->whenLoaded('locations')),
+            'locations' =>  TripLocationResource::collection($this->whenLoaded('locations')),
             'route_locations' => TripRouteLocationResource::collection($this->whenLoaded('routeLocations')),
             // 'location' => new TripLocationResource($this->whenLoaded('locations')),
             // 'locations' => $this->when($this->locations()->exists(), function () {
@@ -62,9 +62,8 @@ class TripResource extends JsonResource
                 'meters' => $this->distance,
                 'kilometers' => $this->distanceInKm,
             ],
-            'fare' => [
-                'amount' => $this->fare,
-            ],
+            'expected_fare' => $this->expected_fare,
+            'fare' => $this->fare,
         ];
     }
 }

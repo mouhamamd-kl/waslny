@@ -8,20 +8,22 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use App\Enums\channels\BroadCastChannelEnum;
+use App\Http\Resources\DriverResource;
+use App\Models\Driver;
 
 class DriverLocationUpdatedForDashboard implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $driverId;
-    public $location;
+    public Driver $driver;
+    public  $location;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($driverId, $location)
+    public function __construct($driver, $location)
     {
-        $this->driverId = $driverId;
+        $this->driver = $driver;
         $this->location = $location;
     }
 
@@ -45,7 +47,7 @@ class DriverLocationUpdatedForDashboard implements ShouldBroadcastNow
     public function broadcastWith()
     {
         return [
-            'driver_id' => $this->driverId,
+            'driver' => (new DriverResource($this->driver->fresh()))->resolve(),
             'location' => $this->location,
         ];
     }

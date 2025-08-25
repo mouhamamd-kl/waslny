@@ -180,6 +180,18 @@ class Trip extends Model
         return $query->whereNull('end_time')->whereNotNull('start_time');
     }
 
+    public function scopeActiveOrScheduled($query)
+    {
+        $activeOrScheduledStatuses = TripStatus::whereIn('system_value', [
+            TripStatusEnum::Scheduled->value,
+            TripStatusEnum::OnGoing->value,
+            TripStatusEnum::DriverAssigned->value,
+            TripStatusEnum::DriverEnRoute->value,
+        ])->pluck('id');
+
+        return $query->whereIn('trip_status_id', $activeOrScheduledStatuses);
+    }
+
     public function scopeForDriver($query, $driverId)
     {
         return $query->where('driver_id', $driverId);
@@ -247,20 +259,20 @@ class Trip extends Model
             ->exists();
     }
 
-    public function assignDriver(Driver $driver): void
-    {
-        if ($this->driver_id) {
-            throw new Exception('Trip already has a driver assigned');
-        }
+    // public function assignDriver(Driver $driver): void
+    // {
+    //     if ($this->driver_id) {
+    //         throw new Exception('Trip already has a driver assigned');
+    //     }
 
-        $this->driver()->associate($driver);
-        $this->transitionTo(TripStatusEnum::DriverAssigned);
-        $this->save();
+    //     $this->driver()->associate($driver);
+    //     $this->transitionTo(TripStatusEnum::DriverAssigned);
+    //     $this->save();
 
 
-        // Update driver status
-        $driver->setStatus(DriverStatusEnum::STATUS_ON_TRIP);
-    }
+    //     // Update driver status
+    //     $driver->setStatus(DriverStatusEnum::STATUS_ON_TRIP);
+    // }
 
     public function recordNotification(Driver $driver): void
     {
@@ -305,45 +317,41 @@ class Trip extends Model
         return $this->status->name === $status->value;
     }
 
-    public function startTrip(): void
-    {
-        $this->transitionTo(TripStatusEnum::OnGoing);
-        $this->start_time = now();  // Still track specific timing if needed
-        $this->save();
-    }
+    // Old model implementation, now handled by TripService
+    // public function startTrip(): void
+    // {
+    //     $this->transitionTo(TripStatusEnum::OnGoing);
+    //     $this->start_time = now();  // Still track specific timing if needed
+    //     $this.save();
+    // }
 
-    public function completeTrip(): void
-    {
-        $this->transitionTo(TripStatusEnum::Completed);
-        $this->end_time = now();
+    // Old model implementation, now handled by TripService
+    // public function completeTrip(): void
+    // {
+    //     $this->transitionTo(TripStatusEnum::Completed);
+    //     $this->end_time = now();
 
-        $this->driver->update([
-            'driver_status_id' => DriverStatus::where('name', 'available')->first()->id
-        ]);
+    //     $this->driver->setStatus(DriverStatusEnum::STATUS_AVAILABLE);
 
-        $this->save();
-        $this->processPayment();
-    }
+    //     $this->save();
+    //     $this->processPayment();
+    // }
 
     public function cancelByRider(): void
     {
         $this->transitionTo(TripStatusEnum::RiderCancelled);
         $this->save();
-
         if ($this->driver) {
-            $this->driver->update([
-                'driver_status_id' => DriverStatus::where('name', 'available')->first()->id
-            ]);
+            $this->driver->setStatus(DriverStatusEnum::STATUS_AVAILABLE);
         }
     }
     public function cancelByDriver(): void
     {
         $this->transitionTo(TripStatusEnum::DriverCancelled);
         $this->save();
-
-        $this->driver->update([
-            'driver_status_id' => DriverStatus::where('name', 'available')->first()->id
-        ]);
+        if ($this->driver) {
+            $this->driver->setStatus(DriverStatusEnum::STATUS_AVAILABLE);
+        }
     }
 
     public function applyCoupon(RiderCoupon $riderCoupon): void

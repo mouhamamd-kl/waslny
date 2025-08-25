@@ -45,6 +45,8 @@ return new class extends Migration
             $table->rememberToken()->nullable();
             $table->timestamps();
 
+
+            $table->timestamp('last_seen_at')->nullable()->after('rememberToken');
             $table->spatialIndex('location'); // Spatial index for location
             $table->index('driver_status_id'); // Index for status
             $table->timestamp('last_seen_at')->nullable()->after('rememberToken');

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('trip_statuses', function (Blueprint $table) {
-            $table->boolean('is_active')->default(true);
-        });
+        // Schema::table('trip_statuses', function (Blueprint $table) {
+        //     $table->boolean('is_active')->default(true);
+        // });
     }
 
     /**
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('trip_statuses', function (Blueprint $table) {
-            $table->boolean('is_active')->default(true);
-        });
+        // Schema::table('trip_statuses', function (Blueprint $table) {
+        //     $table->boolean('is_active')->default(true);
+        // });
     }
 };

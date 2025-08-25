@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->boolean('is_active')->after('description')->default(true);
+            $table->boolean('is_system_defined')->default(false);
             $table->timestamps();
         });
     }

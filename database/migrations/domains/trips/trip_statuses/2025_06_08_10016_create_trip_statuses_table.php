@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('trip_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_system_defined')->default(false);
             $table->timestamps();
         });
     }

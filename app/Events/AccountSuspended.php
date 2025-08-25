@@ -37,17 +37,17 @@ class AccountSuspended implements ShouldBroadcastNow
         $key = $this->user instanceof Driver ? 'driverId' : 'riderId';
 
         //to make private again
-        // return new PrivateChannel(
-        //     $channel->bind(
-        //          $this->user->id
-        //     )
-        // );
-
-        return new Channel(
+        return new PrivateChannel(
             $channel->bind(
-                $this->user->id
+                 $this->user->id
             )
         );
+
+        // return new Channel(
+        //     $channel->bind(
+        //         $this->user->id
+        //     )
+        // );
     }
 
     public function broadcastAs(): string

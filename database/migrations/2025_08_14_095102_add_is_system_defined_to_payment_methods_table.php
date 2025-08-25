@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('payment_methods', function (Blueprint $table) {
-            $table->boolean('is_system_defined')->default(false);
-        });
+        // Schema::table('payment_methods', function (Blueprint $table) {
+        //     $table->boolean('is_system_defined')->default(false);
+        // });
     }
 
     /**
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('payment_methods', function (Blueprint $table) {
-            $table->dropColumn('is_system_defined');
-        });
+        // Schema::table('payment_methods', function (Blueprint $table) {
+        //     $table->dropColumn('is_system_defined');
+        // });
     }
 };

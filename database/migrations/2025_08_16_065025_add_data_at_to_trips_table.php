@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('trips', function (Blueprint $table) {
-            $table->unsignedInteger('driver_search_radius')->default(5000); // meters (5km)
-            $table->timestamp('search_started_at')->nullable();
-            $table->timestamp('search_expires_at')->nullable();
-        });
+        // Schema::table('trips', function (Blueprint $table) {
+        //     $table->unsignedInteger('driver_search_radius')->default(5000); // meters (5km)
+        //     $table->timestamp('search_started_at')->nullable();
+        //     $table->timestamp('search_expires_at')->nullable();
+        // });
     }
 
     /**
@@ -23,10 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('trips', function (Blueprint $table) {
-            $table->dropColumn('driver_search_radius'); // meters (5km)
-            $table->dropColumn('search_started_at')->nullable();
-            $table->dropColumn('search_expires_at')->nullable();
-        });
+        // Schema::table('trips', function (Blueprint $table) {
+        //     $table->dropColumn('driver_search_radius'); // meters (5km)
+        //     $table->dropColumn('search_started_at')->nullable();
+        //     $table->dropColumn('search_expires_at')->nullable();
+        // });
     }
 };

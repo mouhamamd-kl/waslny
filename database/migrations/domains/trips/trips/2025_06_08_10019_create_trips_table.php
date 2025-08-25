@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CarServiceLevel;
 use App\Models\Coupon;
 use App\Models\Driver;
 use App\Models\PaymentMethod;
@@ -42,13 +43,22 @@ return new class extends Migration
 
             $table->magellanPoint('current_location', 4326)->nullable();
 
-            $table->bigInteger('distance')->nullable();
-            $table->bigInteger('fare')->nullable();
+            $table->decimal('distance', 10, 2)->nullable();
+            $table->decimal('fare', 10, 2)->nullable();
+            $table->decimal('expected_fare', 10, 2)->nullable();
 
             $table->unsignedInteger('driver_search_radius')->default(5000); // meters (5km)
             $table->timestamp('search_started_at')->nullable();
             $table->timestamp('search_expires_at')->nullable();
 
+            $table->timestamp('approaching_pickup_notified_at')->nullable();
+            $table->foreignIdFor(CarServiceLevel::class)->onDelete('cascade');
+
+            $table->unsignedTinyInteger('rider_rating')->nullable()->after('fare')->check('rider_rating >= 1 AND rider_rating <= 5');
+            $table->text('rider_review_notes')->nullable()->after('rider_rating');
+            $table->unsignedTinyInteger('driver_rating')->nullable()->after('rider_review_notes')->check('driver_rating >= 1 AND driver_rating <= 5');
+            $table->text('driver_review_notes')->nullable()->after('driver_rating');
+            $table->bigInteger('tip_amount')->nullable()->after('driver_review_notes');
             $table->timestamps();
         });
     }

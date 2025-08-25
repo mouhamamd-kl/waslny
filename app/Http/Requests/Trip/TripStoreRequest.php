@@ -80,7 +80,6 @@ class TripStoreRequest extends BaseRequest
             'locations.*.location_order' => ['integer', 'min:1', 'distinct'],
             'locations.*.location_type' => [Rule::enum(LocationTypeEnum::class)],
 
-
             // 'locations.*.estimated_arrival_time' => [
             //     'required',
             //     function ($attribute, $value, $fail) {

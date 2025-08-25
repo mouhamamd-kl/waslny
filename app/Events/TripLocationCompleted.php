@@ -4,6 +4,8 @@ namespace App\Events;
 
 use App\Enums\channels\BroadCastChannelEnum;
 use App\Http\Resources\TripResource;
+use App\Models\Trip;
+use App\Models\TripLocation;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -17,13 +19,13 @@ class TripLocationCompleted implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
+    public Trip $trip;
     public $tripLocation;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(\App\Models\Trip $trip, \App\Models\TripLocation $tripLocation)
+    public function __construct(Trip $trip, TripLocation $tripLocation)
     {
         $this->trip = $trip;
         $this->tripLocation = $tripLocation;

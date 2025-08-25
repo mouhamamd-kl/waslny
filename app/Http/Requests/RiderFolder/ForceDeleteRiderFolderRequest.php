@@ -32,7 +32,7 @@ class ForceDeleteRiderFolderRequest extends BaseRequest
      *
      * @return void
      */
-    protected function prepareForValidation()
+    protected function handleRequestPreparation(): void
     {
         $this->merge([
             'force' => filter_var($this->force, FILTER_VALIDATE_BOOLEAN),

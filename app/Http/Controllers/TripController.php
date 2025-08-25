@@ -19,6 +19,8 @@ use App\Http\Requests\Trip\TripStoreRequest;
 use App\Http\Requests\Trip\TripUpdateRequest;
 use App\Http\Requests\Trip\TripRiderSearchRequest;
 use App\Http\Requests\Trip\TripFineRequest;
+use App\Http\Requests\Trip\CancelTripByRiderRequest;
+use App\Http\Requests\Trip\CancelTripByDriverRequest;
 use App\Http\Resources\TripResource;
 use App\Models\Trip;
 use App\Models\TripLocation;
@@ -173,22 +175,22 @@ class TripController extends Controller
     }
 
 
-    public function completeTrip($id)
-    {
-        try {
-            $trip = $this->trip_service->findById($id);
-            if (!$trip) {
-                return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
-            }
-            $trip->completeTrip();
+    // public function completeTrip($id)
+    // {
+    //     try {
+    //         $trip = $this->trip_service->findById($id);
+    //         if (!$trip) {
+    //             return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
+    //         }
+    //         $trip->completeTrip();
 
-            event(new TripCompleted($trip));
+    //         event(new TripCompleted($trip));
 
-            return ApiResponse::sendResponseSuccess([], 'Trip completed successfully.', 200);
-        } catch (Exception $e) {
-            return ApiResponse::sendResponseError($e->getMessage());
-        }
-    }
+    //         return ApiResponse::sendResponseSuccess([], 'Trip completed successfully.', 200);
+    //     } catch (Exception $e) {
+    //         return ApiResponse::sendResponseError($e->getMessage());
+    //     }
+    // }
 
     // Rider submits review (rating + notes + tip)
     public function submitRiderReview($id, SubmitRiderReviewRequest $request)
@@ -231,14 +233,14 @@ class TripController extends Controller
         return ApiResponse::sendResponseSuccess([], 'Review submitted successfully.');
     }
 
-    public function cancelTripByRider(Request $request)
+    public function cancelTripByRider(CancelTripByRiderRequest $request)
     {
         try {
-            $trip = $this->trip_service->findById($request->trip_id);
+            $trip = $this->trip_service->findById($request->validated('trip_id'));
             if (!$trip) {
                 return ApiResponse::sendResponseError(trans('messages.error.not_found', 'Trip not found'), 404);
             }
-            $trip->cancelByRider();
+            $this->trip_service->cancelTrip($trip, $trip->rider);
 
             event(new TripCancelledByRider($trip));
 
@@ -249,14 +251,14 @@ class TripController extends Controller
     }
 
 
-    public function cancelTripByDriver(Request $request)
+    public function cancelTripByDriver(CancelTripByDriverRequest $request)
     {
         try {
-            $trip = $this->trip_service->findById($request->trip_id);
+            $trip = $this->trip_service->findById($request->validated('trip_id'));
             if (!$trip) {
                 return ApiResponse::sendResponseError(trans('messages.error.not_found', 'Trip not found'), 404);
             }
-            $trip->cancelByDriver();
+            $this->trip_service->cancelTrip($trip, $trip->driver);
 
             event(new TripCancelledByDriver($trip));
 
@@ -289,10 +291,11 @@ class TripController extends Controller
                 'coupon_id' => $request->coupon_id,
                 'requested_time' => now(),
                 'payment_method_id' => $request->payment_method_id,
-                'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching)->id,
+                'trip_status_id' => $this->trip_status_service->search_trip_status(TripStatusEnum::Searching->value)->id,
                 'search_started_at' => now(),
                 'search_expires_at' => now()->addMinutes(5),
-                'car_service_level_id' => $request->car_service_level_id
+                'car_service_level_id' => $request->car_service_level_id,
+                'expected_fare' => $this->trip_service->calculateTripFare($request->validated())
             ];
 
             $trip = $this->trip_service->create($tripData);
@@ -300,6 +303,7 @@ class TripController extends Controller
             $this->trip_service->createTripLocations($trip, $request->locations);
 
             $trip = $this->trip_service->findTripById($trip->id);
+
             if ($trip) {
                 event(new TripCreated($trip));
             }
@@ -309,6 +313,7 @@ class TripController extends Controller
                 201
             );
         } catch (Exception $e) {
+            throw $e;
             \Illuminate\Support\Facades\Log::error('Trip creation failed: ' . $e->getMessage());
             return ApiResponse::sendResponseError(trans_fallback('messages.error.creation_failed', 'Trip Creation Failed'));
         }
@@ -392,7 +397,7 @@ class TripController extends Controller
     public function getTripFine(TripFineRequest $request)
     {
         try {
-            $fine = $this->trip_service->calculateTripFine($request->validated());
+            $fine = $this->trip_service->calculateTripFare($request->validated());
             return ApiResponse::sendResponseSuccess(['fine' => $fine], 'Trip fine calculated successfully.');
         } catch (Exception $e) {
             return ApiResponse::sendResponseError($e->getMessage());

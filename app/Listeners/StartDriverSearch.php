@@ -24,8 +24,8 @@ class StartDriverSearch implements ShouldQueue
     public function handle(TripCreated $event)
     {
         //TODO
-        // Log::info(['StartDriverSearch listener handled for trip ID: ' . $event->trip->id]);
-        // event(new TestNotification(['StartDriverSearch handled for trip ' . $event->trip->id]));
+        Log::info(['StartDriverSearch listener handled for trip ID: ' . $event->trip->id]);
+        event(new TestNotification(['StartDriverSearch handled for trip ' . $event->trip->id]));
         // trip_flow
         if ($event->trip != null) {
             FindDriverForTrip::dispatch($event->trip);

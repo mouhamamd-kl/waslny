@@ -20,5 +20,5 @@ use App\Models\Trip;
 use App\Notifications\TestFirebaseNotification;
 use Illuminate\Support\Facades\Redis;
 
-
-require __DIR__ . '/api/driver/DriverStatusRoute.php';
+require __DIR__ . '/api/config.php';
+// require __DIR__ . '/api/driver/DriverStatusRoute.php';

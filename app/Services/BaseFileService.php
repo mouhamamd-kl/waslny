@@ -147,7 +147,7 @@ class BaseFileService
         // dd($filePath . ' ' . $this->disk);
         try {
             // 4. Check file existence (optional - adds overhead)
-            if (!$storage->exists($filePath)) {
+            if (!$storage->fileExists($filePath)) {
                 throw new FileNotFoundException("File [$filePath] not found in disk [$this->disk]");
             }
 

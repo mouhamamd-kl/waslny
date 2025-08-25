@@ -13,7 +13,7 @@ class TripDriverLocationUpdated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $tripId;
+    public int $tripId;
     public $location;
 
     /**

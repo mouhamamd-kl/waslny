@@ -5,8 +5,9 @@ namespace App\Enums;
 enum TripStatusEnum: string
 {
     // Initial states
-    case Pending = 'pending';           // Scheduled for future
+    case Pending = 'pending';           // Awaiting driver assignment
     case Searching = 'searching';       // Actively looking for driver
+    case Scheduled = 'scheduled';       // Confirmed with a driver for a future time
 
         // Driver assignment flow
     case DriverAssigned = 'driver_assigned';  // Driver accepted trip
@@ -43,6 +44,12 @@ enum TripStatusEnum: string
                 self::RiderCancelled     // Rider cancels before search starts
             ]),
 
+            self::Scheduled => in_array($newStatus, [
+                self::DriverEnRoute,
+                self::RiderCancelled,
+                self::DriverCancelled
+            ]),
+
             // Driver search phase
             self::Searching => in_array($newStatus, [
                 self::DriverAssigned,    // Driver accepts
@@ -68,7 +75,8 @@ enum TripStatusEnum: string
             // Pickup arrival
             self::DriverArrived => in_array($newStatus, [
                 self::OnGoing,           // Trip starts
-                self::RiderCancelled     // Rider doesn't show up
+                self::RiderCancelled,     // Rider doesn't show up
+                self::DriverCancelled,   // Driver cancels en route
             ]),
 
             // Active trip

@@ -61,12 +61,10 @@ class Rider  extends Authenticatable implements Wallet
     protected static function booted()
     {
         static::deleting(function (Rider $rider) {
-            if ($rider->isForceDeleting()) {
-                $rider->savedLocations()->delete();
-                $rider->folders()->delete();
-                $rider->Ridercoupons()->delete();
-                $rider->suspensions()->delete();
-            }
+            $rider->savedLocations()->delete();
+            $rider->folders()->delete();
+            $rider->Ridercoupons()->delete();
+            $rider->suspensions()->delete();
         });
     }
 

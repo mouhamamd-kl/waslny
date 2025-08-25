@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('drivers', function (Blueprint $table) {
-            $table->timestamp('last_seen_at')->nullable()->after('rememberToken');
-        });
+        // Schema::table('drivers', function (Blueprint $table) {
+        //     $table->timestamp('last_seen_at')->nullable()->after('rememberToken');
+        // });
     }
 
     /**
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('drivers', function (Blueprint $table) {
-            $table->dropColumn('last_seen_at');
-        });
+        // Schema::table('drivers', function (Blueprint $table) {
+        //     $table->dropColumn('last_seen_at');
+        // });
     }
 };

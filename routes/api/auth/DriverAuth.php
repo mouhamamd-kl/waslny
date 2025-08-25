@@ -49,6 +49,7 @@ Route::prefix('driver')->name('driver.')->group(function () {
                 Route::get('/', [DriverProfileController::class, 'profile'])
                     ->name('show');
                 Route::post('update', [DriverProfileController::class, 'updateProfile']);
+               
             });
             Route::post('vehicle', [DriverProfileController::class, 'completeDriverCar'])
                 ->name('vehicle.store');

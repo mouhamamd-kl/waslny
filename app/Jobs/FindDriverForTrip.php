@@ -43,7 +43,25 @@ class FindDriverForTrip implements ShouldQueue, ShouldBeUnique
      */
     public function handle(TripService $tripService)
     {
-        if ($this->trip->status->name === TripStatusEnum::SearchTimeout->value) {
+        // The old implementation could work with stale data and had a potential null pointer exception.
+        // event(new TestNotification(['message' => "FindDriverForTrip job started for trip ID: {$this->trip->id}"]));
+        // if (!$this->trip) {
+        //     Log::info("Trip Not Found");
+        //     return;
+        // }
+
+        // New implementation: Refresh the trip model instance to ensure we have the latest data and handle null case.
+        if ($this->trip) {
+            $this->trip = $this->trip->fresh();
+        }
+
+        if (!$this->trip) {
+            Log::info("Trip not found or was deleted.");
+            return;
+        }
+
+        event(new TestNotification(['message' => "FindDriverForTrip job started for trip ID: {$this->trip->id}"]));
+        if ($this->trip->status->system_value !== TripStatusEnum::Searching->value) {
             Log::info("Trip ID: {$this->trip->id} has already timed out. Exiting job.");
             return;
         }
@@ -74,14 +92,19 @@ class FindDriverForTrip implements ShouldQueue, ShouldBeUnique
                 event(new TripUnavailable($this->trip, $otherDrivers));
             }
         } else {
-            if ($drivers->isEmpty()) {
-                Log::info("No drivers found for trip ID: {$this->trip->id}. Expanding search radius.");
-                $this->trip->increment('driver_search_radius', 1000); // Expand by 1km
+            if ($this->trip->search_expires_at->isPast()) {
+                Log::info("Search expired for trip ID: {$this->trip->id}.");
+                $this->trip->transitionTo(TripStatusEnum::SearchTimeout);
+                event(new SearchTimeout($this->trip));
+                return;
             }
+
+            event(new TestNotification(['message' => "No driver found for trip ID: {$this->trip->id}. Re-dispatching job."]));
+            Log::info("No drivers found for trip ID: {$this->trip->id}. Expanding search radius.");
+            $this->trip->increment('driver_search_radius', 1000); // Expand by 1km
             Log::info("No driver found for trip ID: {$this->trip->id}. Re-dispatching job.");
-            // Log::info('Queue worker output: ');
             $this->tries++;
-            self::dispatch($this->trip, $this->tries)->delay(now()->addSeconds($this->backoff()));
+            $this->release(now()->addSeconds($this->backoff()));
         }
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Events;
 
+use App\Http\Resources\DriverResource;
+use App\Http\Resources\TripResource;
 use App\Models\Driver;
 use App\Models\Trip;
 use Illuminate\Broadcasting\Channel;
@@ -16,8 +18,8 @@ class DriverPreAssigned implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
-    public $driver;
+    public Trip $trip;
+    public Driver $driver;
 
     /**
      * Create a new event instance.
@@ -56,8 +58,8 @@ class DriverPreAssigned implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'trip' => $this->trip,
-            'driver' => $this->driver,
+            'trip' => (new TripResource($this->trip->fresh()))->resolve(),
+            'driver' => (new DriverResource($this->driver->fresh()))->resolve(),
         ];
     }
 }

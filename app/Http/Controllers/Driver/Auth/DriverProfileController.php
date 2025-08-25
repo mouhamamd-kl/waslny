@@ -122,7 +122,8 @@ class DriverProfileController extends Controller
                     $file = $request[$type->value . '_photo'];
                     if ($file instanceof UploadedFile) {
                         // $driverCar->updatePhoto($type, $file);
-                        $data[$type->value . '_photo'] =  $assetService->uploadPublic($data['inside_photo']);
+                        $path = "{$driver->id}";
+                        $data[$type->value . '_photo'] =  $assetService->uploadPublic($data['inside_photo'], $path);
                     }
                 }
                 /** @var DriverCar $driverCar */ // Add PHPDoc type hint

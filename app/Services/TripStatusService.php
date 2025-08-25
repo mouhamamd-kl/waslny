@@ -61,7 +61,7 @@ class TripStatusService extends BaseService
     {
         try {
             /** @var TripType $tripType */ // Add PHPDoc type hint
-            return  $tripType = $this->search_first(['name' => $name]);
+            return  $tripType = $this->search_first(['system_value' => $name]);
         } catch (Exception $e) {
             throw new Exception('error Searching Trip Status' . $e);
         }

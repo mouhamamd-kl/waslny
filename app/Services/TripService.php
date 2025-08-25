@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\Rider;
 use App\Models\Trip;
 use App\Models\TripStatus;
+use App\Enums\DriverStatusEnum;
 use App\Enums\TripStatusEnum;
 use App\Events\SearchTimeout;
 use App\Events\TripAvailableForDriver;
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Clickbar\Magellan\Database\PostgisFunctions\ST;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -31,11 +33,13 @@ class TripService extends BaseService
 {
     protected array $relations = ['driver', 'rider', 'status', 'type', 'timeType', 'locations', 'paymentMethod', 'notifications', 'notifiedDrivers', 'riderCoupon', 'routeLocations'];
     protected DriverSearchService $driverSearchService;
+    protected CarServiceLevelService $carServiceLevelService;
 
-    public function __construct(CacheHelper $cache, DriverSearchService $driverSearchService)
+    public function __construct(CacheHelper $cache, DriverSearchService $driverSearchService, CarServiceLevelService $carServiceLevelService)
     {
         parent::__construct(new Trip, $cache);
         $this->driverSearchService = $driverSearchService;
+        $this->carServiceLevelService = $carServiceLevelService;
     }
 
     public function searchTrips(
@@ -138,6 +142,24 @@ class TripService extends BaseService
     //     ];
     // }
 
+    // in app/Services/TripService.php
+    public function cancelTrip(Trip $trip, Model $canceller): void
+    {
+        if ($canceller instanceof \App\Models\Rider) {
+            $trip->transitionTo(TripStatusEnum::RiderCancelled);
+        } elseif ($canceller instanceof \App\Models\Driver) {
+            $trip->transitionTo(TripStatusEnum::DriverCancelled);
+            if ($trip->driver) {
+                $trip->driver->setStatus(DriverStatusEnum::STATUS_AVAILABLE);
+            }
+        } else {
+            throw new \Exception("Invalid canceller type.");
+        }
+
+        $trip->save();
+    }
+
+
     private function notifyDriver(Trip $trip, Driver $driver): void
     {
         // Send push notification to driver
@@ -227,20 +249,59 @@ class TripService extends BaseService
     //     })->delay(now()->addSeconds(15));
     // }
 
-    public function calculateTripFine($data)
+    public function calculateTripFare($data)
     {
-        $carServiceLevel = app(CarServiceLevelService::class)->findById($data['car_service_level_id']);
+        $carServiceLevel = $this->carServiceLevelService->findById($data['car_service_level_id']);
         $pricing = $carServiceLevel->getCurrentPricing();
 
         $locations = $data['locations'];
-        $totalDistance = 0;
+        $totalDistanceInMeters = 0;
 
         for ($i = 0; $i < count($locations) - 1; $i++) {
-            $point1 = $locations[$i]['location'];
-            $point2 = $locations[$i + 1]['location'];
-            $totalDistance += $point1->distance($point2);
+            $point1 = Point::makeGeodetic($locations[$i]['location']['coordinates'][0], $locations[$i]['location']['coordinates'][1]);
+            $point2 = Point::makeGeodetic($locations[$i + 1]['location']['coordinates'][0], $locations[$i + 1]['location']['coordinates'][1]);
+
+            // $point1 = $locations[$i]['location'];
+            // $point2 = $locations[$i + 1]['location'];
+
+            // ST::distanceSphere returns distance in meters
+            $distanceInMeters = Trip::select(ST::distanceSphere($point1, $point2)->as('distance'))->first()->distance;
+
+            dd("Point 1: " . $point1->getLatitude() . ", " . $point1->getLongitude(), "Point 2: " . $point2->getLatitude() . ", " . $point2->getLongitude(), "Distance (meters): " . $distanceInMeters);
+
+            $totalDistanceInMeters += $distanceInMeters;
         }
 
-        return $pricing->calculateFare($totalDistance / 1000);
+        return $pricing->calculateFare($totalDistanceInMeters / 1000);
+    }
+
+    public function assignDriver(Trip $trip, Driver $driver): void
+    {
+        if ($trip->driver_id) {
+            throw new \Exception('Trip already has a driver assigned');
+        }
+
+        $trip->driver()->associate($driver);
+        $trip->transitionTo(TripStatusEnum::DriverAssigned);
+        $trip->save();
+
+        // Update driver status
+        $driver->setStatus(DriverStatusEnum::STATUS_ON_TRIP);
+    }
+
+    public function startTrip(Trip $trip): void
+    {
+        $trip->transitionTo(TripStatusEnum::OnGoing);
+        $trip->start_time = now();  // Still track specific timing if needed
+        $trip->save();
+    }
+
+    public function completeTrip(Trip $trip): void
+    {
+        $trip->transitionTo(TripStatusEnum::Completed);
+        $trip->end_time = now();
+        $trip->driver->setStatus(DriverStatusEnum::STATUS_AVAILABLE);
+        $trip->save();
+        // $trip->processPayment();
     }
 }

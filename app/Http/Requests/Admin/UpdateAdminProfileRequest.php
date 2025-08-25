@@ -78,7 +78,7 @@ class UpdateAdminProfileRequest extends BaseRequest
     /**
      * Prepare the data for validation.
      */
-    protected function prepareForValidation(): void
+    protected function handleRequestPreparation(): void
     {
         if ($this->has('new_password') && empty($this->current_password)) {
             $this->merge(['current_password' => '']);

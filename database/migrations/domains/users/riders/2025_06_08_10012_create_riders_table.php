@@ -36,6 +36,8 @@
                     ->check('rating >= 0 AND rating <= 5'); // PostgreSQL CHECK constraint
                 $table->timestamp('two_factor_expires_at')->nullable();
                 $table->char('two_factor_code', length: 6)->nullable();
+
+                $table->timestamp('last_seen_at')->nullable()->after('rememberToken');
                 // two_factor_code CHAR(6),
                 // two_factor_expires_at TIMESTAMP,
                 // two_factor_enabled BOOLEAN DEFAULT false,

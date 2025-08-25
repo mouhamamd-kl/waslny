@@ -41,7 +41,9 @@ class RiderService extends BaseService
     {
         try {
             $assetService = FileServiceFactory::makeForRiderProfile();
-            $assetService->delete($rider->profile_photo);
+            if ($rider->profile_photo && $rider->profile_photo != '') {
+                $assetService->delete($rider->profile_photo);
+            }
         } catch (Exception $e) {
             throw new Exception('error deleting assets for rider' . $e);
         }

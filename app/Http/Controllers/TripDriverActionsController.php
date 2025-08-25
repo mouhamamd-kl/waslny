@@ -8,6 +8,7 @@ use App\Events\DriverAssigned;
 use App\Helpers\ApiResponse;
 use App\Events\DriverLocationUpdated;
 use App\Events\DriverArrived;
+use App\Events\DriverEnRouteToPickup;
 use App\Events\TripStarted;
 use App\Events\TripLocationCompleted;
 use App\Events\TripCompleted;
@@ -60,7 +61,18 @@ class TripDriverActionsController extends Controller
             }
 
             $driver = auth('driver-api')->user();
-            $trip->assignDriver($driver);
+
+            // old code
+            //
+            // new code
+            // here check if the TripDriverNotification sent_at for the trip is passed 3 minutes to return
+            $notification = $trip->driverNotifications()->where('driver_id', $driver->id)->latest()->first();
+
+            if ($notification && $notification->sent_at->diffInMinutes(now()) > 3) {
+                return ApiResponse::sendResponseError(trans_fallback('messages.driver.error.no_longer_available', 'Trip is no longer available.'));
+            }
+            // $trip->assignDriver($driver);
+            $this->tripService->assignDriver($trip, $driver);
 
             $trip->load($this->tripService->getRelations());
             event(new DriverAssigned($trip, $driver));
@@ -82,14 +94,12 @@ class TripDriverActionsController extends Controller
             if (!$trip) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.error.not_found', 'Trip not found'), 404);
             }
-            if (!$trip->hasStatus(TripStatusEnum::DriverEnRoute)) {
-                $trip->transitionTo(TripStatusEnum::DriverEnRoute);
-            }
-
             $location = $request->validated();
-
+            if ($trip->hasStatus(TripStatusEnum::DriverAssigned) || $trip->hasStatus(TripStatusEnum::Scheduled)) {
+                $trip->transitionTo(TripStatusEnum::DriverEnRoute);
+                event(new DriverEnRouteToPickup($trip));
+            }
             event(new TripDriverLocationUpdated($trip->id, $location));
-
             return ApiResponse::sendResponseSuccess([], trans_fallback('messages.driver.location_updated', 'Location updated successfully.'), 200);
         } catch (Exception $e) {
             return ApiResponse::sendResponseError($e->getMessage());
@@ -127,11 +137,12 @@ class TripDriverActionsController extends Controller
             if ($trip->hasStatus(TripStatusEnum::OnGoing)) {
                 return ApiResponse::sendResponseError(trans_fallback('messages.trip.error.already_arrived', 'Driver has already arrived.'), 422);
             }
-            $trip->startTrip();
-
+            // Old implementation using the Trip model
+            // $trip->startTrip();
+            // New implementation using the TripService
+            $this->tripService->startTrip($trip);
             $trip->load($this->tripService->getRelations());
             event(new TripStarted($trip));
-
             return ApiResponse::sendResponseSuccess(
                 [],
                 trans_fallback('messages.trip.started', 'Trip started successfully.'),
@@ -216,12 +227,13 @@ class TripDriverActionsController extends Controller
             }
 
             $trip->dropoff_location->completeTripLocation();
-            $trip->completeTrip();
+            // Old implementation using the Trip model
+            // $trip->completeTrip();
+            // New implementation using the TripService
+            $this->tripService->completeTrip($trip);
             $trip->update(['fare' => $fare]);
             $trip->load($this->tripService->getRelations());
             event(new TripCompleted($trip));
-
-
             return ApiResponse::sendResponseSuccess([], trans_fallback('messages.trip.completed', 'Trip completed successfully.'), 200);
         } catch (Exception $e) {
             return ApiResponse::sendResponseError($e->getMessage());

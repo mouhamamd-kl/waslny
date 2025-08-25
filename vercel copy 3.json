@@ -1,0 +1,135 @@
+{
+    "version": 2,
+    "framework": null,
+    "functions": {
+        "api/worker.php": {
+            "runtime": "vercel-php@0.7.3",
+            "memory": 1024,
+            "maxDuration": 300
+        },
+        "api/schedule.php": {
+            "runtime": "vercel-php@0.7.3",
+            "memory": 1024,
+            "maxDuration": 300
+        },
+        "api/index2.php": {
+            "runtime": "vercel-php@0.7.3",
+            "memory": 1024,
+            "maxDuration": 300
+        },
+        "api/index.php": { "runtime": "vercel-php@0.7.3" }
+    },
+    "routes": [
+        {
+            "src": "/api/driver-search",
+            "dest": "/api/index2.php",
+            "methods": ["POST"]
+        },
+        {
+            "src": "/api/worker",
+            "dest": "/api/worker.php",
+            "methods": ["POST"]
+        },
+        {
+            "src": "/api/schedule",
+            "dest": "/api/schedule.php",
+            "methods": ["POST"]
+        },
+        { "src": "/(.*\\.\\w+)$", "dest": "/public/$1" },
+        { "src": "/(.*)", "dest": "/api/index.php" }
+    ],
+    "env": {
+        "APP_ENV": "local",
+        "APP_DEBUG": "true",
+        "APP_URL": "https://waslny-project.vercel.app/",
+        "ASSET_URL": "/",
+        "APP_CONFIG_CACHE": "/tmp/config.php",
+        "APP_EVENTS_CACHE": "/tmp/events.php",
+        "APP_PACKAGES_CACHE": "/tmp/packages.php",
+        "APP_ROUTES_CACHE": "/tmp/routes.php",
+        "APP_SERVICES_CACHE": "/tmp/services.php",
+        "VIEW_COMPILED_PATH": "/tmp",
+        "SESSION_SAME_SITE": "none",
+        "SESSION_SECURE_COOKIE": "true",
+        "CACHE_DRIVER": "array",
+        "SESSION_DRIVER": "cookie",
+        "APP_NAME": "waslny",
+        "APP_KEY": "base64:A+m6qeo+ZUuB0umZYlbysicjn1iswH0w+/qyZU+KC6o=",
+        "APP_TIMEZONE": "UTC",
+        "FRONTEND_URL": "https://waslny-project.vercel.app/",
+
+        "APP_LOCALE": "en",
+        "APP_FALLBACK_LOCALE": "en",
+        "APP_FAKER_LOCALE": "en_US",
+
+        "APP_MAINTENANCE_DRIVER": "file",
+        "PHP_CLI_SERVER_WORKERS": "4",
+
+        "BCRYPT_ROUNDS": "12",
+
+        "LOG_CHANNEL": "errorlog",
+        "LOG_STACK": "single",
+        "LOG_DEPRECATIONS_CHANNEL": "null",
+        "LOG_LEVEL": "debug",
+
+        "DB_CONNECTION": "pgsql",
+        "DB_HOST": "aws-0-us-east-2.pooler.supabase.com",
+        "DB_PORT": "6543",
+        "DB_DATABASE": "postgres",
+        "DB_USERNAME": "postgres.cqrlbirnwzidgerehsdq",
+        "DB_PASSWORD": "SswRGLfMbr9Cfc5",
+
+        "BROADCAST_CONNECTION": "pusher",
+        "QUEUE_CONNECTION": "redis",
+
+        "CACHE_STORE": "redis",
+        "CACHE_PREFIX": "",
+
+        "MEMCACHED_HOST": "127.0.0.1",
+
+        "REDIS_HOST": "tls://uncommon-marlin-27897.upstash.io",
+        "REDIS_PORT": "6379",
+        "REDIS_PASSWORD": "AWz5AAIjcDE0Y2I4MmI4ODdjNzU0MWI3YWRmNzNiMzUwOGI2NGU0ZnAxMA",
+
+        "MAIL_MAILER": "smtp",
+        "MAIL_HOST": "smtp.gmail.com",
+        "MAIL_PORT": "465",
+        "MAIL_USERNAME": "mouhammadk44@gmail.com",
+        "MAIL_PASSWORD": "tsvw ebaz oqtz teia",
+        "MAIL_ENCRYPTION": "tls",
+        "MAIL_FROM_ADDRESS": "mouhammadk44@gmail.com",
+        "MAIL_FROM_NAME": "test",
+
+        "TELEGRAM_BOT_TOKEN": "8404390559:AAEg_kOtrBmj5VnbBYA2GAi875vbtWZrk44",
+
+        "FILESYSTEM_DISK": "SUBAPASEPUBLIC",
+        "AWS_ACCESS_KEY_ID": "410ae4def58b3b22f7113b3def1f6294",
+        "AWS_SECRET_ACCESS_KEY": "fed8190d3f42f1532fdda7c801a749db84163c3907d39850dcc821ba7a6456fc",
+        "AWS_DEFAULT_REGION": "us-east-2",
+        "AWS_BUCKET": "waslny",
+        "AWS_ENDPOINT": "https://cqrlbirnwzidgerehsdq.supabase.co/storage/v1/s3/waslny",
+        "AWS_USE_PATH_STYLE_ENDPOINT": "true",
+        "AWS_DISK_PUBLIC": "supabase",
+        "AWS_DISK_PRIVATE": "supabase_private",
+
+        "AWS_BUCKET_PUBLIC": "waslny",
+        "AWS_BUCKET_PRIVATE": "waslny-private",
+        "SUPABASE_PROJECT_ID": "cqrlbirnwzidgerehsdq",
+        "SUPABASE_STORAGE_BUCKET": "waslny",
+
+        "VITE_APP_NAME": "${APP_NAME}",
+
+        "PUSHER_APP_ID": "1975841",
+        "PUSHER_APP_KEY": "f521d53f124667c40c3c",
+        "PUSHER_APP_SECRET": "f7275fd65088d4b7a8a8",
+        "PUSHER_APP_CLUSTER": "us2",
+        "useTLS": "true",
+
+        "DRIVER_SEARCH_URL": "https://waslny-self.vercel.app/api/api/test-htpp",
+        "DRIVER_SEARCH_SECRET": "base64:A+m6qeo+ZUuB0umZYlbysicjn1iswH0w+/qyZU+KC6o=",
+        "CRON_SECRET": "a3f8b2c1d5e7a9b4c8d6f2a1b5e9c3d8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2",
+        "FIREBASE_CREDENTIALS": "./firebase_credentials.json",
+
+        "TELESCOPE_ENABLED": "true"
+    }
+}

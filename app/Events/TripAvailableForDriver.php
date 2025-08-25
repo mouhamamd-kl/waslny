@@ -18,8 +18,8 @@ class TripAvailableForDriver implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
-    public $driverId;
+    public Trip $trip;
+    public int $driverId;
 
     /**
      * Create a new event instance.
@@ -67,7 +67,7 @@ class TripAvailableForDriver implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'trip' => (new TripResource($this->trip))->resolve(),
+            'trip' => (new TripResource($this->trip->fresh()))->resolve(),
             'sent_at' => now()->toISOString()
         ];
     }

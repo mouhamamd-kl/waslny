@@ -17,7 +17,7 @@ class TripTimeIsNow implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $trip;
+    public Trip $trip;
 
     /**
      * Create a new event instance.
